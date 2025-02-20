@@ -1,22 +1,37 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import Informathions from '../data/informathions.json'
+import { StyleSheet, Text, View, Button } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import informathions from '../data/informathions.json';
 
-const Detail = (idSelected, setProductSelected) => {
-    const [product, setProduct] = useState()
+const Detail = ({ idSelected, setProductSelected }) => { 
+    const [product, setProduct] = useState(null);
 
     useEffect(() => {
-        const productSelect = Informathions.find((product) => product.id === idSelected)
+        const productSelect = informathions.find(
+          (product) => product.id.toString() === idSelected.toString()
+        );
+        setProduct(productSelect);
+    }, [idSelected]);
 
-        setProduct(productSelect)
-    },[idSelected])
-  return (
-    <View>
-      <Text>Detail</Text>
-    </View>
-  )
-}
 
-export default Detail
+    return (
+        <View style={styles.container}>
+            <Button onPress={() => setProductSelected("")} title="Volver" />
+            {product ? (
+                <>
+                    <Text>{product.description}</Text>
+                    <Text>{product.title}</Text>
+                </>
+            ) : (
+                <Text>Cargando...</Text> 
+            )}
+        </View>
+    );
+};
 
-const styles = StyleSheet.create({})
+export default Detail;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  }
+});

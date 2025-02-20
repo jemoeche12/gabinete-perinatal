@@ -1,4 +1,3 @@
-import React, { Component } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
   Text,
@@ -9,30 +8,25 @@ import {
 } from "react-native";
 import fondoInicio from "../../assets/img/fondoInicio.jpg";
 import BotonTurnos from "../components/BotonTurnos";
-import BotonInformes from "../components/BotonTalleres";
 import BotonTalleres from "../components/BotonTalleres";
-import Recursos from "./Recursos";
 
-export class Home extends Component {
-  render() {
-    return (
-      <View style={styles.container}>
-        <ImageBackground
-          source={fondoInicio}
-          style={styles.background}
-          resizeMode="cover">
-          <Text style={styles.text}>
-            Nadie es ajeno a gestar. Se gesta el bebe y la familia que nace con
-            él.
-          </Text>
-          <BotonTurnos />
-          <BotonTalleres />
-        </ImageBackground>
-        <StatusBar style="auto" />
-      </View>
-    );
-  }
-}
+
+
+const Home = () => {
+  return (
+    <View style={styles.container}>
+      <ImageBackground source={fondoInicio} style={styles.background} resizeMode="cover">
+        <Text style={styles.text}>
+          Nadie es ajeno a gestar. Se gesta el bebé y la familia que nace con él.
+        </Text>
+        <BotonTurnos />
+        <BotonTalleres />
+      </ImageBackground>
+      <StatusBar style="auto" />
+    </View>
+  );
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

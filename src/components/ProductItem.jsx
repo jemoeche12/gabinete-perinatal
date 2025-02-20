@@ -1,11 +1,14 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import Card from './Card'
 
-const ProductItem = ({product}) => {
+const ProductItem = ({ product, setItemSelected = () =>{}, }) => {
     return (
         <Card>
-            <Text>{product}</Text>
+            <Pressable onPress={() =>setItemSelected(product.id)}>
+                <Text>{product}</Text>
+
+            </Pressable>
         </Card>)
 }
 

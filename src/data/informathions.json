@@ -1,22 +1,27 @@
 [{
     "title": "casa blanca",
     "id": 1,
-    "category": "informes"
+    "category": "informes",
+    "description": "libro casablanca"
 
 }, {
     "title": "cien leguas de viaje submarino",
     "id": 2,
-    "category": "noticias"
+    "category": "noticias",
+    "description": "libro casablanca"
 
 },
 {
     "title": "juvenilla",
     "id": 3,
-    "category": "test"
+    "category": "test",
+    "description": "libro casablanca"
 
 },
 {
     "title": "SOMBRAS DE GREY",
     "id": "4",
-    "category": "test"
+    "category": "test",
+    "description": "libro casablanca"
+
 }]

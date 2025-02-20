@@ -7,17 +7,21 @@ import Detail from './Detail'
 
 const Informacion = () => {
   const [categorySelected, setCategorySelected] = useState("")
-  const [itemSelected, setItemSelected] = useState("")
+  const [itemIdSelected, setItemIdSelected] = useState("")
 
   return (
     <View>
       {!categorySelected ? (
         <Recursos setCategorySelected={setCategorySelected} />
-      ) : !itemSelected ? (
-        <ItemListCategory categorySelected={categorySelected} setCategorySelected={setCategorySelected} setItemSelected={setItemSelected} />
+      ) : !itemIdSelected ? (
+        <ItemListCategory categorySelected={categorySelected}
+         setCategorySelected={setCategorySelected}
+          setItemIdSelected={setItemIdSelected} />
 
       ) : (
-        <Detail idSelected={itemSelected} setProductSelected={setItemSelected}/>
+        <Detail 
+        idSelected={itemIdSelected} 
+        setProductSelected={setItemIdSelected}/>
       )
       }
     </View>
