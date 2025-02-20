@@ -41,6 +41,7 @@ const styles = StyleSheet.create({
   },
   textInput:{
     color: "black",
+    borderColor: "black"
 
   }
 })
