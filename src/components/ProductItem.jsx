@@ -2,10 +2,10 @@ import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import Card from './Card'
 
-const ProductItem = ({ product, setItemSelected = () =>{}, }) => {
+const ProductItem = ({ navigation, product }) => {
     return (
         <Card>
-            <Pressable onPress={() =>setItemSelected(product.id)}>
+            <Pressable onPress={() => navigation.navigate('Detail', {productId: product.id})}>
                 <Text>{product}</Text>
 
             </Pressable>

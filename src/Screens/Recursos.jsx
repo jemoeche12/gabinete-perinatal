@@ -3,12 +3,13 @@ import React, { useState } from 'react'
 import categories from '../data/categories.json'
 import CategoryItem from '../components/CategoryItem'
 
-const Recursos = ({setCategorySelected}) => {
+const Recursos = ({navigation}) => {
   return (
-    <View>
+    <View style={styles.container}>
         <FlatList 
+        showsVerticalScrollIndicator={false}
         data={categories.sort()}
-        renderItem={({item}) => <CategoryItem category={item} selectedCategory={setCategorySelected}/>}
+        renderItem={({item}) => <CategoryItem category={item} navigation={navigation}/>}
         keyExtractor={element => element}/>
     </View>
   )
@@ -17,5 +18,7 @@ const Recursos = ({setCategorySelected}) => {
 export default Recursos
 
 const styles = StyleSheet.create({
-  
+  container:{
+    marginVertical: 40
+  }
 })

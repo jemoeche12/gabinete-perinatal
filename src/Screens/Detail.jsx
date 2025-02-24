@@ -8,31 +8,29 @@ import {
 import React, { useEffect, useState } from "react";
 import allProducts from "../data/informathions.json";
 
-const Detail = ({ idSelected, setProductSelected }) => {
+const Detail = ({ navigation, route }) => {
   const [product, setProduct] = useState(null);
+
+  const {productId: idSelected} = route.params
 
  
 
   useEffect(() => {
-    console.log("ID Seleccionado:", idSelected);
     const productSelected = allProducts.find(
-      (product) => product.id.toString() === idSelected.toString()
+      (product) => product.id === Number(idSelected)
     );
-    console.log("Producto encontrado:", productSelected);
     setProduct(productSelected);
   }, [idSelected]);
 
   return (
     <View style={styles.container}>
-      <Button onPress={() => setProductSelected("")} title="Volver" />
+      <Button onPress={() => navigation.goBack()} title="Volver" />
       {product ? (
         <>
           <Text style={styles.title}>{product.title}</Text>
           <Text style={styles.description}>{product.description}</Text>
         </>
-      ) : (
-        <Text>Cargando...</Text>
-      )}
+      ) : null}
     </View>
   );
 };

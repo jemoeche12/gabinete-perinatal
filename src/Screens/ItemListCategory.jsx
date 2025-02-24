@@ -4,10 +4,12 @@ import informathions from '../data/informathions.json';
 import ProductItem from '../components/ProductItem';
 import Search from '../components/Search';
 
-const ItemListCategory = ({ categorySelected = "", setCategorySelected = () => { } }) => {
+const ItemListCategory = ({ navigation, route }) => {
     const [busqueda, setBusqueda] = useState("");
     const [error, setError] = useState("");
     const [productsFiltered, setProductFiltered] = useState([]);
+
+    const {category: categorySelected} = route.params;
 
     useEffect(() => {
 
@@ -28,14 +30,14 @@ const ItemListCategory = ({ categorySelected = "", setCategorySelected = () => {
     return (
         <View style={styles.container}>
             <View style={styles.searchContainer}>
-                <Search onSearch={setBusqueda} goBack={() => setCategorySelected("")} />
+                <Search onSearch={setBusqueda} goBack={() => navigation.goBack()} />
                 {error ? <Text style={styles.errorText}>{error}</Text> : null}
             </View>
             <FlatList
                 data={productsFiltered}
                 renderItem={({ item }) => (
                     <View style={styles.productItem}>
-                        <ProductItem product={item.title} />
+                        <ProductItem product={item.title} navigation={navigation} />
                     </View>
                 )}
                 keyExtractor={(product) => product.id}

@@ -1,14 +1,14 @@
 [{
     "title": "casa blanca",
     "id": 1,
-    "category": "informes",
+    "category": "Apego",
     "description": "libro casablanca"
 
 }, {
-    "title": "cien leguas de viaje submarino",
+    "title": "Inodoro o Pelela",
     "id": 2,
-    "category": "noticias",
-    "description": "libro casablanca"
+    "category": "Inodoro o Pelela",
+    "description": "Es importante ofrecer un espacio adaptado al niño"
 
 },
 {
