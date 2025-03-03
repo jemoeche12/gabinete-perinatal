@@ -1,17 +1,18 @@
 import {
   StyleSheet,
-  Text,
   View,
   TouchableOpacity,
   onPressButton,
 } from "react-native";
 import React from "react";
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+
 
 const BotonTalleres = () => {
   return (
-    <TouchableOpacity  style={styles.container} onPress={onPressButton}>
+    <TouchableOpacity style={styles.container} onPress={onPressButton}>
       <View style={styles.button}>
-        <Text style={styles.buttonText}>TALLERES</Text>
+        <FontAwesome name="book" size={42} color="white" />
       </View>
     </TouchableOpacity>
   );
@@ -26,10 +27,10 @@ const styles = StyleSheet.create({
   },
   button: {
     marginBottom: 10,
-    width: 100,
-    height: 100,
-    alignItems:'center',
-    justifyContent:'center',
+    width: 70,
+    height: 70,
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: "rgb(181, 130, 140)",
     borderRadius: '50%',
     marginLeft: 50,
@@ -38,9 +39,9 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     textAlign: "center",
-    padding: 20,
+    padding: 10,
     color: "white",
-    fontWeight:'bold',
+    fontWeight: 'bold',
     fontSize: 15
   },
 });

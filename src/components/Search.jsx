@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useState } from 'react'
-import { TextInput } from 'react-native-web'
+import { TextInput } from 'react-native';
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
@@ -37,11 +37,15 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     gap: 10,
-    width: "100%"
+    width: "100%",
+    alignItems:"center"
   },
-  textInput:{
+  textInput: {
     color: "black",
-    borderColor: "black"
-
-  }
-})
+    borderColor: "black",
+    flex: 1, 
+    borderRadius: 5,
+    borderWidth: 1, 
+    padding: 10, 
+  },
+});

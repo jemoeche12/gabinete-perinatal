@@ -37,7 +37,7 @@ const ItemListCategory = ({ navigation, route }) => {
                 data={productsFiltered}
                 renderItem={({ item }) => (
                     <View style={styles.productItem}>
-                        <ProductItem product={item.title} navigation={navigation} />
+                        <ProductItem product={item} navigation={navigation} />
                     </View>
                 )}
                 keyExtractor={(product) => product.id}
@@ -82,8 +82,7 @@ const styles = StyleSheet.create({
     productText: {
         fontSize: 18,
         fontWeight: "bold",
-        color: "#B78270",
+        color: "black",
         fontFamily: "Roboto",
     },
 });
-
