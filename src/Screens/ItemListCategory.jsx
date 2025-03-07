@@ -1,31 +1,29 @@
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import informathions from '../data/informathions.json';
 import ProductItem from '../components/ProductItem';
 import Search from '../components/Search';
+import { useGetProductsByCategoryQuery } from '../services/recursosService';
+
 
 const ItemListCategory = ({ navigation, route }) => {
     const [busqueda, setBusqueda] = useState("");
     const [error, setError] = useState("");
     const [productsFiltered, setProductFiltered] = useState([]);
 
-    const {category: categorySelected} = route.params;
+    const { category: categorySelected } = route.params;
+    const { data: productsFetched = [], error: errorFetched, isLoading } = useGetProductsByCategoryQuery(categorySelected);
 
     useEffect(() => {
+        if (!isLoading) {
+            const productFilter = productsFetched.filter((product) =>
+                product.title.toLowerCase().includes(busqueda.toLowerCase())
+            );
+            setProductFiltered(productFilter);
+            setError("");
+        }
+    }, [busqueda, categorySelected, productsFetched, errorFetched]);
 
-        const productPreFiltered = informathions.filter((product) =>
-            product.category === categorySelected
-        );
 
-
-        const productFilter = productPreFiltered.filter((product) =>
-            product.title.toLowerCase().includes(busqueda.toLowerCase())
-        );
-
-
-        setProductFiltered(productFilter);
-        setError("");
-    }, [busqueda, categorySelected]);
 
     return (
         <View style={styles.container}>
@@ -52,7 +50,7 @@ export default ItemListCategory;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#F8EDE3", 
+        backgroundColor: "#F8EDE3",
         padding: 10,
     },
     searchContainer: {
@@ -69,7 +67,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     productItem: {
-        backgroundColor: "#E3CAA5", 
+        backgroundColor: "#E3CAA5",
         padding: 15,
         marginVertical: 8,
         marginHorizontal: 10,

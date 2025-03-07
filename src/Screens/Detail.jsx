@@ -4,40 +4,34 @@ import {
   Text,
   View,
   ImageBackground,
+  ScrollView
 } from "react-native";
-import React, { useEffect, useState } from "react";
-import allProducts from "../data/informathions.json";
+import React from "react";
+import { useGetProductByIdQuery } from "../services/recursosService";
+
+
 
 const Detail = ({ navigation, route }) => {
-  const [product, setProduct] = useState(null);
   const { productId: idSelected } = route.params;
-
-  useEffect(() => {
-    const productSelected = allProducts.find(
-      (product) => product.id === Number(idSelected)
-    );
-    setProduct(productSelected);
-  }, [idSelected]);
+  const { data: product } = useGetProductByIdQuery(idSelected);
+  
 
   return (
     <ImageBackground
       source={require("../../assets/img/aa.png")}
       style={styles.background}
     >
-      <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
         {product ? (
-          <>
+          <View style={styles.content}>
             <Text style={styles.title}>{product.title}</Text>
             <Text style={styles.description}>{product.description}</Text>
             <Pressable style={styles.btn} onPress={() => navigation.goBack()}>
-          <Text style={styles.btnText}>Volver</Text>
-        </Pressable>
-          </>
-        ) : (
-          null)}
-
-
-      </View>
+              <Text style={styles.btnText}>Volver</Text>
+            </Pressable>
+          </View>
+        ) : null}
+      </ScrollView>
     </ImageBackground>
   );
 };
@@ -54,7 +48,6 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(0,0,0,0.7)",
 
   },
   title: {
@@ -64,14 +57,22 @@ const styles = StyleSheet.create({
 
   },
   description: {
-    fontSize: 17,
+    fontSize: 18,
     textAlign: "center",
-    marginTop: -75,
-    paddingVertical: 80,
     color: "white",
-    width: "100%",
-    height: "100%",
-    fontWeight: "300"
+    fontWeight: "300",
+    marginBottom: 40,
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
+    backgroundColor: "rgba(0,0,0,0.7)",
+
+  }, content: {
+    padding: 20,
+    alignItems: "center",
   },
   btn: {
     borderRadius: 10,

@@ -7,6 +7,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 
 
@@ -36,7 +37,7 @@ const BottonTabNavigator = () => {
                     tabBarIcon: ({ focused }) => {
                         return (
                             <View>
-                                <FontAwesome name="book" size={28} color="black" />
+                                <Ionicons name="book-outline" size={28} color="black" />
                             </View>
                         )
                     }
@@ -46,7 +47,7 @@ const BottonTabNavigator = () => {
                     tabBarIcon: ({ focused }) => {
                         return (
                             <View>
-                                <Ionicons name="information-circle-outline" size={28} color="black" />
+                                <AntDesign name="folderopen" size={28} color="black" />
                             </View>
                         )
                     }
@@ -57,7 +58,18 @@ const BottonTabNavigator = () => {
                     tabBarIcon: ({ focused }) => {
                         return (
                             <View>
-                                <AntDesign name="user" size={28} color="black" />
+                                <AntDesign name="team" size={28} color="black" />
+                            </View>
+                        )
+                    }
+                }}
+            />
+            < Tab.Screen name="Test" component={Recursos}
+                options={{
+                    tabBarIcon: ({ focused }) => {
+                        return (
+                            <View>
+                                <MaterialCommunityIcons name="head-question-outline" size={28} color="black" />
                             </View>
                         )
                     }

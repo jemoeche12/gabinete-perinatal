@@ -5,14 +5,14 @@ import {
   onPressButton,
 } from "react-native";
 import React from "react";
-import FontAwesome from '@expo/vector-icons/FontAwesome';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 
 const BotonTalleres = () => {
   return (
     <TouchableOpacity style={styles.container} onPress={onPressButton}>
       <View style={styles.button}>
-        <FontAwesome name="book" size={42} color="white" />
+      <Ionicons name="book-outline" size={42} color="white" />
       </View>
     </TouchableOpacity>
   );
