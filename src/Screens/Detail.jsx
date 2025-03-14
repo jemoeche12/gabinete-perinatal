@@ -10,7 +10,6 @@ import React from "react";
 import { useGetProductByIdQuery } from "../services/recursosService";
 
 
-
 const Detail = ({ navigation, route }) => {
   const { productId: idSelected } = route.params;
   const { data: product } = useGetProductByIdQuery(idSelected);
@@ -53,7 +52,9 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     color: "white",
-    marginTop: -20
+    marginTop: -20,
+    textAlign: "center",
+    fontWeight: "bold",
 
   },
   description: {
@@ -62,6 +63,7 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "300",
     marginBottom: 40,
+    fontFamily: "Crafty"
   },
   scrollContainer: {
     flexGrow: 1,

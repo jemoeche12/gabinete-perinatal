@@ -12,9 +12,9 @@ const ProductItem = ({ navigation, product }) => {
         navigation.navigate('Detail', {productId: product.id})    }
 
     return (
-        <Card>
-            <Pressable onPress={handleNavigate}>
-                <Text>{product.title}</Text>
+        <Card style={styles.container}>
+            <Pressable  onPress={handleNavigate}>
+                <Text style={styles.title}>{product.title}</Text>
 
             </Pressable>
         </Card>)
@@ -22,4 +22,11 @@ const ProductItem = ({ navigation, product }) => {
 
 export default ProductItem
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+    container:{
+        backgroundColor: "#DEC3B2",
+    },
+    title:{
+        fontFamily: "Crafty"
+    }
+})

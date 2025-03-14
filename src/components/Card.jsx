@@ -3,7 +3,7 @@ import React from 'react'
 
 const Card = ({ children }) => {
     return (
-        <View>
+        <View >
             {
                 children
             }
@@ -13,4 +13,6 @@ const Card = ({ children }) => {
 
 export default Card
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+
+})

@@ -39,15 +39,15 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
   },
   text: {
-    fontFamily: "Roboto",
     color: "#B78270",
     fontSize: 30,
-    fontWeight: "bold",
-    marginTop: 30,
+    marginTop: 10,
     marginLeft: 10,
     borderRadius: 10,
     padding: 10,
     width: "50%",
+    fontFamily:"Crafty"
+
   },
   
 });

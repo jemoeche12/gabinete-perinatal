@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   productItem: {
-    backgroundColor: "#E3CAA5",
+    backgroundColor: "#DEC3B2",
     padding: 15,
     marginVertical: 8,
     marginHorizontal: 10,
@@ -54,11 +54,11 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 2, height: 2 },
     elevation: 3,
     alignItems: "center",
+
   },
   productText: {
     fontSize: 18,
-    fontWeight: "bold",
-    color: "#B78270",
-    fontFamily: "Roboto",
+    color: "black",
+    fontFamily:"Crafty"
   },
 });

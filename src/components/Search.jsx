@@ -20,9 +20,6 @@ const Search = ({ onSearch = () => { }, error = "", goBack = () => { } }) => {
       <Pressable onPress={() => onSearch(busqueda)}>
         <AntDesign name="search1" size={24} color="black" />
       </Pressable>
-      <Pressable onPress={() => setBusqueda("")}>
-        <FontAwesome5 name="eraser" size={24} color="black" />
-      </Pressable>
       <Pressable onPress={goBack}>
         <Entypo name="chevron-with-circle-left" size={24} color="black" />
       </Pressable>

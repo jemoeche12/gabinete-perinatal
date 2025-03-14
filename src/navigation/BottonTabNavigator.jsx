@@ -8,6 +8,7 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import TalleresStackNavigator from './TalleresStackNavigator'
 
 
 
@@ -32,7 +33,7 @@ const BottonTabNavigator = () => {
                     }
                 }}
             />
-            <Tab.Screen name="Talleres" component={Home}
+            <Tab.Screen name="Talleres" component={TalleresStackNavigator}
                 options={{
                     tabBarIcon: ({ focused }) => {
                         return (
@@ -86,7 +87,6 @@ const styles = StyleSheet.create({
         backgroundColor: "#F8EDE3",
         shadowColor: "black",
         elevation: 4,
-        borderRadius: 15,
         height: 60,
     },
 });
