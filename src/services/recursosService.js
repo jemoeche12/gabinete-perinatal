@@ -26,9 +26,12 @@ export const recursosApi = createApi({
             }
         }),
         getProfileImage: builder.query({
-            query: (localId) => `profileImages/${localId}.json`,
+            query: (localId) => {
+                return `profileImages/${localId}.json`;
+            },
             providesTags: ["profileImageGet"],
         }),
+        
         postProfileImage: builder.mutation({
             query: ({localId, image}) => ({
                 url: `profileImages/${localId}.json`,

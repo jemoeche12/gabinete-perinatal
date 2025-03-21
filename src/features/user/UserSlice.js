@@ -12,14 +12,20 @@ export const AuthSlice = createSlice({
     },
     reducers: {
         setUser: (state, { payload }) => {
-            state.value.user = payload.user
-            state.value.idToken = payload.idToken;
-            state.value.localId = payload.localId;
+            state.value.user = {
+                email: payload.user?.email || null,
+                name: payload.user?.name || null,
+                lastname: payload.user?.lastname || null,
+            };
+            state.value.idToken = payload.idToken || null;
+            state.value.localId = payload.localId || null;  
         },
+        
         clearUser: (state) => {
             state.value.user = null; 
             state.value.idToken = null;
             state.value.localId = null;
+            state.value.imageCamera = null;
         },
         setImageCamera: (state, { payload }) => {
             state.value.imageCamera = payload;

@@ -20,15 +20,18 @@ const Signup = ({ navigation }) => {
 
   useEffect(() => {
     if (result.isSuccess) {
-      dispatch(setUser({
-
-        user: { email: result.data.email },
-                idToken: result.data.idToken
-
-      }));
-
+        dispatch(setUser({
+            user: { 
+                email: result.data.email,
+                name: name,      
+                lastname: lastName  
+            },
+            idToken: result.data.idToken,
+            localId: result.data.localId  
+        }));
     }
-  }, [result])
+}, [result]);
+
 
   const onSubmit = () => {
     try {

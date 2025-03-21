@@ -6,8 +6,8 @@ import { useGetProfileImageQuery } from '../services/recursosService';
 
 const MyProfil = ({ navigation }) => {
 
-    const { imageCamera, localId } = useSelector(state => state.auth.value)
-    
+    const { imageCamera, localId, user } = useSelector(state => state.auth.value)
+
 
     const { data: imageFromBase } = useGetProfileImageQuery(localId)
 
@@ -31,7 +31,13 @@ const MyProfil = ({ navigation }) => {
                 onPress={tomarImagen}
                 title='Agregar Imagen'
             />
-            
+            <View style={styles.userInfoContainer}>
+                <Text style={styles.userInfoText}>Nombre: {user?.name || "No disponible"}</Text>
+                <Text style={styles.userInfoText}>Apellido: {user?.lastname || "No disponible"}</Text>
+                <Text style={styles.userInfoText}>Email: {user?.email || "No disponible"}</Text>
+            </View>
+
+
         </View>
     )
 }
@@ -60,6 +66,21 @@ const styles = StyleSheet.create({
         borderRadius: 50,
 
     },
-
+    userInfoContainer: {
+        marginTop: 20,
+        padding: 15,
+        borderRadius: 10,
+        shadowColor: "#000",
+        shadowOpacity: 0.1,
+        shadowOffset: { width: 0, height: 2 },
+        shadowRadius: 4,
+        elevation: 3,
+        alignItems: "center",
+    },
+    userInfoText: {
+        fontSize: 18,
+        color: "#333",
+        marginVertical: 15,
+    },
 
 })
