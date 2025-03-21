@@ -1,16 +1,21 @@
 import { StyleSheet} from 'react-native'
 import React from 'react'
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { NavigationContainer } from '@react-navigation/native'
 import BottonTabNavigator from './BottonTabNavigator';
+import AuthStackNavigator from './AuthStackNavigator';
+import { useSelector } from 'react-redux';
 
 
-const Stack = createNativeStackNavigator();
+
+
 
 const Navigator = () => {
+    const {user} = useSelector(state => state.auth.value)
+
+   
     return (
             <NavigationContainer>
-                <BottonTabNavigator />
+                {user ? <BottonTabNavigator /> : <AuthStackNavigator />}
             </NavigationContainer>
 
     )

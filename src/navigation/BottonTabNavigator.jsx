@@ -1,14 +1,14 @@
 import { StyleSheet, View } from 'react-native'
 import React from 'react'
 import Home from '../Screens/Home'
-import Recursos from '../Screens/Recursos'
 import RecursoStackNavigator from './RecursosStackNavigator'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import TalleresStackNavigator from './TalleresStackNavigator'
+import MyProfileStackNavigator from './MyProfileStackNavigator'
+import Test from '../Screens/Test'
 
 
 
@@ -54,18 +54,7 @@ const BottonTabNavigator = () => {
                     }
                 }} />
 
-            < Tab.Screen name="Perfil" component={Recursos}
-                options={{
-                    tabBarIcon: ({ focused }) => {
-                        return (
-                            <View>
-                                <AntDesign name="team" size={28} color="black" />
-                            </View>
-                        )
-                    }
-                }}
-            />
-            < Tab.Screen name="Test" component={Recursos}
+            < Tab.Screen name="Test" component={Test}
                 options={{
                     tabBarIcon: ({ focused }) => {
                         return (
@@ -76,6 +65,17 @@ const BottonTabNavigator = () => {
                     }
                 }}
             />
+                < Tab.Screen name="Perfil" component={MyProfileStackNavigator}
+                    options={{
+                        tabBarIcon: ({ focused }) => {
+                            return (
+                                <View>
+                                    <AntDesign name="team" size={28} color="black" />
+                                </View>
+                            )
+                        }
+                    }}
+                />
         </Tab.Navigator >
     )
 }

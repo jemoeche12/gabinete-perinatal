@@ -23,7 +23,8 @@
     "react-native-safe-area-context": "^5.2.0",
     "react-native-screens": "~4.4.0",
     "react-native-web": "~0.19.13",
-    "react-redux": "^9.2.0"
+    "react-redux": "^9.2.0",
+    "expo-image-picker": "~16.0.6"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

@@ -9,7 +9,7 @@ const Stack = createNativeStackNavigator();
 const TalleresStackNavigator = () => {  
     return (
         <Stack.Navigator screenOptions={{ headerShown: false, headerStyle: { backgroundColor: "#F8EDE3" } }}>
-            <Stack.Screen name= "RED DE APOYO PERINATAL DIGITAL" component={Talleres}/>
+            <Stack.Screen name= "TalleresStackNavigator" component={Talleres}/>
             <Stack.Screen name= "DetalleTalleres" component={DetalleTalleres}/>
         </Stack.Navigator>
     )

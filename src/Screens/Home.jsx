@@ -4,15 +4,20 @@ import {
   View,
   ImageBackground,
   StyleSheet,
-  
+
 } from "react-native";
 import fondoInicio from "../../assets/img/fondoInicio2.png";
 import BotonTurnos from "../components/BotonTurnos";
 import BotonTalleres from "../components/BotonTalleres";
+import Talleres from "./Talleres";
 
 
 
-const Home = () => {
+const Home = ({ navigation }) => {
+
+  const handleTalleres = () => {
+  }
+
   return (
     <View style={styles.container}>
       <ImageBackground source={fondoInicio} style={styles.background} >
@@ -20,12 +25,16 @@ const Home = () => {
           Nadie es ajeno a gestar. Se gesta el bebé y la familia que nace con él
         </Text>
         <BotonTurnos />
-        <BotonTalleres />
+        <BotonTalleres onPress={handleTalleres} />
       </ImageBackground>
       <StatusBar style="auto" />
     </View>
   );
 };
+
+
+
+export default Home;
 
 const styles = StyleSheet.create({
   container: {
@@ -33,8 +42,8 @@ const styles = StyleSheet.create({
   },
   background: {
     flex: 1,
-    height: "100%", 
-    justifyContent: "flex-start", 
+    height: "100%",
+    justifyContent: "flex-start",
     alignItems: "flex-start",
     resizeMode: "cover",
   },
@@ -46,10 +55,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     width: "50%",
-    fontFamily:"Crafty"
+    fontFamily: "Crafty"
 
   },
-  
-});
 
-export default Home;
+});

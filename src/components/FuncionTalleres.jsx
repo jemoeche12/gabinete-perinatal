@@ -15,10 +15,10 @@ const FuncionTalleres = () => {
 
                 ¿Cómo participar?{"\n"}{"\n"}
 
-                1️⃣ Elige el taller que más te interese.{"\n"}{"\n"}
-                2️⃣ Inscríbete y accede al enlace del taller en vivo.{"\n"}{"\n"}
-                3️⃣ Selecciona en el calendario el horario de tu sesión personalizada.{"\n"}{"\n"}
-                4️⃣ Disfruta de un espacio de aprendizaje y acompañamiento con una psicóloga perinatal.
+                1️ - Elige el taller que más te interese.{"\n"}{"\n"}
+                2️ - Inscríbete y accede al enlace del taller en vivo.{"\n"}{"\n"}
+                3️ - Selecciona en el calendario el horario de tu sesión personalizada.{"\n"}{"\n"}
+                4️ - Disfruta de un espacio de aprendizaje y acompañamiento con una psicóloga perinatal.
             </Text>
         </View>
     )
@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
         color: "black",
         marginTop: 30,
         textAlign: "center",
-        fontWeight: "bold",
+        fontFamily: "Crafty",
         padding: 20,
 
     },

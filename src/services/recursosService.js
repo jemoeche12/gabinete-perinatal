@@ -2,7 +2,9 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { baseUrl } from "../databases/realTimeDataBase";
 
 export const recursosApi = createApi({
+    reducerPath: "recursosApi",
     baseQuery: fetchBaseQuery({ baseUrl: baseUrl }),
+    tagTypes: ["profileImageGet"],
     endpoints: (builder) => ({
         getCategories: builder.query({
             query: () => "categories.json",
@@ -22,9 +24,23 @@ export const recursosApi = createApi({
                     return responseTransformed[0]
                 }  return null;
             }
+        }),
+        getProfileImage: builder.query({
+            query: (localId) => `profileImages/${localId}.json`,
+            providesTags: ["profileImageGet"],
+        }),
+        postProfileImage: builder.mutation({
+            query: ({localId, image}) => ({
+                url: `profileImages/${localId}.json`,
+                method: "PUT",
+                body: {
+                    image:image
+                }
+            }),
+            invalidatesTags: ["profileImageGet"],
         })
     })
 })
 
 
-export const { useGetCategoriesQuery, useGetProductsByCategoryQuery, useGetProductByIdQuery } = recursosApi;
+export const { useGetCategoriesQuery, useGetProductsByCategoryQuery, useGetProductByIdQuery, useGetProfileImageQuery, usePostProfileImageMutation } = recursosApi;
