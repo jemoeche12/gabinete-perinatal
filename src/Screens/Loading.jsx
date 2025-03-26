@@ -21,7 +21,7 @@ const LoadingScreen = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <ImageBackground source={fondoInicio} style={styles.background} >
-                <Text style={styles.appName}>Bienvenidos a la red de Psicologia Perinatal</Text>
+                <Text style={styles.appName}>Bienvenidos a tu red Perinatal Digital</Text>
                 <ActivityIndicator size="large" color="#B78270" style={styles.loader} />
             </ImageBackground>
         </View>

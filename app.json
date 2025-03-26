@@ -4,25 +4,32 @@
     "slug": "gabinete-perinatal",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/IconApp2.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "image": "./assets/IconApp2.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#ffffff",
+      "imageSize": [
+        500,
+        500
+      ]
     },
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/IconApp2.png",
         "backgroundColor": "#ffffff"
       }
     },
     "web": {
-      "favicon": "./assets/favicon.png"
-    }
+      "favicon": "./assets/IconApp2.png"
+    },
+    "plugins": [
+      "expo-sqlite"
+    ]
   }
 }

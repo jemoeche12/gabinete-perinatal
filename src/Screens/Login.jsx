@@ -19,8 +19,13 @@ const Login = ({ navigation }) => {
   useEffect(() => {
     if (result.isSuccess) {
       dispatch(setUser({
-        user: result.data.email,
-        idToken: result.data.idToken
+        user: { email: result.data.email,
+          name: result.data.name,
+          lastname: result.data.lastname
+        },
+        localId: result.data.localId,
+        idToken: result.data.idToken,
+
       }))
 
     }
@@ -33,9 +38,9 @@ const Login = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.form}>
-        <Text style={styles.title}>Bienvenido</Text>
-        <InputForm label={"email"} onChange={setEmail} error={errorMail} />
-        <InputForm label={"password"} onChange={setPassword} error={errorPassword} isSecure={true} />
+        <Text style={styles.title}>Bienvenida/o</Text>
+        <InputForm label={"Email"} onChange={setEmail} error={errorMail} />
+        <InputForm label={"Contraseña"} onChange={setPassword} error={errorPassword} isSecure={true} />
         <SubmitButton onPress={onSubmit} title="Iniciar Sesion" />
         <Pressable style={styles.button} onPress={() => navigation.navigate("Signup")}>
           <Text style={styles.buttonText}>Registrarse</Text>

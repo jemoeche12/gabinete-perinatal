@@ -32,9 +32,9 @@ const MyProfil = ({ navigation }) => {
                 title='Agregar Imagen'
             />
             <View style={styles.userInfoContainer}>
-                <Text style={styles.userInfoText}>Nombre: {user?.name || "No disponible"}</Text>
-                <Text style={styles.userInfoText}>Apellido: {user?.lastname || "No disponible"}</Text>
-                <Text style={styles.userInfoText}>Email: {user?.email || "No disponible"}</Text>
+                <Text style={styles.userInfoText}>Nombre: {user.name}</Text>
+                <Text style={styles.userInfoText}>Apellido: {user.lastname}</Text>
+                <Text style={styles.userInfoText}>Email: {user.email}</Text>
             </View>
 
 
@@ -76,6 +76,8 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 3,
         alignItems: "center",
+        width: "75%",
+        height: "auto"
     },
     userInfoText: {
         fontSize: 18,
