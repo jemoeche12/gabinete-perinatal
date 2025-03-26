@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { useSignInMutation } from "../services/authService";
 import { setUser } from "../features/user/UserSlice";
 import SubmitButton from "../components/SubmitButton";
+import { useDB } from "../hooks/useDB";
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -13,16 +14,25 @@ const Login = ({ navigation }) => {
   const [errorPassword, setErrorPassword] = useState("");
 
   const dispatch = useDispatch()
+  const {insertSession} = useDB()
 
   const [triggerSignIn, result] = useSignInMutation()
 
   useEffect(() => {
-    if (result.isSuccess) {
+    if (result?.data && result.isSuccess) {
+      (async() =>{
+        try{
+          const response = await insertSession({
+            email: result.data.email,
+            localId: result.data.localId,
+            token: result.data.idToken
+          })
+        }catch(error){
+          alert(error)
+        }
+      })()
       dispatch(setUser({
-        user: { email: result.data.email,
-          name: result.data.name,
-          lastname: result.data.lastname
-        },
+        email: result.data.email,
         localId: result.data.localId,
         idToken: result.data.idToken,
 

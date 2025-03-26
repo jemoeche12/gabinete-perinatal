@@ -1,18 +1,29 @@
 import { StyleSheet, Image, View, Text } from 'react-native'
 import React from 'react'
 import AddButton from '../components/AddButton'
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useGetProfileImageQuery } from '../services/recursosService';
+import { useDB } from '../hooks/useDB';
+import { clearUser } from '../features/user/UserSlice';
 
 const MyProfil = ({ navigation }) => {
 
     const { imageCamera, localId, user } = useSelector(state => state.auth.value)
 
-
     const { data: imageFromBase } = useGetProfileImageQuery(localId)
+    const {truncateSessionTable} = useDB()
+    const dispatch = useDispatch()
 
     const tomarImagen = () => {
         navigation.navigate("ImagenSeleccionada")
+    }
+    const cerrarSesion = async () =>{
+       try{
+        const response = await truncateSessionTable()
+        dispatch(clearUser())
+       } catch(error){
+        alert(error)
+       }
     }
 
     const imageProfileDefault = "../../assets/img/imageProfile2.png"
@@ -31,13 +42,8 @@ const MyProfil = ({ navigation }) => {
                 onPress={tomarImagen}
                 title='Agregar Imagen'
             />
-            <View style={styles.userInfoContainer}>
-                <Text style={styles.userInfoText}>Nombre: {user.name}</Text>
-                <Text style={styles.userInfoText}>Apellido: {user.lastname}</Text>
-                <Text style={styles.userInfoText}>Email: {user.email}</Text>
-            </View>
-
-
+            
+            <AddButton onPress={cerrarSesion} title="Cerrar Sesion" />
         </View>
     )
 }

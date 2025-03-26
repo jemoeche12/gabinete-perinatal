@@ -5,6 +5,7 @@ import SubmitButton from '../components/SubmitButton';
 import { useDispatch } from 'react-redux';
 import { useSignUpMutation } from '../services/authService';
 import { setUser } from '../features/user/UserSlice';
+import { useDB } from '../hooks/useDB';
 
 const Signup = ({ navigation }) => {
   const [name, setName] = useState("");
@@ -14,23 +15,31 @@ const Signup = ({ navigation }) => {
   const [errorMail, setErrorMail] = useState("");
   const [errorPassword, setErrorPassword] = useState("");
 
+  const {insertSession} = useDB()
   const dispatch = useDispatch()
 
   const [triggerSignUp, result] = useSignUpMutation()
 
   useEffect(() => {
-    if (result.isSuccess) {
-        dispatch(setUser({
-            user: { 
-                email: result.data.email,
-                name: name,      
-                lastname: lastName  
-            },
-            idToken: result.data.idToken,
-            localId: result.data.localId  
-        }));
+    if (result?.data && result.isSuccess) {
+      (async() =>{
+        try{
+          const response = await insertSession({
+           email: result.data.email,
+           localId: result.data.localId,
+           token: result.data.idToken
+          })
+        } catch(error){
+          alert(error)
+        }
+      })()
+      dispatch(setUser({
+        email: result.data.email,
+        idToken: result.data.idToken,
+        localId: result.data.localId
+      }));
     }
-}, [result]);
+  }, [result]);
 
 
   const onSubmit = () => {
@@ -54,10 +63,10 @@ const Signup = ({ navigation }) => {
     <View style={styles.container}>
       <View style={styles.form}>
         <Text style={styles.title}>Registro</Text>
-        <InputForm  label={"Nombre"} onChange={setName} />
-        <InputForm  label={"Apellido"} onChange={setLastName} />
-        <InputForm  label={"Email"} onChange={setEmail} error={errorMail} />
-        <InputForm 
+        <InputForm label={"Nombre"} onChange={setName} />
+        <InputForm label={"Apellido"} onChange={setLastName} />
+        <InputForm label={"Email"} onChange={setEmail} error={errorMail} />
+        <InputForm
           label={"Contraseña"}
           onChange={setPassword}
           error={errorPassword}
@@ -97,7 +106,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     fontFamily: 'Crafty',
   },
-  
+
   sub: {
     color: '#555',
     fontSize: 16,

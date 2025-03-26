@@ -1,11 +1,11 @@
 import * as SQLite from "expo-sqlite";
-export const useDb = () => {
+export const useDB = () => {
   const openDatabase = async () => {
     const db = await SQLite.openDatabaseSync("sessions.db")
     return db;
   };
 
-  const initDb = async () => {
+  const initDB = async () => {
     const db = await openDatabase();
     const sql = `CREATE TABLE IF NOT EXISTS sessions (localId TEXT PRIMARY KEY NOT NULL, email TEXT NOT NULL, token TEXT NOT NULL);`;
     const res = await db.execAsync(sql)
@@ -36,7 +36,7 @@ export const useDb = () => {
   };
 
   return {
-    initDb,
+    initDB,
     insertSession,
     getSession,
     truncateSessionTable,
