@@ -1,4 +1,4 @@
-import { StyleSheet, Image, View, Text } from 'react-native'
+import { StyleSheet, Image, View } from 'react-native'
 import React from 'react'
 import AddButton from '../components/AddButton'
 import { useDispatch, useSelector } from 'react-redux';
@@ -42,7 +42,6 @@ const MyProfil = ({ navigation }) => {
                 onPress={tomarImagen}
                 title='Agregar Imagen'
             />
-            
             <AddButton onPress={cerrarSesion} title="Cerrar Sesion" />
         </View>
     )

@@ -8,9 +8,9 @@ import React from "react";
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 
-const BotonTalleres = () => {
+const BotonTalleres = ({onPress}) => {
   return (
-    <TouchableOpacity style={styles.container} onPress={onPressButton}>
+    <TouchableOpacity style={styles.container} onPress={onPress}>
       <View style={styles.button}>
       <Ionicons name="book-outline" size={42} color="white" />
       </View>

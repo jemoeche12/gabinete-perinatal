@@ -9,14 +9,13 @@ import {
 import fondoInicio from "../../assets/img/fondoInicio2.png";
 import BotonTurnos from "../components/BotonTurnos";
 import BotonTalleres from "../components/BotonTalleres";
-import Talleres from "./Talleres";
+import { useNavigation } from "@react-navigation/native";
 
 
 
 const Home = ({ navigation }) => {
 
-  const handleTalleres = () => {
-  }
+ 
 
   return (
     <View style={styles.container}>
@@ -25,7 +24,7 @@ const Home = ({ navigation }) => {
           Nadie es ajeno a gestar. Se gesta el bebé y la familia que nace con él
         </Text>
         <BotonTurnos />
-        <BotonTalleres onPress={handleTalleres} />
+        <BotonTalleres onPress={() =>{}} />
       </ImageBackground>
       <StatusBar style="auto" />
     </View>

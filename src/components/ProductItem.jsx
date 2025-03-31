@@ -15,7 +15,6 @@ const ProductItem = ({ navigation, product }) => {
         <Card style={styles.container}>
             <Pressable  onPress={handleNavigate}>
                 <Text style={styles.title}>{product.title}</Text>
-
             </Pressable>
         </Card>)
 }

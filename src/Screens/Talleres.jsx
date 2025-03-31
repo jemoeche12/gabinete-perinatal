@@ -2,14 +2,17 @@ import { ImageBackground, ScrollView, StyleSheet, Text, } from 'react-native'
 import React from 'react'
 import FuncionTalleres from '../components/FuncionTalleres'
 import fondo from '../../assets/img/fondo5.jpg'
+import AddButton from '../components/AddButton'
 
 const Talleres = ({ navigation }) => {
+    
     return (
         <ImageBackground source={fondo} style={styles.background}>
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 <Text style={styles.title}>Te damos la bienvenida a la sección TALLERES de  Red de Apoyo Perinatal Digital, un espacio diseñado para acompañarte en el camino de la maternidad y paternidad con información especializada y un espacio de escucha profesional.</Text>
                 <FuncionTalleres />
-            </ScrollView>
+                <AddButton title="Ir a Talleres" onPress={() => navigation.navigate('ListTalleres')} />
+                </ScrollView>
         </ImageBackground>
 
     )

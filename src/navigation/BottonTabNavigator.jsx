@@ -6,9 +6,9 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import TalleresStackNavigator from './TalleresStackNavigator'
 import MyProfileStackNavigator from './MyProfileStackNavigator'
 import Test from '../Screens/Test'
+import TalleresStackNavigator from './TalleresStackNavigator'
 
 
 
