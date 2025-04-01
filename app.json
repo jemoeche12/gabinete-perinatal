@@ -23,13 +23,19 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/IconApp2.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.jemoeche.gabineteperinatal"
     },
     "web": {
       "favicon": "./assets/IconApp2.png"
     },
     "plugins": [
       "expo-sqlite"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "f8ca6ed0-f2ae-4da6-bf46-f376b65fd201"
+      }
+    }
   }
 }
