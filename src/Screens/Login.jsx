@@ -50,7 +50,8 @@ const Login = ({ navigation }) => {
       <View style={styles.form}>
         <Text style={styles.title}>Bienvenida/o</Text>
         <InputForm label={"Email"} onChange={setEmail} error={errorMail} />
-        <InputForm label={"Contraseña"} onChange={setPassword} error={errorPassword} isSecure={true} />
+        <InputForm label={"Contraseña"} onChange={setPassword} error={errorPassword} isSecure={true} placeholder={"Mínimo 6 caracteres"}
+        />
         <SubmitButton onPress={onSubmit} title="Iniciar Sesion" />
         <Pressable style={styles.button} onPress={() => navigation.navigate("Signup")}>
           <Text style={styles.buttonText}>Registrarse</Text>
@@ -98,6 +99,11 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#fff",
+    fontSize: 18,
+    fontFamily: "Crafty",
+  },
+  placeholder: {
+    color: "black",
     fontSize: 18,
     fontFamily: "Crafty",
   },

@@ -68,6 +68,7 @@ const Signup = ({ navigation }) => {
         <InputForm label={"Email"} onChange={setEmail} error={errorMail} />
         <InputForm
           label={"Contraseña"}
+          placeholder={"Mínimo 6 caracteres"}
           onChange={setPassword}
           error={errorPassword}
           isSecure={true}

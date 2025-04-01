@@ -1,7 +1,7 @@
 import { StyleSheet, Text, TextInput, View } from 'react-native'
 import React, { useState } from 'react'
 
-const InputForm = ({ onChange, label, error = "", isSecure = false }) => {
+const InputForm = ({ onChange, placeholder, label, error = "", isSecure = false }) => {
   const [input, SetInput] = useState("");
 
   const handleChangeText = (text) => {
@@ -18,6 +18,7 @@ const InputForm = ({ onChange, label, error = "", isSecure = false }) => {
         style={styles.textInput}
         value={input}
         onChangeText={handleChangeText}
+        placeholder={placeholder}
         secureTextEntry={isSecure} />
         {error ? <Text style={styles.error}>{error}</Text> : null}
     </View>
