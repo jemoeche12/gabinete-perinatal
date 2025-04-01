@@ -15,6 +15,9 @@ import { useNavigation } from "@react-navigation/native";
 
 const Home = ({ navigation }) => {
 
+  const manejoTaller = () => {
+    navigation.navigate("Talleres")
+  }
  
 
   return (
@@ -23,8 +26,7 @@ const Home = ({ navigation }) => {
         <Text style={styles.text}>
           Nadie es ajeno a gestar. Se gesta el bebé y la familia que nace con él
         </Text>
-        <BotonTurnos />
-        <BotonTalleres onPress={() =>{}} />
+      <BotonTalleres style={styles.button} title="TALLERES" onPress={manejoTaller} />
       </ImageBackground>
       <StatusBar style="auto" />
     </View>
@@ -54,7 +56,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     width: "50%",
-    fontFamily: "Crafty"
+    fontFamily: "Crafty",
+    marginBottom: "35%",
 
   },
 

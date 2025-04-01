@@ -13,7 +13,7 @@ const LoadingScreen = ({ navigation }) => {
     useEffect(() => {
         const timer = setTimeout(() => {
             navigation.replace("Login");
-        }, 5000);
+        }, 6000);
         return () => clearTimeout(timer)
     }, [navigation])
 

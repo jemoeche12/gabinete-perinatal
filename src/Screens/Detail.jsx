@@ -17,7 +17,7 @@ const Detail = ({ navigation, route }) => {
 
   return (
     <ImageBackground
-      source={require("../../assets/img/aa.png")}
+      source={require("../../assets/img/fondoRecurso.png")}
       style={styles.background}
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>

@@ -12,18 +12,17 @@ const DetailTalleres = ({ route, navigation }) => {
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <View style={styles.content}>
-        <Text style={styles.title}>{taller.titulo}</Text>
-        <Text style={styles.description}>{taller.objetivo}</Text>
-          <View style={styles.modalidad}>
-            <Text style={styles.modalidadText}>Dia: {taller.modalidad.dia}</Text>
-            <Text style={styles.modalidadText}>Formato: {taller.modalidad.formato}</Text>
-            <Text style={styles.modalidadText}>Acompañamiento: {taller.modalidad.acompañamiento}</Text>
-          </View>
-        <Pressable style={styles.button} onPress={() => navigation.goBack()}>
-          <Text style={styles.buttonText}>Volver</Text>
-        </Pressable>
+      <Text style={styles.title}>{taller.titulo}</Text>
+      <Text style={styles.description}>{taller.objetivo}</Text>
+      <Text style={styles.contenidos}>{taller.contenidos}</Text>
+      <View style={styles.modalidad}>
+        <Text style={styles.modalidadText}>Dia: {taller.modalidad.dia}</Text>
+        <Text style={styles.modalidadText}>Formato: {taller.modalidad.formato}</Text>
+        <Text style={styles.modalidadText}>Acompañamiento: {taller.modalidad.acompañamiento}</Text>
       </View>
+      <Pressable style={styles.button} onPress={() => navigation.goBack()}>
+        <Text style={styles.buttonText}>Volver</Text>
+      </Pressable>
     </ScrollView>
   );
 };
@@ -35,6 +34,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     padding: 16,
     backgroundColor: '#F8EDE3',
+    width: '100%',
   },
   content: {
     flex: 1,
@@ -46,6 +46,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 16,
   },
+  contenidos: {
+    fontSize: 18,
+    textAlign: 'center',
+    marginBottom: 16,
+    fontFamily: 'Crafty',
+    padding: 10,
+  },
   description: {
     fontSize: 16,
     textAlign: 'center',
@@ -54,10 +61,14 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   button: {
-    backgroundColor: '#007BFF',
+    backgroundColor: '#E6C6B7',
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,
+    width: '80%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: "10%"
   },
   buttonText: {
     color: '#fff',
@@ -67,15 +78,15 @@ const styles = StyleSheet.create({
   list: {
     flexGrow: 1,
   },
-  modalidad:{
+  modalidad: {
     padding: 10,
     marginVertical: 18,
-    marginHorizontal: 10,
+    width: "100%",
     gap: 10,
     fontFamily: "Crafty",
-    fontSize: 16
+    fontSize: 16,
   },
-  modalidadText:{
+  modalidadText: {
     fontSize: 18,
     color: "black",
     fontFamily: "Crafty"

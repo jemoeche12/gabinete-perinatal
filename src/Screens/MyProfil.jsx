@@ -11,19 +11,19 @@ const MyProfil = ({ navigation }) => {
     const { imageCamera, localId, user } = useSelector(state => state.auth.value)
 
     const { data: imageFromBase } = useGetProfileImageQuery(localId)
-    const {truncateSessionTable} = useDB()
+    const { truncateSessionTable } = useDB()
     const dispatch = useDispatch()
 
     const tomarImagen = () => {
         navigation.navigate("ImagenSeleccionada")
     }
-    const cerrarSesion = async () =>{
-       try{
-        const response = await truncateSessionTable()
-        dispatch(clearUser())
-       } catch(error){
-        alert(error)
-       }
+    const cerrarSesion = async () => {
+        try {
+            const response = await truncateSessionTable()
+            dispatch(clearUser())
+        } catch (error) {
+            alert(error)
+        }
     }
 
     const imageProfileDefault = "../../assets/img/imageProfile2.png"
@@ -43,7 +43,12 @@ const MyProfil = ({ navigation }) => {
                 title='Agregar Imagen'
             />
             <AddButton onPress={cerrarSesion} title="Cerrar Sesion" />
+            <Image style={styles.imagen}
+                source={require("../../assets/IconApp3.png")}
+                resizeMode="cover"
+            />
         </View>
+
     )
 }
 
@@ -89,5 +94,9 @@ const styles = StyleSheet.create({
         color: "#333",
         marginVertical: 15,
     },
+    imagen:{
+        height: 300,
+        width: 300,
+    }
 
 })

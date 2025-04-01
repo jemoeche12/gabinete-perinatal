@@ -2,17 +2,18 @@ import {
   StyleSheet,
   View,
   TouchableOpacity,
-  onPressButton,
+  Text,
 } from "react-native";
 import React from "react";
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 
-const BotonTalleres = ({onPress}) => {
+const BotonTalleres = ({ title, onPress }) => {
   return (
     <TouchableOpacity style={styles.container} onPress={onPress}>
       <View style={styles.button}>
-      <Ionicons name="book-outline" size={42} color="white" />
+        <Ionicons name="book-outline" size={42} color="#B78270" />
+        <Text style={styles.buttonText}>{title}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -26,22 +27,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   button: {
-    marginBottom: 10,
-    width: 70,
-    height: 70,
+    width: 95,
+    height: 95,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: "rgb(181, 130, 140)",
-    borderRadius: '50%',
+    backgroundColor: "#E6C6B7",
+    borderRadius: 45,
     marginLeft: 50,
-    marginTop: 10,
-
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   buttonText: {
     textAlign: "center",
-    padding: 10,
-    color: "white",
-    fontWeight: 'bold',
-    fontSize: 15
+    color: "black",
+    fontFamily: "Crafty",
+    fontSize: 15,
+    color: "#B78270",
   },
 });

@@ -1,9 +1,9 @@
 import { useDispatch } from 'react-redux';
-import { Pressable, StyleSheet, Text, View, Image } from 'react-native';
+import { Pressable, StyleSheet, Text, View, Image, ImageBackground } from 'react-native';
 import { setTalleresTitleSelected } from '../features/talleres/TalleresSlice';
 import Card from './Card';
 
-const TalleresByTitle = ({ titulo, navigation, id, modalidad }) => {
+const TalleresByTitle = ({ titulo, navigation, id, modalidad, beneficios }) => {
 
   const dispatch = useDispatch();
 
@@ -15,14 +15,14 @@ const TalleresByTitle = ({ titulo, navigation, id, modalidad }) => {
 
   return (
     <Card style={styles.container}>
-      <View>
-        <Pressable onPress={handlePress} style={styles.productItem}>
-          <Text style={styles.productTextTitle}>{titulo}</Text>
-          <Text style={styles.productText}>Dia: {modalidad.dia}</Text>
-          <Text style={styles.productText}>Acompañamiento: {modalidad.acompañamiento}</Text>
-          <Text style={styles.productText}>Formato: {modalidad.formato}</Text>
-        </Pressable>
-      </View>
+
+      <Pressable onPress={handlePress} style={styles.productItem}>
+        <Text style={styles.productTextTitle}>{titulo}</Text>
+        <Text style={styles.productText}>Beneficios: {beneficios}</Text>
+        <Text style={styles.productText}>Dia: {modalidad.dia}</Text>
+        <Text style={styles.productText}>Acompañamiento: {modalidad.acompañamiento}</Text>
+        <Text style={styles.productText}>Formato: {modalidad.formato}</Text>
+      </Pressable>
     </Card>
   );
 };
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     fontWeight: "bold",
     lineHeight: 26
-    
+
   },
   productText: {
     fontSize: 18,
@@ -62,5 +62,5 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     textAlign: "flex-start",
   },
-  
+
 });

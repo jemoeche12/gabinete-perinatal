@@ -4,10 +4,8 @@ import { useGetTallerByIdQuery } from '../services/talleresService';
 import CardTalleres from '../components/CardTalleres';
 
 const IdTalleres = ({ route, navigation }) => {
-  const { tallerId } = route.params || {};
-  console.log("ID del taller recibido:", tallerId);
-      const { data: taller, error, isLoading } = useGetTallerByIdQuery(tallerId);
-    console.log("Datos del taller:", taller);
+    const { tallerId } = route.params || {};
+    const { data: taller, error, isLoading } = useGetTallerByIdQuery(tallerId);
 
     if (isLoading) return <Text>Cargando taller...</Text>;
     if (error) return <Text>Error: {error.message}</Text>;
