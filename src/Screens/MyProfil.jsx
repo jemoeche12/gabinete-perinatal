@@ -44,7 +44,7 @@ const MyProfil = ({ navigation }) => {
             />
             <AddButton onPress={cerrarSesion} title="Cerrar Sesion" />
             <Image style={styles.imagen}
-                source={require("../../assets/IconApp3.png")}
+                source={require("../../assets/IconApp7.png")}
                 resizeMode="cover"
             />
         </View>
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
         borderColor: "black",
         borderRadius: 55,
         padding: 5,
-        marginTop: 50,
+        marginTop: 120,
         marginBottom: 30
     },
     image: {

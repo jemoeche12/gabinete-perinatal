@@ -1,13 +1,26 @@
 import { FlatList, StyleSheet, View, Text } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import CategoryItem from '../components/CategoryItem'
 import { useGetCategoriesQuery } from '../services/recursosService'
+import CustomHeader from '../components/CustomHeader'
+import MenuDesplegable from '../components/MenuDesplegable'
 
-const Recursos = ({ navigation }) => {
+const Recursos = ({ navigation, visible }) => {
+  const [isMenuVisible, setIsMenuVisible] = useState(visible)
+
   const { data } = useGetCategoriesQuery()
 
+  const toggleMenu = () =>{
+    setIsMenuVisible(!isMenuVisible)
+
+  }
+
+
   return (
-    <FlatList
+    <>
+    <CustomHeader onMenuPress={toggleMenu} />
+    {isMenuVisible && <MenuDesplegable onClose={toggleMenu} visible={isMenuVisible} />}
+     <FlatList
       style={styles.container}
       showsVerticalScrollIndicator={false}
       data={data}
@@ -34,6 +47,7 @@ const Recursos = ({ navigation }) => {
       }
       contentContainerStyle={styles.list}
     />
+    </>
   )
 }
 
@@ -51,7 +65,7 @@ const styles = StyleSheet.create({
     fontFamily: "Crafty",
     width: "90%",
     marginHorizontal: "5%",
-    fontSize: 16,
+    fontSize: 24,
   },
   list: {
     paddingBottom: 40,

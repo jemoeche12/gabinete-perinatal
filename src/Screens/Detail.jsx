@@ -8,18 +8,28 @@ import {
 } from "react-native";
 import React from "react";
 import { useGetProductByIdQuery } from "../services/recursosService";
+import { useState } from "react";
+import CustomHeader from "../components/CustomHeader";
+import MenuDesplegable from "../components/MenuDesplegable";
 
 
-const Detail = ({ navigation, route }) => {
+const Detail = ({ navigation, route, visible }) => {
   const { productId: idSelected } = route.params;
   const { data: product } = useGetProductByIdQuery(idSelected);
+  const [isMenuVisible, setIsMenuVisible] = useState(visible);
   
+    const toggleMenu = () => {
+      setIsMenuVisible(!isMenuVisible);
+    };
+
 
   return (
     <ImageBackground
       source={require("../../assets/img/fondoRecurso.png")}
       style={styles.background}
     >
+      <CustomHeader onMenuPress={toggleMenu} />
+      {isMenuVisible && <MenuDesplegable onClose={toggleMenu} visible={isMenuVisible} />}
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {product ? (
           <View style={styles.content}>

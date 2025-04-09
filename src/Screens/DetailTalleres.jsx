@@ -1,29 +1,44 @@
-import { StyleSheet, Text, View, Pressable, ScrollView } from 'react-native';
-import React from 'react';
+import { StyleSheet, Text, View, Pressable, ScrollView, Image } from 'react-native';
+import React, { useState } from 'react';
 import { useGetTallerByIdQuery } from '../services/talleresService';
+import iconImageLoading from '../../assets/IconApp2.png';
+import CustomHeader from '../components/CustomHeader';
+import MenuDesplegable from '../components/MenuDesplegable';
 
-const DetailTalleres = ({ route, navigation }) => {
+const DetailTalleres = ({ route, navigation, visible }) => {
   const { tallerId } = route.params;
   const { data: taller, isLoading, error } = useGetTallerByIdQuery(tallerId);
+  const [isMenuVisible, setIsMenuVisible] = useState(visible)
 
-  if (isLoading) return <Text>Cargando detalles del taller...</Text>;
+  if (isLoading) return (
+    <View style={styles.containImageLoading}>
+      <Image source={iconImageLoading} style={styles.iconImageLoading} />
+    </View>
+  );
   if (error) return <Text>Error: {error.message}</Text>;
   if (!taller) return <Text>No se encontró el taller.</Text>;
 
+  const toggleMenu = () => {
+    setIsMenuVisible(!isMenuVisible)
+  }
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <Text style={styles.title}>{taller.titulo}</Text>
-      <Text style={styles.description}>{taller.objetivo}</Text>
-      <Text style={styles.contenidos}>{taller.contenidos}</Text>
-      <View style={styles.modalidad}>
-        <Text style={styles.modalidadText}>Dia: {taller.modalidad.dia}</Text>
-        <Text style={styles.modalidadText}>Formato: {taller.modalidad.formato}</Text>
-        <Text style={styles.modalidadText}>Acompañamiento: {taller.modalidad.acompañamiento}</Text>
-      </View>
-      <Pressable style={styles.button} onPress={() => navigation.goBack()}>
-        <Text style={styles.buttonText}>Volver</Text>
-      </Pressable>
-    </ScrollView>
+    <>
+      <CustomHeader onMenuPress={toggleMenu} />
+      {isMenuVisible && <MenuDesplegable onClose={toggleMenu} visible={isMenuVisible} />}
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <Text style={styles.title}>{taller.titulo}</Text>
+        <Text style={styles.description}>{taller.objetivo}</Text>
+        <Text style={styles.contenidos}>{taller.contenidos}</Text>
+        <View style={styles.modalidad}>
+          <Text style={styles.modalidadText}>Dia: {taller.modalidad.dia}</Text>
+          <Text style={styles.modalidadText}>Formato: {taller.modalidad.formato}</Text>
+          <Text style={styles.modalidadText}>Acompañamiento: {taller.modalidad.acompañamiento}</Text>
+        </View>
+        <Pressable style={styles.button} onPress={() => navigation.goBack()}>
+          <Text style={styles.buttonText}>Volver</Text>
+        </Pressable>
+      </ScrollView>
+    </>
   );
 };
 
@@ -54,7 +69,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   description: {
-    fontSize: 16,
+    fontSize: 18,
     textAlign: 'center',
     marginBottom: 32,
     fontFamily: 'Crafty',
@@ -90,5 +105,21 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "black",
     fontFamily: "Crafty"
+  },
+  containImageLoading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    height: '100%',
+    width: '100%',
+  },
+  iconImageLoading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 250,
+    height: 250,
+    resizeMode: 'contain',
   }
 });

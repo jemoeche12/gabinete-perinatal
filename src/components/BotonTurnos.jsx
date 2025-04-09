@@ -1,17 +1,19 @@
 import {
   StyleSheet,
   View,
+  Text,
   onPressButton,
   TouchableOpacity,
 } from "react-native";
 import React from "react";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
-const BotonTurnos = () => {
+const BotonTurnos = ({ title }) => {
   return (
     <TouchableOpacity style={styles.container} onPress={onPressButton}>
       <View style={styles.button}>
-        <MaterialCommunityIcons name="calendar-text-outline" size={44} color="white" />
+        <MaterialCommunityIcons name="calendar-text-outline" size={44} color="#B78270" />
+        <Text style={styles.buttonText}>{title}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -25,22 +27,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   button: {
-    marginBottom: 10,
-    width: 70,
-    height: 70,
+    width: 95,
+    height: 95,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: "rgb(181, 130, 140)",
-    borderRadius: '50%',
-    marginLeft: 20,
-    marginTop: 120,
-    shadowOpacity: 0.5,
-    shadowColor: 'rgba(0, 0, 0, 0.5)',
-    shadowOffset: { width: "2", height: "3" },
-    shadowRadius: 1,
-    elevation: 4
-
-
+    backgroundColor: "#E6C6B7",
+    borderRadius: 45,
+    marginLeft: 30,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   icon: {
 
@@ -51,8 +52,10 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     textAlign: "center",
-    padding: 20,
-    color: "white",
-    fontWeight: 'bold'
+    color: "black",
+    fontFamily: "Crafty",
+    fontSize: 15,
+    color: "#B78270",
   },
-});
+},
+);

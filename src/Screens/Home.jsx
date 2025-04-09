@@ -4,32 +4,48 @@ import {
   View,
   ImageBackground,
   StyleSheet,
+  SafeAreaView,
 
 } from "react-native";
 import fondoInicio from "../../assets/img/fondoInicio2.png";
 import BotonTurnos from "../components/BotonTurnos";
 import BotonTalleres from "../components/BotonTalleres";
 import { useNavigation } from "@react-navigation/native";
+import CustomHeader from "../components/CustomHeader";
+import { useState } from "react";
+import MenuDesplegable from "../components/MenuDesplegable";
 
 
 
-const Home = ({ navigation }) => {
+const Home = ({ navigation, visible }) => {
+  const [isMenuVisible, setIsMenuVisible] = useState(visible);
+
+  const toggleMenu = () => {
+    setIsMenuVisible(!isMenuVisible);
+  };
 
   const manejoTaller = () => {
     navigation.navigate("Talleres")
   }
- 
+
 
   return (
-    <View style={styles.container}>
-      <ImageBackground source={fondoInicio} style={styles.background} >
-        <Text style={styles.text}>
-          Nadie es ajeno a gestar. Se gesta el bebé y la familia que nace con él
-        </Text>
-      <BotonTalleres style={styles.button} title="TALLERES" onPress={manejoTaller} />
-      </ImageBackground>
-      <StatusBar style="auto" />
-    </View>
+    <SafeAreaView style={{ flex: 1 }}>
+      <CustomHeader onMenuPress={toggleMenu} />
+      {isMenuVisible && <MenuDesplegable onClose={toggleMenu} visible={isMenuVisible} />}
+      <View style={styles.container}>
+        <ImageBackground source={fondoInicio} style={styles.background} >
+          <Text style={styles.text}>
+            Nadie es ajeno a gestar. Se gesta el bebé y la familia que nace con él
+          </Text>
+          <View style={styles.buttonContainer}>
+            <BotonTurnos style={styles.button} title="TURNOS" onPress={() => navigation.navigate("Turnos")} />
+            <BotonTalleres style={styles.button} title="TALLERES" onPress={manejoTaller} />
+          </View>
+        </ImageBackground>
+      </View>
+    </SafeAreaView>
+
   );
 };
 
@@ -48,6 +64,14 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     resizeMode: "cover",
   },
+  buttonContainer: {
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 10,
+    marginRight: "50%",
+    gap: 10,
+  },
   text: {
     color: "#B78270",
     fontSize: 30,
@@ -57,7 +81,7 @@ const styles = StyleSheet.create({
     padding: 10,
     width: "50%",
     fontFamily: "Crafty",
-    marginBottom: "35%",
+    marginBottom: "10%",
 
   },
 
