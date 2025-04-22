@@ -1,12 +1,12 @@
 import { StyleSheet, Text, TextInput, View } from 'react-native'
 import React, { useState } from 'react'
 
-const InputForm = ({ onChange, placeholder, label, error = "", isSecure = false }) => {
+const InputForm = ({ onChangeText, placeholder, label, error = "", isSecure = false }) => {
   const [input, SetInput] = useState("");
 
   const handleChangeText = (text) => {
     SetInput(text)
-    onChange(text)
+    onChangeText(text)
 
   }
 
@@ -15,7 +15,7 @@ const InputForm = ({ onChange, placeholder, label, error = "", isSecure = false 
     <View style={styles.container}>
       <Text style={styles.text}>{label}</Text>
       <TextInput
-        style={styles.textInput}
+        style={styles.input}
         value={input}
         onChangeText={handleChangeText}
         placeholder={placeholder}
@@ -27,4 +27,15 @@ const InputForm = ({ onChange, placeholder, label, error = "", isSecure = false 
 
 export default InputForm
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+   input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 10,
+    padding: 10,
+    fontSize: 16,
+    fontFamily: "Crafty",
+    backgroundColor: "#fff",
+    marginBottom: 10,
+  },
+})

@@ -2,18 +2,28 @@ import { StyleSheet, Text, View, Image, Pressable, SafeAreaView } from 'react-na
 import React from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import { useNavigation } from '@react-navigation/native';
 
 const CustomHeader = ({ onMenuPress }) => {
+  const navigation = useNavigation();
 
-  const handleNavigation = () => {
+  const handleNavigationContact = () => {
+    navigation.navigate('ContactoScreen');
+  }
+  const handleNavigationAbout = () => {
+    navigation.navigate('AboutApp');
   }
 
   return (
     <View style={styles.container}>
-      <Image source={require("../../assets/IconApp7.png")} style={styles.img} />
+      <Pressable onPress={() => navigation.navigate("Home")}>
+        <Image source={require("../../assets/IconApp7.png")} style={styles.img} />
+      </Pressable>
       <View style={styles.textContainer}>
-        <Text style={styles.text}>Acerca de</Text>
-        <Pressable onPress={handleNavigation} style={styles.text}>
+        <Pressable onPress={handleNavigationAbout} style={styles.text}>
+          <Text style={styles.text}>Acerca de</Text>
+        </Pressable>
+        <Pressable onPress={handleNavigationContact} style={styles.text}>
           <Text style={styles.text}>Contacto</Text>
         </Pressable>
         <Pressable onPress={onMenuPress} style={styles.drawerIcon}>
@@ -34,12 +44,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F8EDE3',
     height: 120,
+    width: '100%',
 
   },
   img: {
     width: 120,
     height: 120,
-    marginTop: 20,
+    marginRight: 5
   },
   textContainer: {
     flexDirection: 'row',
@@ -47,23 +58,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 20,
     marginTop: 20,
+    marginRight: 20
   },
   text: {
     fontFamily: "Crafty",
     fontSize: 18,
-    color: "black"
+    color: "black",
   },
-  menuContainer: {
-    position: 'absolute',
-    height: 350,
-    top: 60,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    zIndex: 1,
-  }
+
 })

@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, Pressable, ScrollView, Image } from 'react-native';
 import React, { useState } from 'react';
 import { useGetTallerByIdQuery } from '../services/talleresService';
-import iconImageLoading from '../../assets/IconApp2.png';
+import iconImageLoading from '../../assets/IconApp7.png';
 import CustomHeader from '../components/CustomHeader';
 import MenuDesplegable from '../components/MenuDesplegable';
 

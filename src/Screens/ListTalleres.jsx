@@ -3,7 +3,7 @@ import { FlatList, Pressable, Text, View, Image, StyleSheet } from 'react-native
 import TalleresByTitle from '../components/TalleresByTitle';
 import { useGetTalleresQuery } from '../services/talleresService';
 import { useState } from 'react';
-import iconImageLoading from '../../assets/IconApp2.png';
+import iconImageLoading from '../../assets/IconApp7.png';
 import CustomHeader from '../components/CustomHeader';
 import MenuDesplegable from '../components/MenuDesplegable';
 

@@ -15,7 +15,7 @@ const Search = ({ onSearch = () => { }, error = "", goBack = () => { } }) => {
     <View style={styles.container}>
       <TextInput style={styles.textInput}
         value={busqueda}
-        onChangeText={setBusqueda}
+        onChangeTextText={setBusqueda}
         placeholder='Search' />
       <Pressable onPress={() => onSearch(busqueda)}>
         <AntDesign name="search1" size={24} color="black" />

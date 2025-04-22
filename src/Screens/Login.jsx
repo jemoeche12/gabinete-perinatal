@@ -49,8 +49,8 @@ const Login = ({ navigation }) => {
     <View style={styles.container}>
       <View style={styles.form}>
         <Text style={styles.title}>Bienvenida/o</Text>
-        <InputForm label={"Email"} onChange={setEmail} error={errorMail} />
-        <InputForm label={"Contraseña"} onChange={setPassword} error={errorPassword} isSecure={true} placeholder={"Mínimo 6 caracteres"}
+        <InputForm label={"Email"} onChangeText={setEmail} error={errorMail} />
+        <InputForm label={"Contraseña"} onChangeText={setPassword} error={errorPassword} isSecure={true} placeholder={"Mínimo 6 caracteres"}
         />
         <SubmitButton onPress={onSubmit} title="Iniciar Sesion" />
         <Pressable style={styles.button} onPress={() => navigation.navigate("Signup")}>

@@ -1,4 +1,4 @@
-import { StyleSheet} from 'react-native'
+import { StyleSheet } from 'react-native'
 import React, { useEffect } from 'react'
 import { NavigationContainer } from '@react-navigation/native'
 import BottonTabNavigator from './BottonTabNavigator';
@@ -6,6 +6,7 @@ import AuthStackNavigator from './AuthStackNavigator';
 import { useDispatch, useSelector } from 'react-redux';
 import { useDB } from '../hooks/useDB';
 import { setUser } from '../features/user/UserSlice';
+import RootStackNavigator from './RootStackNavigator';
 
 
 
@@ -13,14 +14,14 @@ import { setUser } from '../features/user/UserSlice';
 
 
 const Navigator = () => {
-    const {user} = useSelector(state => state.auth.value)
-    const {getSession} = useDB()
-   const dispatch = useDispatch()
-    useEffect(() =>{
-        (async() =>{
-            try{
+    const { user } = useSelector(state => state.auth.value)
+    const { getSession } = useDB()
+    const dispatch = useDispatch()
+    useEffect(() => {
+        (async () => {
+            try {
                 const response = await getSession()
-                if(response){
+                if (response) {
                     const user = response;
                     dispatch(setUser({
                         email: user.email,
@@ -28,15 +29,15 @@ const Navigator = () => {
                         idToken: user.token
                     }))
                 }
-            }catch(error){
-                console.error(error)
+            } catch (error) {
+                alert(error)
             }
         })()
-    },[user])
+    }, [user])
     return (
-            <NavigationContainer>
-                {user ? <BottonTabNavigator /> : <AuthStackNavigator />}
-            </NavigationContainer>
+        <NavigationContainer>
+            {user ? <RootStackNavigator /> : <AuthStackNavigator />}
+        </NavigationContainer>
 
     )
 }

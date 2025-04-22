@@ -63,13 +63,13 @@ const Signup = ({ navigation }) => {
     <View style={styles.container}>
       <View style={styles.form}>
         <Text style={styles.title}>Registro</Text>
-        <InputForm label={"Nombre"} onChange={setName} />
-        <InputForm label={"Apellido"} onChange={setLastName} />
-        <InputForm label={"Email"} onChange={setEmail} error={errorMail} />
+        <InputForm label={"Nombre"} onChangeText={setName} />
+        <InputForm label={"Apellido"} onChangeText={setLastName} />
+        <InputForm label={"Email"} onChangeText={setEmail} error={errorMail} />
         <InputForm
           label={"Contraseña"}
           placeholder={"Mínimo 6 caracteres"}
-          onChange={setPassword}
+          onChangeText={setPassword}
           error={errorPassword}
           isSecure={true}
         />

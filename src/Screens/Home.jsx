@@ -17,15 +17,18 @@ import MenuDesplegable from "../components/MenuDesplegable";
 
 
 
-const Home = ({ navigation, visible }) => {
+const Home = ({ visible }) => {
   const [isMenuVisible, setIsMenuVisible] = useState(visible);
-
+  const navigation = useNavigation();
   const toggleMenu = () => {
     setIsMenuVisible(!isMenuVisible);
   };
 
   const manejoTaller = () => {
     navigation.navigate("Talleres")
+  }
+  const manejoTurnos = () => {
+    navigation.navigate("CalendarScreen")
   }
 
 
@@ -39,7 +42,7 @@ const Home = ({ navigation, visible }) => {
             Nadie es ajeno a gestar. Se gesta el bebé y la familia que nace con él
           </Text>
           <View style={styles.buttonContainer}>
-            <BotonTurnos style={styles.button} title="TURNOS" onPress={() => navigation.navigate("Turnos")} />
+            <BotonTurnos style={styles.button} title="TURNOS" onPress={manejoTurnos} />
             <BotonTalleres style={styles.button} title="TALLERES" onPress={manejoTaller} />
           </View>
         </ImageBackground>

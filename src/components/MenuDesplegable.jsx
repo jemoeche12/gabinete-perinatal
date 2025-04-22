@@ -1,27 +1,31 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, Text, Pressable, Image, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import RootStackNavigator from '../navigation/RootStackNavigator';
 
 const MenuDesplegable = ({ visible, onClose }) => {
+    const navigation = useNavigation();
     const slideAnim = useRef(new Animated.Value(300));
     const opacityAnim = useRef(new Animated.Value(0));
 
+
     useEffect(() => {
-        if(visible){
+        if (visible) {
             Animated.parallel([
                 Animated.timing(slideAnim.current, {
                     toValue: 0,
-                    duration: 500,
+                    duration: 400,
                     useNativeDriver: true,
                     easing: Easing.ease,
                 }),
                 Animated.timing(opacityAnim.current, {
                     toValue: 1,
-                    duration: 500,
+                    duration: 400,
                     useNativeDriver: true,
                     easing: Easing.ease,
                 }),
-            ]).start(); 
-        } else{
+            ]).start();
+        } else {
             Animated.parallel([
                 Animated.timing(slideAnim.current, {
                     toValue: 300,
@@ -31,14 +35,14 @@ const MenuDesplegable = ({ visible, onClose }) => {
                 }),
                 Animated.timing(
                     opacityAnim.current, {
-                        toValue: 0,
-                        duration: 400,
-                        useNativeDriver: true,
-                        easing: Easing.ease,
-                    }
+                    toValue: 0,
+                    duration: 400,
+                    useNativeDriver: true,
+                    easing: Easing.ease,
+                }
                 )
-            ]).start(({finished}) =>{
-                if(finished){
+            ]).start(({ finished }) => {
+                if (finished) {
                     onClose?.();
                 }
             });
@@ -54,12 +58,26 @@ const MenuDesplegable = ({ visible, onClose }) => {
                 },
             ]}
         >
-            <Image source={require('../../assets/IconApp8.png')} style={styles.imgIcon} />
-            <Text style={styles.menuItem}>Sobre Nosotros</Text>
-            <Text style={styles.menuItem}>Preguntas Frecuentes</Text>
-            <Text style={styles.menuItem}>Mis Talleres</Text>
-            <Text style={styles.menuItem}>Términos y Condiciones</Text>
-            <Text style={styles.menuItem}>Cerrar Sesion</Text>
+            <Image source={require('../../assets/IconApp7.png')} style={styles.imgIcon} />
+            
+            <Pressable onPress={() => navigation.navigate({name: "Main", params: { screen: "Home" } })}>
+                <Text style={styles.menuItem}>Inicio</Text>
+            </Pressable>
+            <Pressable onPress={() => navigation.navigate("SobreNosotros")}>
+                <Text style={styles.menuItem}>Sobre Nosotros</Text>
+            </Pressable>
+            <Pressable onPress={() => navigation.navigate("FaQ")}>
+                <Text style={styles.menuItem}>Preguntas Frecuentes</Text>
+            </Pressable>
+            <Pressable onPress={() => navigation.navigate("FaQ")}>
+                <Text style={styles.menuItem}>Mis Talleres</Text>
+            </Pressable>
+            <Pressable onPress={() => navigation.navigate("FaQ")}>
+                <Text style={styles.menuItem}>Términos y Condiciones</Text>
+            </Pressable>
+            <Pressable onPress={() => navigation.navigate("FaQ")}>
+                <Text style={styles.menuItem}>Cerrar Sesion</Text>
+            </Pressable>
             <Pressable onPress={() => onClose?.()} style={styles.closeButton}>
                 <Text style={styles.closeBtnText}>Cerrar Menú</Text>
             </Pressable>
@@ -85,8 +103,8 @@ const styles = StyleSheet.create({
     },
     closeButton: {
         position: 'absolute',
-        top: "90%",
-        right: 20,
+        top: "95%",
+        alignItems: 'center',
         padding: 10,
         backgroundColor: '#B78270',
         borderRadius: 5,
@@ -106,10 +124,11 @@ const styles = StyleSheet.create({
         fontFamily: "Crafty",
     },
     imgIcon: {
-        width: 200,
-        height: 200,
-        marginBottom: 20,
-        marginTop: -250,
+        width: 225,
+        height: 225,
+        marginBottom: 5,
+        marginTop: -200,
+        backgroundColor: "transparent",
     }
 });
 
