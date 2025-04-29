@@ -3,19 +3,19 @@ import {
   View,
   Text,
   onPressButton,
-  TouchableOpacity,
+  Pressable,
 } from "react-native";
 import React from "react";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
-const BotonTurnos = ({ title }) => {
+const BotonTurnos = ({ title, onPress }) => {
   return (
-    <TouchableOpacity style={styles.container} onPress={onPressButton}>
+    <Pressable style={styles.container} onPress={onPress}>
       <View style={styles.button}>
         <MaterialCommunityIcons name="calendar-text-outline" size={44} color="#B78270" />
         <Text style={styles.buttonText}>{title}</Text>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 

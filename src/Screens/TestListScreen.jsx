@@ -1,85 +1,44 @@
-import { ScrollView, StyleSheet, Text } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import TestComponent from '../components/TestComponent';
+import { StyleSheet, Text, View, FlatList, Pressable, ScrollView } from 'react-native';
 import CustomHeader from '../components/CustomHeader';
+import { useState } from 'react';
 import MenuDesplegable from '../components/MenuDesplegable';
+import React from 'react';
+import { useGetTestTituloQuery } from '../services/testService';
+import TestComponent from '../components/TestComponent';
 
-const TestListScreen = ({visible}) => {
-  const [respuestas, setRespuestas] = useState({});
-  const [isMenuVisible, setIsMenuVisible] = useState(visible);
+const TestListScreen = ({navigation, visible}) => {
+  const { data, error, isLoading } = useGetTestTituloQuery();
 
-  const toggleMenu = () => {
-    setIsMenuVisible(!isMenuVisible);
-  };  
-  const handleRespuesta = (index, option) => {
-    setRespuestas((prev) => ({
-      ...prev,
-      [index]: option,
-    }));
-  };
-
-  const questions = [
-    '1️⃣ ¿Con qué frecuencia te has sentido preocupada o ansiosa por el embarazo?',
-    '2️⃣ ¿Te has sentido abrumada por los cambios físicos y emocionales del embarazo?',
-    '3️⃣ ¿Sientes que puedes disfrutar de tu embarazo?',
-    '4️⃣ ¿Cómo describirías tu estado de ánimo en la última semana?',
-    '5️⃣ ¿Has sentido cambios en tu sueño o apetito que te preocupen?',
-    '6️⃣ ¿Te sientes acompañada y apoyada en tu embarazo?',
-    '7️⃣ ¿Tienes pensamientos negativos o miedos intensos sobre el embarazo o el parto?',
-    '8️⃣ ¿Cómo te sientes con respecto a tu cuerpo y los cambios físicos del embarazo?',
-    '9️⃣ ¿Cómo es tu conexión con tu bebé durante el embarazo?',
-    '🔟 ¿Cómo manejas el estrés diario durante el embarazo?',
-    '1️⃣1️⃣ ¿Has sentido falta de interés o placer en actividades que antes disfrutabas?',
-    '1️⃣2️⃣ ¿Has tenido pensamientos negativos sobre ti misma o sentimientos de culpa?',
-  ];
+  const [isMenuVisible, setMenuVisible] = useState(visible);
+  const toggleMenu = () => setMenuVisible(!isMenuVisible);
 
   return (
     <>
       <CustomHeader onMenuPress={toggleMenu} />
       {isMenuVisible && <MenuDesplegable onClose={toggleMenu} visible={isMenuVisible} />}
-      <ScrollView style={styles.container}>
-        <Text style={styles.titlePrincipal}>Test de Bienestar Emocional en el Embarazo {"\n"}{"\n"}
+      <FlatList
+        style={styles.container}
+        showsVerticalScrollIndicator={false}
+        data={data}
+        keyExtractor={(item, index) => index.toString() || item.toString()} 
+        renderItem={({ item }) => (
+          <TestComponent categoryTest={item} navigation={navigation} id={item.id} titulo={item.titulo} test={item}/>
+        )}
+        ListHeaderComponent={
+          <View style={styles.view}>
+            <Text style={styles.text}>
+              La gestación, el parto y la crianza son etapas llenas de desafíos y cambios. Para ayudarte en este camino, hemos desarrollado una serie de test diseñados para madres, padres y acompañantes emocionales, con el objetivo de brindarte un espacio de reflexión y autoconocimiento.{"\n"}{"\n"}
 
-          Objetivo: Evaluar el estado emocional de la embarazada y detectar signos de ansiedad, estrés o depresión.{"\n"}{"\n"}
-
-          Instrucciones: Responde según cómo te has sentido en la última semana.</Text>
-        {questions.map((question, index) => (
-          <TestComponent style={styles.title}
-            key={index}
-            title={question}
-            options={['Casi Nunca', 'Algunas Veces', 'Frecuentemente', 'Casi todo el tiempo']}
-            onSelect={(option) => handleRespuesta(index, option)}
-          />
-        ))}
-        <Text style={styles.description}>Interpretación del Test de Bienestar Emocional en el Embarazo{"\n"}{"\n"}
-
-          El resultado de este test no busca etiquetar ni diagnosticar, sino servir como una herramienta de exploración para conocer el estado emocional de la persona gestante y su vivencia del embarazo.{"\n"}{"\n"}
-
-          Cada respuesta del test tiene un puntaje asignado: {"\n"}{"\n"}
-          Opcion 1:            suma 1 punto{"\n"}{"\n"}
-          Opcion 2:            suma 2 puntos{"\n"}{"\n"}
-          Opcion 3:            suma 3 puntos{"\n"}{"\n"}
-          Opcion 4:            suma 4 puntos {"\n"}{"\n"}
-
-          Al finalizar el Test se suman los puntajes de todas las respuestas. {"\n"}{"\n"}
-          12-19 puntos → Bienestar emocional {"\n"}{"\n"}
-
-          🔹 Puntaje bajo: Puede indicar que la persona percibe estabilidad emocional y cuenta con estrategias para afrontar los cambios del embarazo. Aun así, es importante indagar si existen preocupaciones no expresadas o aspectos invisibilizados en su bienestar emocional.{"\n"}{"\n"}
+              ¿Cómo funcionan los test?
+              Cada test está enfocado en un aspecto clave de la experiencia perinatal. Puedes hacerlos en cualquier momento y tantas veces como desees. Al finalizar, recibirás una devolución con sugerencias y recursos que pueden ayudarte en tu camino. {"\n"}{"\n"}
 
 
-          20-29 puntos → Alerta moderada (dificultades emocionales que requieren atención){"\n"}{"\n"}
-
-          🔹 Puntaje medio: Sugiere que la persona está transitando su embarazo con algunas dificultades emocionales o preocupaciones. Es clave profundizar en cómo está viviendo su experiencia, qué apoyo tiene y qué estrategias puede fortalecer para mejorar su bienestar.{"\n"}{"\n"}
-
-
-          30-48 puntos → Alerta alta (posibles signos de ansiedad o depresión perinatal, se recomienda buscar apoyo profesional){"\n"}{"\n"}
-
-          🔹 Puntaje alto: Refleja que la persona podría estar experimentando emociones intensas, dificultades en la adaptación o miedos recurrentes. Es una oportunidad para abrir el espacio terapéutico desde la escucha empática, indagar en los factores que pueden estar influyendo y brindar herramientas que le permitan sentirse más acompañada y contenida.{"\n"}{"\n"}
-
-          El objetivo del acompañamiento psicológico perinatal no es reducir un puntaje, sino comprender la experiencia única de cada embarazo y ofrecer recursos personalizados para el bienestar de la persona gestante y su bebé.{"\n"}{"\n"}
-
-        </Text>
-      </ScrollView>
+              Recuerda: Estos test no reemplazan una evaluación profesional, pero pueden ser un primer paso para comprender mejor tu experiencia y recibir el apoyo adecuado si lo necesitas{"\n"}{"\n"}
+            </Text>
+          </View>
+        }
+        contentContainerStyle={styles.list}
+      />
     </>
   );
 };
@@ -88,20 +47,20 @@ export default TestListScreen;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: "#F8EDE3"
+    backgroundColor: "#F8EDE3",
+    flex: 1, 
   },
-  titlePrincipal: {
+  view: {
+    marginTop: 40,
+  },
+  text: {
     fontFamily: "Crafty",
+    width: "90%",
+    marginHorizontal: "5%",
     fontSize: 24,
-    textAlign: "center",
-    marginVertical: 25
   },
-  description: {
-    fontFamily: "Crafty",
-    marginTop: 20,
-    marginBottom: 20,
-    fontSize: 18
-  }
+  list: {
+    paddingBottom: 40,
+  },
+  
 });

@@ -22,8 +22,6 @@ const RootStackNavigator = () => {
             <Stack.Screen name="FaQ" component={FaqScreen} />
             <Stack.Screen name="SobreNosotros" component={SobreNosotros} />
             <Stack.Screen name="ContactoScreen" component={ContactoScreen} />
-            <Stack.Screen name="CalendarScreen" component={CalendarScreen} />
-
         </Stack.Navigator>
     )
 }

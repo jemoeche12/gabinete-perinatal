@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Home from '../Screens/Home'
 import TalleresStackNavigator from './TalleresStackNavigator'
 import CalendarScreen from '../Screens/CalendarScreen'
+import ModalForm from '../components/ModalForm'
 
 const HomeStackNavigator = () => {
   const Stack = createNativeStackNavigator()
@@ -15,7 +16,6 @@ const HomeStackNavigator = () => {
     }}>
       <Stack.Screen name='Home' component={Home} />
       <Stack.Screen name='Talleres' component={TalleresStackNavigator} options={{ headerBackVisible: false, headerShown: false }} />
-      <Stack.Screen name='CalendarScreen' component={CalendarScreen} options={{ headerBackVisible: false, headerShown: false }} />
     </Stack.Navigator>
   )
 }

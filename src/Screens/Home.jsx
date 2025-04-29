@@ -14,11 +14,13 @@ import { useNavigation } from "@react-navigation/native";
 import CustomHeader from "../components/CustomHeader";
 import { useState } from "react";
 import MenuDesplegable from "../components/MenuDesplegable";
+import ModalForm from "../components/ModalForm";
 
 
 
 const Home = ({ visible }) => {
   const [isMenuVisible, setIsMenuVisible] = useState(visible);
+  const [modalVisible, setModalVisible] = useState(false)
   const navigation = useNavigation();
   const toggleMenu = () => {
     setIsMenuVisible(!isMenuVisible);
@@ -27,10 +29,10 @@ const Home = ({ visible }) => {
   const manejoTaller = () => {
     navigation.navigate("Talleres")
   }
-  const manejoTurnos = () => {
-    navigation.navigate("CalendarScreen")
-  }
 
+const manejoTurnos = () =>{
+  setModalVisible(!modalVisible)
+}
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -43,6 +45,7 @@ const Home = ({ visible }) => {
           </Text>
           <View style={styles.buttonContainer}>
             <BotonTurnos style={styles.button} title="TURNOS" onPress={manejoTurnos} />
+            <ModalForm modalVisible={modalVisible} setModalVisible={setModalVisible}/>
             <BotonTalleres style={styles.button} title="TALLERES" onPress={manejoTaller} />
           </View>
         </ImageBackground>

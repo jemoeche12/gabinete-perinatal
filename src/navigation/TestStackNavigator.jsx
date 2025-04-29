@@ -1,10 +1,8 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import CustomHeader from '../components/CustomHeader';
 import TestListScreen from '../Screens/TestListScreen';
 import TestDetailScreen from '../Screens/TestDetailScreen';
-import ContactoScreen from '../Screens/ContactoScreen';
-import AboutApp from '../Screens/AboutApp';
+
 
 const TestStackNavigator = () => {
   const Stack = createNativeStackNavigator();

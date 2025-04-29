@@ -1,69 +1,45 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React, { useState } from 'react';
+import { StyleSheet, Text, View, Pressable } from 'react-native';
+import Card from './Card';
+import React from 'react';
+import { useDispatch } from 'react-redux';
+import { setCategoryTestSelected } from '../features/test/TestSlice';
 
-const TestComponent = ({ titlePrincipal, title, options = [], onSelect = () => { } }) => {
-    const [optionSelected, setOptionSelected] = useState(null);
-
-    const handleSelection = (option) => {
-        setOptionSelected(option);
-        onSelect(option);
+const TestComponent = ({ categoryTest, navigation, id, item }) => {
+    const dispatch = useDispatch();
+    const handleNavigation = () => {
+      dispatch(setCategoryTestSelected(id));
+      navigation.navigate("TestDetail", { id: id });
     };
-
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>{title}</Text>
-            {options.map((option, index) => (
-                <TouchableOpacity
-                    key={index}
-                    onPress={() => handleSelection(option)}
-                    style={[
-                        styles.option,
-                        optionSelected === option && styles.optionSelected,
-                    ]}
-                >
-                    <Text style={styles.optionText}>{option}</Text>
-                </TouchableOpacity>
-            ))}
-        </View>
+      <Card>
+        <Pressable style={styles.productItem} onPress={handleNavigation}>
+          <Text style={styles.productText} id={id} test={item}>{categoryTest}</Text>
+        </Pressable>
+      </Card>
     );
-};
+  };
+  
+
 
 export default TestComponent;
 
 const styles = StyleSheet.create({
-    container: {
-        marginBottom: 20,
-    },
-    titlePrincipal:{
-        fontFamily:"Crafty",
-        fontSize: 20,
-        textAlign: "center",
-        marginVertical: 25
-    },
-    title: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 16,
-
-    },
-    option: {
-        padding: 12,
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 8,
-        marginVertical: 8,
-        backgroundColor: '#fff',
-        fontFamily: "Crafty",
-
-    },
-    optionText: {
-        fontSize: 16,
-        fontFamily: "Crafty",
-        color: "black",
-        textAlign: "center"
-
-    },
-    optionSelected: {
-        backgroundColor: '#B78270',
-    },
+  productItem: {
+    backgroundColor: "#DEC3B2",
+    padding: 15,
+    marginVertical: 8,
+    marginHorizontal: 10,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 2, height: 2 },
+    elevation: 3,
+    alignItems: "center",
+  },
+  productText: {
+    fontSize: 18,
+    color: "black",
+    textAlign: "center",
+    fontFamily: "Crafty"
+  },
 });
