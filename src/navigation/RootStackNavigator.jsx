@@ -5,7 +5,6 @@ import BottonTabNavigator from './BottonTabNavigator'
 import AboutApp from '../Screens/AboutApp'
 import FaqScreen from '../Screens/FaqScreen'
 import ContactoScreen from '../Screens/ContactoScreen'
-import CalendarScreen from '../Screens/CalendarScreen'
 import SobreNosotros from '../Screens/SobreNosotros'
 
 const RootStackNavigator = () => {

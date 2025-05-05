@@ -3,8 +3,6 @@ import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Home from '../Screens/Home'
 import TalleresStackNavigator from './TalleresStackNavigator'
-import CalendarScreen from '../Screens/CalendarScreen'
-import ModalForm from '../components/ModalForm'
 
 const HomeStackNavigator = () => {
   const Stack = createNativeStackNavigator()

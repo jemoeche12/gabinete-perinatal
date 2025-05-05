@@ -1,47 +1,97 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, FlatList } from 'react-native';
 import React from 'react';
 import { useGetTestByIdQuery } from '../services/testService';
 
-const TestDetailScreen = ({ route }) => {
+const TestDetailScreen = ({ route, navigation }) => {
   const { id } = route.params;
-  console.log('ID recibido en TestDetailScreen:', id);
+  const { data, isLoading, error } = useGetTestByIdQuery(id);
 
-  const { data: test, isLoading, error } = useGetTestByIdQuery(id, { // <---- Cambié "tests" a "test"
-    onSuccess: (data) => {
-      console.log('Datos recibidos de la API (onSuccess):', data);
-      if (data?.id) {
-        console.log('Éxito - ID del test recibido de la API:', data.id);
-      } else if (data) {
-        console.log('Éxito - Datos recibidos de la API (sin propiedad id):', data);
-      } else {
-        console.log('Éxito - Datos recibidos de la API: null');
-      }
-    },
-  });
+  if (isLoading) return <Text style={styles.loading}>Cargando...</Text>;
+  if (error || !data) return <Text style={styles.error}>Error al cargar el test</Text>;
 
-  console.log('Valor de "test" después de la consulta:', test); // <---- Ahora logueamos "test"
-
-  if (isLoading) return <Text>Cargando...</Text>;
-  if (error) {
-    console.error('Error al cargar el test:', error);
-    return <Text>Ocurrió un error al cargar el test</Text>;
-  }
-
-  if (!test) { // <---- Verificamos si "test" existe (puede ser null si no se encuentra)
-    return <Text>No se encontró el test</Text>; // <---- Mensaje más apropiado
-  }
+  const preguntasArray = data.preguntas ? Object.values(data.preguntas) : [];
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>{test.titulo}</Text>
-      <Text style={styles.subTitle}>Objetivo:</Text>
-      <Text style={styles.text}>{test.interpretaciones?.objetivo}</Text>
-      <Text style={styles.subTitle}>Instrucciones:</Text>
-      <Text style={styles.text}>{test.instrucciones}</Text>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>{data.titulo}</Text>
+      <Text style={styles.description}>{data.objetivo}</Text>
+
+      <Text style={styles.subtitulo}>Preguntas:</Text>
+      <FlatList
+        data={preguntasArray}
+        keyExtractor={(item, index) => index.toString()} 
+        renderItem={({ item, index }) => (
+          <View style={styles.preguntaBox}>
+            <Text style={styles.pregunta}>{index + 1}. {item}</Text>
+          </View>
+        )}
+        scrollEnabled={false}
+      />
+
+
+      <Pressable
+        style={styles.boton}
+        onPress={() => navigation.navigate("TestStart", { id: testId })}
+      >
+        <Text style={styles.botonTexto}>Comenzar Test</Text>
+      </Pressable>
+
     </ScrollView>
   );
 };
 
 export default TestDetailScreen;
 
-// ... (estilos)
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: '#F8EDE3',
+    padding: 20,
+  },
+  loading: {
+    marginTop: 50,
+    fontSize: 18,
+    textAlign: 'center',
+  },
+  error: {
+    marginTop: 50,
+    fontSize: 18,
+    color: 'red',
+    textAlign: 'center',
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    fontFamily: 'Crafty',
+    marginBottom: 15,
+  },
+  description: {
+    fontSize: 18,
+    marginBottom: 20,
+  },
+  subtitulo: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginTop: 20,
+  },
+  preguntaBox: {
+    backgroundColor: '#DEC3B2',
+    padding: 12,
+    borderRadius: 10,
+    marginVertical: 5,
+  },
+  pregunta: {
+    fontSize: 16,
+  },
+  button: {
+    marginTop: 30,
+    backgroundColor: '#B78270',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontFamily: 'Crafty',
+  },
+});

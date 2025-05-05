@@ -30,16 +30,25 @@ const ModalForm = ({ modalVisible, setModalVisible }) => {
 
                 <Text style={styles.label}>Teléfono:</Text>
                 <TextInput style={styles.input} keyboardType='phone-pad' />
-                <View>
-                    <Text>Fecha de la Cita</Text>
+                <View style={styles.containerCalendar}>
+                    <Text style={styles.textCalendar}>Fecha de la Cita</Text>
                     <DateTimePicker
+                        styles={{
+
+                            today: { borderColor: '#B78270', borderWidth: 2, borderRadius: 10 },
+                            selected: { backgroundColor: '#B78270', borderRadius: 10 },
+                            selected_label: { color: 'white' },
+                        }}
+                        locale='es'
+                        calendar="gregory"
                         mode="single"
                         date={selected}
                         onChange={({ date }) => setSelected(date)}
-                        minDate={today} 
-                        enabledDates={(date) => dayjs(date).day() === 1}
-                        disabledDates={(date) => [0, 6].includes(dayjs(date).day())} 
+                        minDate={today}
+                        disabledDates={(date) => [0, 6].includes(dayjs(date).day())}
                     />
+
+
                 </View>
 
                 <Text style={styles.label}>Consulta:</Text>
@@ -47,7 +56,7 @@ const ModalForm = ({ modalVisible, setModalVisible }) => {
                 <TextInput
                     style={[styles.input, styles.textArea]}
                     multiline
-                    numberOfLines={4}
+                    numberOfLines={10}
                     placeholder="Contanos lo que necesitás, te leemos con atención"
                     placeholderTextColor="#999"
                 />
@@ -100,8 +109,30 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         width: '90%',
     },
+    containerCalendar: {
+        marginVertical: 20,
+        backgroundColor: 'rgba(190, 153, 141, 0.85)',
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: '#B78270',
+        shadowColor: '#B78270',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.4,
+        shadowRadius: 6,
+        elevation: 6,
+        padding: 16,
+    },
+
+    textCalendar: {
+        paddingBottom: 10,
+        fontSize: 16,
+        color: '#4E342E',
+        fontWeight: '600',
+    },
+
+
     textArea: {
-        height: 100,
+        height: 150,
         textAlignVertical: "top",
     },
     pickerContainer: {

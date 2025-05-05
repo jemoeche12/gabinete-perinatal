@@ -2,6 +2,7 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import TestListScreen from '../Screens/TestListScreen';
 import TestDetailScreen from '../Screens/TestDetailScreen';
+import TestStartScreen from '../Screens/TestStart'
 
 
 const TestStackNavigator = () => {
@@ -15,7 +16,7 @@ const TestStackNavigator = () => {
       }}>
       <Stack.Screen name="Tests" component={TestListScreen} />
       <Stack.Screen name="TestDetail" component={TestDetailScreen} options={{headerBackVisible: false}}/>
-    
+
     </Stack.Navigator>
   );
 };
