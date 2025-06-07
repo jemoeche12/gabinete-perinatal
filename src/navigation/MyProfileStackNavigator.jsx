@@ -3,7 +3,6 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import MyProfil from '../Screens/MyProfil';
 import ImagenSelector from '../Screens/ImagenSelector';
-import CustomHeader from '../components/CustomHeader';
 
 const Stack = createNativeStackNavigator();
 

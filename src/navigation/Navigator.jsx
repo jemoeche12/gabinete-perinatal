@@ -1,7 +1,6 @@
 import { StyleSheet } from 'react-native'
 import React, { useEffect } from 'react'
 import { NavigationContainer } from '@react-navigation/native'
-import BottonTabNavigator from './BottonTabNavigator';
 import AuthStackNavigator from './AuthStackNavigator';
 import { useDispatch, useSelector } from 'react-redux';
 import { useDB } from '../hooks/useDB';

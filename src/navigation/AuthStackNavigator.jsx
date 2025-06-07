@@ -4,7 +4,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Login from '../Screens/Login';
 import Signup from '../Screens/Signup';
 import Loading from '../Screens/Loading';
-import CustomHeader from '../components/CustomHeader';
 
 const Stack = createNativeStackNavigator();
 

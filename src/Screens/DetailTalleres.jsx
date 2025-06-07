@@ -59,21 +59,24 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 16,
+    marginBottom: 24,
+    textAlign: 'center',
   },
   contenidos: {
     fontSize: 18,
-    textAlign: 'center',
-    marginBottom: 16,
+    textAlign: 'justify',
+    marginBottom: 24,
     fontFamily: 'Crafty',
     padding: 10,
+    lineHeight: 28,
   },
   description: {
     fontSize: 18,
-    textAlign: 'center',
+    textAlign: 'justify',
     marginBottom: 32,
     fontFamily: 'Crafty',
     padding: 10,
+    lineHeight: 28,
   },
   button: {
     backgroundColor: '#E6C6B7',
@@ -83,7 +86,9 @@ const styles = StyleSheet.create({
     width: '80%',
     alignItems: 'center',
     justifyContent: 'center',
-    marginHorizontal: "10%"
+    marginHorizontal: '10%',
+    marginTop: 24,
+    marginBottom: 40,
   },
   buttonText: {
     color: '#fff',
@@ -95,16 +100,15 @@ const styles = StyleSheet.create({
   },
   modalidad: {
     padding: 10,
-    marginVertical: 18,
-    width: "100%",
+    marginVertical: 24,
+    width: '100%',
     gap: 10,
-    fontFamily: "Crafty",
-    fontSize: 16,
   },
   modalidadText: {
     fontSize: 18,
-    color: "black",
-    fontFamily: "Crafty"
+    color: 'black',
+    fontFamily: 'Crafty',
+    lineHeight: 26,
   },
   containImageLoading: {
     flex: 1,
@@ -121,5 +125,6 @@ const styles = StyleSheet.create({
     width: 250,
     height: 250,
     resizeMode: 'contain',
-  }
+  },
 });
+
