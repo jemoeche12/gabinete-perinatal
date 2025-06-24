@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
 
     },
     description: {  
-        fontSize: 20,
+        fontSize: 24,
         color: "black",
         textAlign: "center",
         padding: 20,

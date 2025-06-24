@@ -7,8 +7,9 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import MyProfileStackNavigator from './MyProfileStackNavigator'
-import Test from '../Screens/Test'
 import TalleresStackNavigator from './TalleresStackNavigator'
+import TestStackNavigator from './TestStackNavigator'
+import HomeStackNavigator from './HomeStackNavigator'
 
 
 
@@ -17,66 +18,61 @@ const Tab = createBottomTabNavigator();
 const BottonTabNavigator = () => {
     return (
         <Tab.Navigator
-            screenOptions={{
-                tabBarStyle: styles.tabBar
-            }
-            }
-        >
-            <Tab.Screen name="Home" component={Home}
-                options={{
-                    tabBarIcon: ({ focused }) => {
-                        return (
-                            <View>
-                                <AntDesign name="home" size={26} color="black" />
-                            </View>
-                        )
-                    }
-                }}
-            />
-            <Tab.Screen name="Talleres" component={TalleresStackNavigator}
-                options={{
-                    tabBarIcon: ({ focused }) => {
-                        return (
-                            <View>
-                                <Ionicons name="book-outline" size={28} color="black" />
-                            </View>
-                        )
-                    }
-                }} />
-            < Tab.Screen name="Recursos" component={RecursoStackNavigator}
-                options={{
-                    tabBarIcon: ({ focused }) => {
-                        return (
-                            <View>
-                                <AntDesign name="folderopen" size={28} color="black" />
-                            </View>
-                        )
-                    }
-                }} />
-
-            < Tab.Screen name="Test" component={Test}
-                options={{
-                    tabBarIcon: ({ focused }) => {
-                        return (
-                            <View>
-                                <MaterialCommunityIcons name="head-question-outline" size={28} color="black" />
-                            </View>
-                        )
-                    }
-                }}
-            />
-                < Tab.Screen name="Perfil" component={MyProfileStackNavigator}
-                    options={{
-                        tabBarIcon: ({ focused }) => {
-                            return (
-                                <View>
-                                    <AntDesign name="team" size={28} color="black" />
-                                </View>
-                            )
-                        }
-                    }}
-                />
-        </Tab.Navigator >
+  screenOptions={{
+    tabBarStyle: styles.tabBar,
+  }}
+>
+  <Tab.Screen
+    name="Home"
+    component={HomeStackNavigator}
+    options={{
+      headerShown: false, 
+      tabBarIcon: () => (
+        <AntDesign name="home" size={26} color="black" />
+      ),
+    }}
+  />
+  <Tab.Screen
+    name="Talleres"
+    component={TalleresStackNavigator}
+    options={{
+      headerShown: false, 
+      tabBarIcon: () => (
+        <Ionicons name="book-outline" size={28} color="black" />
+      ),
+    }}
+  />
+  <Tab.Screen
+    name="Recursos"
+    component={RecursoStackNavigator}
+    options={{
+      headerShown: false,
+      tabBarIcon: () => (
+        <AntDesign name="folderopen" size={28} color="black" />
+      ),
+    }}
+  />
+  <Tab.Screen
+    name="Test"
+    component={TestStackNavigator}
+    options={{
+      headerShown: false,
+      tabBarIcon: () => (
+        <MaterialCommunityIcons name="head-question-outline" size={28} color="black" />
+      ),
+    }}
+  />
+  <Tab.Screen
+    name="Perfil"
+    component={MyProfileStackNavigator}
+    options={{
+      headerShown: false,
+      tabBarIcon: () => (
+        <AntDesign name="team" size={28} color="black" />
+      ),
+    }}
+  />
+</Tab.Navigator>
     )
 }
 

@@ -1,11 +1,9 @@
 import { StyleSheet, Text, View, Pressable } from 'react-native';
 import React from 'react';
 import Card from './Card';
-import { useDispatch } from 'react-redux';
-import { setTallerIdSelected } from '../features/talleres/TalleresSlice';
+
 
 const CardTalleres = ({ taller, navigation }) => {
-  const dispatch = useDispatch();
 
   if (!taller) return null; 
 

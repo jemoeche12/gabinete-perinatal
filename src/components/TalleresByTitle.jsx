@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View, Image, ImageBackground } from 'react
 import { setTalleresTitleSelected } from '../features/talleres/TalleresSlice';
 import Card from './Card';
 
-const TalleresByTitle = ({ titulo, navigation, id, modalidad, beneficios }) => {
+const TalleresByTitle = ({ titulo, navigation, id, modalidad, beneficios, price }) => {
 
   const dispatch = useDispatch();
 
@@ -22,6 +22,8 @@ const TalleresByTitle = ({ titulo, navigation, id, modalidad, beneficios }) => {
         <Text style={styles.productText}>Dia: {modalidad.dia}</Text>
         <Text style={styles.productText}>Acompañamiento: {modalidad.acompañamiento}</Text>
         <Text style={styles.productText}>Formato: {modalidad.formato}</Text>
+        <Text style={styles.productText}>Precio: $ {price}</Text>
+        
       </Pressable>
     </Card>
   );

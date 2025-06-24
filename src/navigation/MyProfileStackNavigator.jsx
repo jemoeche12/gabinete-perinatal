@@ -10,9 +10,13 @@ const Stack = createNativeStackNavigator();
 const MyProfileStackNavigator = () => {
   return (
     <Stack.Navigator initialRouteName='MyProfile'
-    screenOptions={{headerShown: false}}>
+    screenOptions={{
+      headerShown:false,
+      headerStyle: { backgroundColor: '#F8EDE3' },
+      headerTintColor: '#FFF',
+    }}>
         <Stack.Screen name="MyProfile" component={MyProfil}/>
-        <Stack.Screen name="ImagenSeleccionada" component={ImagenSelector}/>
+        <Stack.Screen name="ImagenSeleccionada" component={ImagenSelector} options={{headerBackVisible: false}}/>
     </Stack.Navigator>
   )
 }

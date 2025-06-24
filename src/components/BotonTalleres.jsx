@@ -1,8 +1,8 @@
 import {
   StyleSheet,
   View,
-  TouchableOpacity,
   Text,
+  Pressable,
 } from "react-native";
 import React from "react";
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -10,12 +10,12 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 
 const BotonTalleres = ({ title, onPress }) => {
   return (
-    <TouchableOpacity style={styles.container} onPress={onPress}>
+    <Pressable style={styles.container} onPress={onPress}>
       <View style={styles.button}>
         <Ionicons name="book-outline" size={42} color="#B78270" />
         <Text style={styles.buttonText}>{title}</Text>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: "#E6C6B7",
     borderRadius: 45,
-    marginLeft: 50,
+    marginLeft: 30,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
