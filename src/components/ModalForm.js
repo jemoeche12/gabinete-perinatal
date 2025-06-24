@@ -2,11 +2,17 @@ import React, { useState } from 'react';
 import { Modal, Text, StyleSheet, View, TextInput, ScrollView, Button, Pressable } from 'react-native';
 import DateTimePicker from 'react-native-ui-datepicker';
 import dayjs from 'dayjs';
-
+import { useSelector } from 'react-redux';
+import { useGetProfileQuery } from '../services/userService';
 
 const ModalForm = ({ modalVisible, setModalVisible }) => {
     let today = new Date();
     const [selected, setSelected] = useState(today);
+    const {user, localId} = useSelector((state) => state.auth.value)
+    const {data: profileDate} = useGetProfileQuery(localId)
+
+    const name = profileDate?.name || "";
+    const lastName = profileDate?.lastName || "";
 
     const handleNavigation = () => {
         setModalVisible(!modalVisible)
@@ -20,14 +26,12 @@ const ModalForm = ({ modalVisible, setModalVisible }) => {
             <ScrollView contentContainerStyle={styles.modalContainer}>
                 <Text style={styles.modalTitle}>Formulario de Cita</Text>
 
-                <Text style={styles.label}>Nombre:</Text>
-                <TextInput style={styles.input} />
+                <TextInput style={styles.input} value={name} editable={false}/>
 
-                <Text style={styles.label}>Apellido:</Text>
-                <TextInput style={styles.input} />
+                <TextInput style={styles.input} value={lastName} editable={false}/>
 
                 <Text style={styles.label}>Email (Nos contactaremos a este mail):</Text>
-                <TextInput style={styles.input} keyboardType='email-address' />
+                <TextInput style={styles.input} keyboardType='email-address' value={user}  editable={false}/>
 
                 <Text style={styles.label}>Teléfono:</Text>
                 <TextInput style={styles.input} keyboardType='phone-pad' />

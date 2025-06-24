@@ -1,34 +1,42 @@
-import { StyleSheet, Text, View, Image, Pressable, SafeAreaView } from 'react-native';
-import React from 'react';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-import { useNavigation } from '@react-navigation/native';
+import { StyleSheet, Text, View, Pressable } from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import EvilIcons from "@expo/vector-icons/EvilIcons";
+import { useNavigation } from "@react-navigation/native";
+import { useSelector } from "react-redux";
 
 const CustomHeader = ({ onMenuPress }) => {
   const navigation = useNavigation();
+  const total = useSelector((state) => state.cart.value.total)
 
   const handleNavigationContact = () => {
-    navigation.navigate('ContactoScreen');
-  }
+    navigation.navigate("ContactoScreen");
+  };
   const handleNavigationAbout = () => {
-    navigation.navigate('AboutApp');
-  }
+    navigation.navigate("AboutApp");
+  };
 
   return (
-    <View style={styles.container}>
-      <Pressable onPress={() => navigation.navigate("Home")}>
-        <Image source={require("../../assets/IconApp7.png")} style={styles.img} />
-      </Pressable>
-      <View style={styles.textContainer}>
-        <Pressable onPress={handleNavigationAbout} style={styles.text}>
-          <Text style={styles.text}>Acerca de</Text>
-        </Pressable>
-        <Pressable onPress={handleNavigationContact} style={styles.text}>
-          <Text style={styles.text}>Contacto</Text>
-        </Pressable>
-        <Pressable onPress={onMenuPress} style={styles.drawerIcon}>
+    <View style={styles.safeArea}>
+      <View style={styles.container}>
+        <Pressable onPress={onMenuPress} style={styles.menuIconWrapper}>
           <Ionicons name="menu" size={30} color="black" />
         </Pressable>
+
+        <View style={styles.textContainer}>
+          <Pressable onPress={handleNavigationAbout}>
+            <Text style={styles.headerText}>Acerca de</Text>
+          </Pressable>
+          <Pressable onPress={handleNavigationContact}>
+            <Text style={styles.headerText}>Contacto</Text>
+          </Pressable>
+        </View>
+
+        <View style={styles.cartIconWrapper}>
+          <Pressable onPress={() => navigation.navigate("Cart")}>
+            <EvilIcons name="cart" size={40} color="black" />
+          </Pressable>
+          <Text style={styles.numberCart}>{total}</Text>
+        </View>
       </View>
     </View>
   );
@@ -36,34 +44,50 @@ const CustomHeader = ({ onMenuPress }) => {
 
 export default CustomHeader;
 
-
 const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F8EDE3',
-    height: 120,
-    width: '100%',
-
+  safeArea: {
+    backgroundColor: "#F8EDE3",
   },
-  img: {
-    width: 120,
-    height: 120,
-    marginRight: 5
+  container: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 15,
+    paddingVertical: 25,
+    width: "100%",
+  },
+  menuIconWrapper: {
+    width: 60,
+    height: 60,
+    justifyContent: "center",
+    alignItems: "center",
   },
   textContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
     gap: 20,
-    marginTop: 20,
-    marginRight: 20
+    marginHorizontal: 10,
+    marginTop: 5,
   },
-  text: {
+  headerText: {
     fontFamily: "Crafty",
     fontSize: 18,
     color: "black",
   },
-
-})
+  cartIconWrapper: {
+    width: 60,
+    height: 60,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row"
+  },
+  numberCart:{
+    fontFamily: "Crafty",
+    fontSize: 20,
+    position: "absolute",
+    marginTop: 40,
+    marginLeft: 45
+  }
+});

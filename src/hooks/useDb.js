@@ -14,7 +14,7 @@ export const useDB = () => {
 
   const insertSession = async ({ email, localId, token }) => {
     const db = await openDatabase();
-    const sql = `INSERT INTO sessions (localId, email, token) VALUES (?, ?, ?);`;
+    const sql = `INSERT OR REPLACE INTO sessions(localId, email, token) VALUES(?, ?, ?)`;
     const args = [localId, email, token];
     const res = await db.runAsync(sql, args);
     return res;

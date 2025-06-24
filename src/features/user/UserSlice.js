@@ -8,6 +8,8 @@ export const AuthSlice = createSlice({
             idToken: null,
             localId: null,
             imageCamera: null,
+            name: "",
+            lastName: ""
         }
     },
     reducers: {
@@ -16,7 +18,7 @@ export const AuthSlice = createSlice({
             state.value.idToken = payload.idToken || null;
             state.value.localId = payload.localId || null;
             state.value.name = payload.name || null;
-            state.value.lastname = payload.lastname || null;
+            state.value.lastName = payload.lastName || null;
 
         },
 
@@ -25,6 +27,8 @@ export const AuthSlice = createSlice({
             state.value.idToken = null;
             state.value.localId = null;
             state.value.imageCamera = null;
+            state.value.name = "",
+            state.value.lastName = ""
         },
         setImageCamera: (state, { payload }) => {
             state.value.imageCamera = payload;

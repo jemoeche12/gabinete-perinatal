@@ -34,7 +34,7 @@ const ListTalleres = ({ navigation, visible }) => {
                 showsVerticalScrollIndicator={false}
                 renderItem={({ item }) => (
                     <Pressable >
-                        <TalleresByTitle id={item.id} titulo={item.titulo} navigation={navigation} modalidad={item.modalidad} beneficios={item.beneficios} />
+                        <TalleresByTitle id={item.id} titulo={item.titulo} navigation={navigation} modalidad={item.modalidad} beneficios={item.beneficios} price={item.price}/>
                     </Pressable>
                 )}
             />

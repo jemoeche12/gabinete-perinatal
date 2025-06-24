@@ -15,6 +15,8 @@ import { Picker } from "@react-native-picker/picker";
 import Card from "../components/Card";
 import CustomHeader from "../components/CustomHeader";
 import MenuDesplegable from "../components/MenuDesplegable";
+import { useGetProfileQuery } from "../services/userService";
+import { useSelector } from "react-redux";
 
 const ContactoScreen = ({ visible }) => {
   const [nombre, setNombre] = useState("");
@@ -23,11 +25,15 @@ const ContactoScreen = ({ visible }) => {
   const [mensaje, setMensaje] = useState("");
   const [quiereContacto, setQuiereContacto] = useState(null);
   const [isMenuVisible, setIsMenuVisible] = useState(visible)
+  const {user, localId} = useSelector((state) => state.auth.value)
+  const {data: profileDate} = useGetProfileQuery(localId)
+
+  const name = profileDate.name || "";
 
   const handleSubmit = () => {
     const dataForm = {
-      nombre,
-      correo,
+      nombre: name || nombre,
+      correo: user || correo,
       motivo,
       mensaje,
       quiereContacto,
@@ -80,7 +86,7 @@ const ContactoScreen = ({ visible }) => {
             style={styles.input}
             placeholder="Escribí tu nombre"
             placeholderTextColor="#999"
-            value={nombre}
+            value={name}
             onChangeText={setNombre}
           />
           <Text style={styles.note}>(Nos contactaremos a este mail)</Text>
@@ -90,7 +96,7 @@ const ContactoScreen = ({ visible }) => {
             style={styles.input}
             placeholder="example@mail.com"
             placeholderTextColor="#999"
-            value={correo}
+            value={user}
             keyboardType="email-address"
           />
           <Text style={styles.label}>Motivo de contacto:</Text>

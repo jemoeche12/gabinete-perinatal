@@ -17,7 +17,7 @@ const RecursoStackNavigator = () => {
       headerStyle: { backgroundColor: '#F8EDE3' },
       headerTintColor: '#FFF',
     }}>
-      <Stack.Screen name="Recursos" component={Recursos} />
+      <Stack.Screen name="RecursosLista" component={Recursos} />
       <Stack.Screen name="ItemListCategory" component={ItemListCategory} options={{ headerBackVisible: false }} />
       <Stack.Screen name="Detail" component={Detail} options={{ headerBackVisible: false }} />
     </Stack.Navigator>
