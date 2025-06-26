@@ -5,20 +5,19 @@ import { useDispatch } from "react-redux";
 import { useSignInMutation } from "../services/authService";
 import { setUser } from "../features/user/UserSlice";
 import SubmitButton from "../components/SubmitButton";
-import { useDB } from "../hooks/useDB";
+import { useDBContext } from "../context/DBContext";
 import { useLazyGetProfileQuery } from "../services/userService";
-
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMail, setErrorMail] = useState("");
   const [errorPassword, setErrorPassword] = useState("");
-  const [name, setName] = useState()
-  const [lastName, setLastName] = useState()
+  const [name, setName] = useState();
+  const [lastName, setLastName] = useState();
 
   const dispatch = useDispatch();
-  const { insertSession } = useDB();
+  const { insertSession, dbInitialized } = useDBContext();
 
   const [triggerSignIn, result] = useSignInMutation();
   const [
@@ -30,38 +29,40 @@ const Login = ({ navigation }) => {
     if (result?.data && result.isSuccess) {
       (async () => {
         try {
-          const response = await insertSession({
+          if (!dbInitialized) {
+            Alert.alert("Error de DB", "La base de datos no está lista. Intente de nuevo.");
+            return;
+          }
+
+          await insertSession({
             email: result.data.email,
             localId: result.data.localId,
             token: result.data.idToken,
           });
         } catch (error) {
-          alert(error);
+          Alert.alert("Error de Sesión", error.message || "Error al guardar la sesión.");
         }
+        triggerGetProfile(result.data.localId);
       })();
-      triggerGetProfile(result.data.localId);
     }
-  }, [result]);
+  }, [result, insertSession, triggerGetProfile, dbInitialized]);
 
   useEffect(() => {
-    if(!profileLoading && !profileError){
-    if (profileDate) {
-        dispatch(
-        setUser({
-          email: result.data.email,
-          localId: result.data.localId,
-          idToken: result.data.idToken,
-          name: profileDate.name,
-          lastName: profileDate.lastName,
-        })
-      );
-    } else{
-      console.log("Disculpe algo salio mal")
+    if (profileError) {
+      Alert.alert("Disculpe, algo salió mal al cargar la información", JSON.stringify(profileError));
+      return;
     }
-  } else if(profileError){
-    Alert.alert("error al intentar obtener la informacion")
-  }
-  }, [profileDate, profileLoading, profileError, dispatch, result.data]);
+    if (!profileLoading && profileDate && result.data) {
+      dispatch(setUser({
+        email: result.data.email,
+        localId: result.data.localId,
+        idToken: result.data.idToken,
+        name: profileDate.name,
+        lastName: profileDate.lastName
+      }));
+      navigation.navigate("HomePrincipal");
+    }
+  }, [profileDate, profileLoading, profileError, dispatch, result.data, navigation]);
 
   const onSubmit = () => {
     triggerSignIn({ email, password });
@@ -93,6 +94,7 @@ const Login = ({ navigation }) => {
 };
 
 export default Login;
+
 
 const styles = StyleSheet.create({
   container: {

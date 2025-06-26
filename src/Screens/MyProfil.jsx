@@ -1,8 +1,8 @@
-import { StyleSheet, Image, View, Text } from "react-native";
+import { StyleSheet, Image, View, Text, Alert } from "react-native";
 import AddButton from "../components/AddButton";
 import { useDispatch, useSelector } from "react-redux";
 import { useGetProfileImageQuery } from "../services/recursosService";
-import { useDB } from "../hooks/useDB";
+import { useDBContext } from "../context/DBContext";
 import { clearUser } from "../features/user/UserSlice";
 import Card from "../components/Card";
 import Feather from "@expo/vector-icons/Feather";
@@ -15,7 +15,7 @@ const MyProfil = ({ navigation }) => {
   );
 
   const { data: imageFromBase } = useGetProfileImageQuery(localId);
-  const { truncateSessionTable } = useDB();
+  const { truncateSessionTable, dbInitialized } = useDBContext();
   const { data: profileDate, isLoading, isError } = useGetProfileQuery(localId);
   const dispatch = useDispatch();
   const name = profileDate?.name || "";
@@ -25,12 +25,18 @@ const MyProfil = ({ navigation }) => {
   const tomarImagen = () => {
     navigation.navigate("ImagenSeleccionada");
   };
+
   const cerrarSesion = async () => {
     try {
-      const response = await truncateSessionTable();
+      if (!dbInitialized) {
+        Alert.alert("Error de DB", "La base de datos no está lista. Intente de nuevo.");
+        return;
+      }
+
+      await truncateSessionTable();
       dispatch(clearUser());
     } catch (error) {
-      alert(error);
+      Alert.alert("Error al cerrar sesión", error.message || "Error desconocido al cerrar sesión.");
     }
   };
 
@@ -94,6 +100,8 @@ const MyProfil = ({ navigation }) => {
 };
 
 export default MyProfil;
+
+
 
 const styles = StyleSheet.create({
   container: {

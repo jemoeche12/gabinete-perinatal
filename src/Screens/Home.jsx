@@ -1,11 +1,4 @@
-import {
-  Text,
-  View,
-  ImageBackground,
-  StyleSheet,
-  SafeAreaView,
-
-} from "react-native";
+import { Text, View, ImageBackground, StyleSheet } from "react-native";
 import fondoInicio from "../../assets/img/fondoInicio2.png";
 import BotonTurnos from "../components/BotonTurnos";
 import BotonTalleres from "../components/BotonTalleres";
@@ -15,46 +8,55 @@ import { useState } from "react";
 import MenuDesplegable from "../components/MenuDesplegable";
 import ModalForm from "../components/ModalForm";
 
-
-
 const Home = ({ visible }) => {
   const [isMenuVisible, setIsMenuVisible] = useState(visible);
-  const [modalVisible, setModalVisible] = useState(false)
+  const [modalVisible, setModalVisible] = useState(false);
   const navigation = useNavigation();
   const toggleMenu = () => {
     setIsMenuVisible(!isMenuVisible);
   };
 
   const manejoTaller = () => {
-    navigation.navigate("Talleres")
-  }
+    navigation.navigate("Talleres");
+  };
 
-const manejoTurnos = () =>{
-  setModalVisible(!modalVisible)
-}
+  const manejoTurnos = () => {
+    setModalVisible(!modalVisible);
+  };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <View style={{ flex: 1 }}>
       <CustomHeader onMenuPress={toggleMenu} />
-      {isMenuVisible && <MenuDesplegable onClose={toggleMenu} visible={isMenuVisible} />}
+      {isMenuVisible && (
+        <MenuDesplegable onClose={toggleMenu} visible={isMenuVisible} />
+      )}
       <View style={styles.container}>
-        <ImageBackground source={fondoInicio} style={styles.background} >
+        <ImageBackground source={fondoInicio} style={styles.background}>
           <Text style={styles.text}>
-            Nadie es ajeno a gestar. Se gesta el bebé y la familia que nace con él
+            Nadie es ajeno a gestar. Se gesta el bebé y la familia que nace con
+            él
           </Text>
           <View style={styles.buttonContainer}>
-            <BotonTurnos style={styles.button} title="TURNOS" onPress={manejoTurnos} />
-            <ModalForm modalVisible={modalVisible} setModalVisible={setModalVisible}/>
-            <BotonTalleres style={styles.button} title="TALLERES" onPress={manejoTaller} />
+            <BotonTurnos
+              style={styles.button}
+              title="TURNOS"
+              onPress={manejoTurnos}
+            />
+            <ModalForm
+              modalVisible={modalVisible}
+              setModalVisible={setModalVisible}
+            />
+            <BotonTalleres
+              style={styles.button}
+              title="TALLERES"
+              onPress={manejoTaller}
+            />
           </View>
         </ImageBackground>
       </View>
-    </SafeAreaView>
-
+    </View>
   );
 };
-
-
 
 export default Home;
 
@@ -87,7 +89,5 @@ const styles = StyleSheet.create({
     width: "50%",
     fontFamily: "Crafty",
     marginBottom: "10%",
-
   },
-
 });

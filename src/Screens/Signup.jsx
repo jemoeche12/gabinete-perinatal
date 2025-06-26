@@ -12,7 +12,7 @@ import SubmitButton from "../components/SubmitButton";
 import { useDispatch } from "react-redux";
 import { useSignUpMutation } from "../services/authService";
 import { setUser } from "../features/user/UserSlice";
-import { useDB } from "../hooks/useDB";
+import { useDBContext } from "../context/DBContext"; 
 import { sendEmailFromClient } from "../services/emailService";
 import { useUpdateUserProfileMutation } from "../services/userService";
 
@@ -24,61 +24,34 @@ const Signup = ({ navigation }) => {
   const [errorMail, setErrorMail] = useState("");
   const [errorPassword, setErrorPassword] = useState("");
 
-  const { insertSession } = useDB();
+  const { insertSession, dbInitialized } = useDBContext();
   const dispatch = useDispatch();
 
   const [triggerSignUp, result] = useSignUpMutation();
   const [
     triggerUpdateProfile,
-    {
-      data: profileResult,
-      isSuccess: profileSuccess,
-      isLoading: profileLoading,
-      error: profileError,
-    },
+    { isLoading: profileLoading }
   ] = useUpdateUserProfileMutation();
 
+  
   useEffect(() => {
-    if (result?.data && result.isSuccess) {
+    if (result.isSuccess && result.data) {
+      const { localId, email, idToken } = result.data;
+
       (async () => {
         try {
-          const localId = result.data.localId;
-          await insertSession({
-            email: result.data.email,
-            localId: localId,
-            token: result.data.idToken,
-          });
-          console.log("Datos para triggerUpdateProfile:", {
-            localId,
-            name,
-            lastName,
-            email,
-          });
+          if (!dbInitialized) {
+            Alert.alert("Error de DB", "La base de datos no está lista para guardar la sesión. Por favor, inténtelo de nuevo.");
+            return; 
+          }
 
-          await triggerUpdateProfile({
-            localId,
-            name,
-            lastName,
-            email,
-          }).unwrap();
-
+          await insertSession({ email, localId, token: idToken });
+          await triggerUpdateProfile({ localId, name, lastName, email }).unwrap();
           dispatch(
-            setUser({
-              email: result.data.email,
-              idToken: result.data.idToken,
-              localId: localId,
-              name: name,
-              lastName: lastName,
-            })
+            setUser({ email, idToken, localId, name, lastName })
           );
-
           await sendEmailFromClient({
-            to: [
-              {
-                email: result.data.email,
-                name: name || "Nuevo Usuario",
-              },
-            ],
+            to: [{ email, name: name || "Nuevo Usuario" }],
             subject: "Bienvenido a la Red Perinatal Digital",
             htmlContent: `
               <p>Hola ${name || "bienvenido"},</p>
@@ -87,49 +60,46 @@ const Signup = ({ navigation }) => {
               <p>Saludos cordiales,<br>El equipo de Red Perinatal Digital</p>
             `,
           });
-
           navigation.navigate("HomePrincipal");
         } catch (error) {
-          console.error("Error completo:", error);
           Alert.alert(
-            "Error en useEffect durante la gestión de sesión, perfil o envío de email:",
-            error.message || JSON.stringify(error)
+            "Error en el registro",
+            error.message || "Error inesperado en el registro."
           );
         }
       })();
-    } else if (result.isError) {
-      Alert.alert("Error en el registro (useSignUpMutation):", result.error);
+    }
 
+    if (result.isError) {
       const errorData = result.error?.data?.error || result.error;
+      Alert.alert(
+        "Error en el registro",
+        errorData.message || "Ocurrió un error. Intenta de nuevo."
+      );
 
       if (
         errorData.path === "email" ||
-        (errorData.message && errorData.message.includes("EMAIL_EXISTS"))
+        errorData.message?.includes("EMAIL_EXISTS")
       ) {
         setErrorMail(errorData.message || "Email inválido o ya en uso.");
       } else if (
         errorData.path === "password" ||
-        (errorData.message && errorData.message.includes("WEAK_PASSWORD"))
+        errorData.message?.includes("WEAK_PASSWORD")
       ) {
         setErrorPassword(
           errorData.message ||
-            "Contraseña débil o inválida (mínimo 6 caracteres)."
+          "Contraseña débil o inválida (mínimo 6 caracteres)."
         );
       } else {
         setErrorMail(
           errorData.message ||
-            "Ocurrió un error inesperado durante el registro. Inténtalo de nuevo."
+          "Error inesperado. Por favor, intenta de nuevo."
         );
       }
+
       setPassword("");
     }
-  }, [
-    result.isSuccess,
-    dispatch,
-    insertSession,
-    navigation,
-    triggerUpdateProfile,
-  ]);
+  }, [result, insertSession, dispatch, triggerUpdateProfile, navigation, name, lastName, dbInitialized]); // Agrega dbInitialized
 
   const onSubmit = () => {
     setErrorMail("");
@@ -148,21 +118,12 @@ const Signup = ({ navigation }) => {
     <View style={styles.container}>
       <View style={styles.form}>
         <Text style={styles.title}>Registro</Text>
-        <InputForm label={"Nombre"} value={name} onChangeText={setName} />
+        <InputForm label="Nombre" value={name} onChangeText={setName} />
+        <InputForm label="Apellido" value={lastName} onChangeText={setLastName} />
+        <InputForm label="Email" value={email} onChangeText={setEmail} error={errorMail} />
         <InputForm
-          label={"Apellido"}
-          value={lastName}
-          onChangeText={setLastName}
-        />
-        <InputForm
-          label={"Email"}
-          value={email}
-          onChangeText={setEmail}
-          error={errorMail}
-        />
-        <InputForm
-          label={"Contraseña"}
-          placeholder={"Mínimo 6 caracteres"}
+          label="Contraseña"
+          placeholder="Mínimo 6 caracteres"
           value={password}
           onChangeText={setPassword}
           error={errorPassword}
@@ -171,18 +132,17 @@ const Signup = ({ navigation }) => {
         <SubmitButton
           onPress={onSubmit}
           title={result.isLoading || profileLoading ? "" : "Enviar"}
-          disabled={result.isLoading || profileLoading}
+          disabled={result.isLoading || profileLoading || !dbInitialized} // Deshabilita si la DB no está lista
         >
-          {(result.isLoading || profileLoading) && (
+          {(result.isLoading || profileLoading) ? (
             <ActivityIndicator size="small" color="#fff" />
-          )}
-          {!(result.isLoading || profileLoading) && (
+          ) : (
             <Text style={{ color: "#fff", fontSize: 18 }}>Enviar</Text>
           )}
         </SubmitButton>
         <Text style={styles.sub}>¿Ya tienes una cuenta?</Text>
         <Pressable onPress={() => navigation.navigate("Login")}>
-          <Text style={styles.subLink}>Iniciar Sesion</Text>
+          <Text style={styles.subLink}>Iniciar Sesión</Text>
         </Pressable>
       </View>
     </View>
@@ -190,6 +150,9 @@ const Signup = ({ navigation }) => {
 };
 
 export default Signup;
+
+
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -10,8 +10,6 @@ exports.sendEmailFunction = onCall(async (request) => {
 
   const {to, subject, htmlContent} = request.data;
 
-  console.log("Datos recibidos:", JSON.stringify({to, subject}, null, 2));
-
   if (
     !Array.isArray(to) ||
     to.length === 0 ||
@@ -24,7 +22,6 @@ exports.sendEmailFunction = onCall(async (request) => {
         !r.email.includes("@"),
     )
   ) {
-    console.error("Destinatarios inválidos:", JSON.stringify(to, null, 2));
     throw new functions.https.HttpsError(
         "invalid-argument",
         "Uno o más destinatarios tienen un email inválido o vacío.",
@@ -49,13 +46,9 @@ exports.sendEmailFunction = onCall(async (request) => {
       ],
     };
 
-    console.log("Payload enviado:", JSON.stringify(messagePayload, null, 2));
-
     const mailjetResponse = await mailer
         .post("send", {version: "v3.1"})
         .request(messagePayload);
-
-    console.log("mail enviado exitosamente:", mailjetResponse.body);
 
     return {
       status: "success",
@@ -63,14 +56,6 @@ exports.sendEmailFunction = onCall(async (request) => {
       data: mailjetResponse.body,
     };
   } catch (error) {
-    console.error(
-        "ERROR DE MAILJET:",
-        error.message,
-        "Status Code:",
-        error.statusCode,
-        "Body:",
-    );
-
     throw new functions.https.HttpsError(
         "internal",
         "Error al enviar el correo electrónico: " + error.message,
