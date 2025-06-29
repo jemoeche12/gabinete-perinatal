@@ -9,14 +9,16 @@ import {
   ScrollView,
   Image,
 } from "react-native";
-import Feather from '@expo/vector-icons/Feather';
-import Fontisto from '@expo/vector-icons/Fontisto';
+import Feather from "@expo/vector-icons/Feather";
+import Fontisto from "@expo/vector-icons/Fontisto";
 import { Picker } from "@react-native-picker/picker";
 import Card from "../components/Card";
 import CustomHeader from "../components/CustomHeader";
 import MenuDesplegable from "../components/MenuDesplegable";
 import { useGetProfileQuery } from "../services/userService";
 import { useSelector } from "react-redux";
+import { useCrearConsultaMutation } from "../services/consultasService";
+import { sendEmailFromClient } from "../services/emailService";
 
 const ContactoScreen = ({ visible }) => {
   const [nombre, setNombre] = useState("");
@@ -24,50 +26,113 @@ const ContactoScreen = ({ visible }) => {
   const [motivo, setMotivo] = useState("");
   const [mensaje, setMensaje] = useState("");
   const [quiereContacto, setQuiereContacto] = useState(null);
-  const [isMenuVisible, setIsMenuVisible] = useState(visible)
-  const {user, localId} = useSelector((state) => state.auth.value)
-  const {data: profileDate} = useGetProfileQuery(localId)
+  const [isMenuVisible, setIsMenuVisible] = useState(visible);
 
-  const name = profileDate.name || "";
+  const authState = useSelector((state) => {
+    return state.auth.value;
+  });
 
-  const handleSubmit = () => {
-    const dataForm = {
-      nombre: name || nombre,
-      correo: user || correo,
-      motivo,
-      mensaje,
-      quiereContacto,
-    };
-    Alert.alert(
-      "¡Gracias por escribirnos!",
-      "Tu mensaje fue enviado con éxito. Nos pondremos en contacto a la brevedad."
-    );
+  const { user, localId } = authState; 
 
-    setNombre("");
-    setCorreo("");
-    setMotivo("");
-    setMensaje("");
-    setQuiereContacto(null);
+  const { data: profileDate } = useGetProfileQuery(localId);
 
+  const [triggerCrearConsulta, { isLoading, isSuccess, isError }] =
+    useCrearConsultaMutation();
+
+  const name = profileDate?.name || ""; 
+
+  const handleSubmit = async () => {
+    try {
+      const dataForm = {
+        nombre: name || nombre, 
+        correo: user || correo, 
+        motivo,
+        mensaje,
+        quiereContacto,
+      };
+
+      let receptor = user || correo; 
+
+     
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
+      if (!receptor || !emailRegex.test(receptor)) {
+        Alert.alert(
+          "Error de Correo",
+          "La dirección de correo electrónico del destinatario es inválida o está vacía. Por favor, verifica el email."
+        );
+        return; 
+      }
+
+      await triggerCrearConsulta(dataForm).unwrap();
+      Alert.alert(
+        "¡Gracias por escribirnos!",
+        "Tu mensaje fue enviado con éxito. Nos pondremos en contacto a la brevedad."
+      );
+
+      const emailPsico = "jemoeche@gmail.com"
+
+      await sendEmailFromClient({
+        to: [{ email: receptor, name: name || nombre, emailPsico: emailPsico }], 
+        subject: "Gracias por contactarte con Red Perinatal Digital",
+        htmlContent: `Gracias por contactarte con Red Perinatal Digital ${name || nombre},
+          <br><br>
+          Si solicitaste que nos pongamos en contacto, lo haremos a la brevedad. Si lo que nos dejaste fue un comentario o sugerencia, te agradecemos por ayudarnos a mejorar.<br><br>
+          Saludos,<br>
+          El equipo de Red Perinatal Digital.
+          `,
+      });
+
+      const emailEquipo = "florenciavelascopsi@hotmail.com";
+      const emailSecretario = "jemoeche@gmail.com";
+
+      await sendEmailFromClient({
+        to: [{email: emailEquipo, email: emailSecretario}],
+        subject: "consulta recibida",
+        htmlContent: `Has recibido una consulta a nombre de ${name},
+                      con la consulta: ${mensaje}, con el motivo: ${motivo}.
+                      quiere contacto: ${quiereContacto}
+        `
+      })
+
+      setNombre("");
+      setCorreo("");
+      setMotivo("");
+      setMensaje("");
+      setQuiereContacto(null);
+
+    } catch (error) {
+      const errorMesagge =
+        error?.data?.message ||
+        error?.message ||
+        "Ocurrió un error inesperado al procesar tu solicitud.";
+      console.error("Error al enviar el mensaje:", error);
+      Alert.alert("Error de Envío", errorMesagge);
+    }
   };
-  const toggleMenu = () => {
 
+  const toggleMenu = () => {
     setIsMenuVisible(!isMenuVisible);
-  }
+  };
 
   return (
     <>
       <CustomHeader onMenuPress={toggleMenu} />
-      {isMenuVisible && <MenuDesplegable visible={isMenuVisible} onClose={toggleMenu} />}
-      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+      {isMenuVisible && (
+        <MenuDesplegable visible={isMenuVisible} onClose={toggleMenu} />
+      )}
+      <ScrollView
+        contentContainerStyle={styles.container}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.card}>
-          <Card >
+          <Card>
             <View>
               <View style={styles.imageContainer}>
                 <Image style={styles.image} />
               </View>
-              <Text style={styles.Nombre}>Nombre:      Maria Florencia</Text>
-              <Text style={styles.Nombre}>Apellido:      Velasco</Text>
+              <Text style={styles.Nombre}>Nombre: Maria Florencia</Text>
+              <Text style={styles.Nombre}>Apellido: Velasco</Text>
             </View>
             <View style={styles.cardContent}>
               <Feather name="phone-call" size={24} color="black" />
@@ -75,7 +140,10 @@ const ContactoScreen = ({ visible }) => {
             </View>
             <View style={styles.cardContent}>
               <Fontisto name="email" size={24} color="black" />
-              <Text style={styles.textCard}> florenciavelascopsi@hotmail.com</Text>
+              <Text style={styles.textCard}>
+                {" "}
+                florenciavelascopsi@hotmail.com
+              </Text>
             </View>
           </Card>
         </View>
@@ -86,8 +154,8 @@ const ContactoScreen = ({ visible }) => {
             style={styles.input}
             placeholder="Escribí tu nombre"
             placeholderTextColor="#999"
-            value={name}
-            onChangeText={setNombre}
+            value={name} 
+            onChangeText={setNombre} 
           />
           <Text style={styles.note}>(Nos contactaremos a este mail)</Text>
           <TextInput
@@ -96,7 +164,7 @@ const ContactoScreen = ({ visible }) => {
             style={styles.input}
             placeholder="example@mail.com"
             placeholderTextColor="#999"
-            value={user}
+            value={user} 
             keyboardType="email-address"
           />
           <Text style={styles.label}>Motivo de contacto:</Text>
@@ -107,9 +175,18 @@ const ContactoScreen = ({ visible }) => {
               style={styles.picker}
             >
               <Picker.Item label="Seleccioná un motivo..." value="" />
-              <Picker.Item label="Consulta general sobre la app" value="consulta" />
-              <Picker.Item label="Necesito orientación emocional" value="orientacion" />
-              <Picker.Item label="Problemas técnicos o errores" value="tecnico" />
+              <Picker.Item
+                label="Consulta general sobre la app"
+                value="consulta"
+              />
+              <Picker.Item
+                label="Necesito orientación emocional"
+                value="orientacion"
+              />
+              <Picker.Item
+                label="Problemas técnicos o errores"
+                value="tecnico"
+              />
               <Picker.Item label="Sugerencia o mejora" value="sugerencia" />
               <Picker.Item label="Otro" value="otro" />
             </Picker>
@@ -123,13 +200,20 @@ const ContactoScreen = ({ visible }) => {
             value={mensaje}
             onChangeText={setMensaje}
           />
-          <Text style={styles.label}>¿Querés que te contacte un profesional del equipo?</Text>
+          <Text style={styles.label}>
+            ¿Querés que te contacte un profesional del equipo?
+          </Text>
           <View style={styles.radioContainer}>
             <TouchableOpacity
               style={styles.radioOption}
               onPress={() => setQuiereContacto(true)}
             >
-              <View style={[styles.radioCircle, quiereContacto === true && styles.radioSelected]} />
+              <View
+                style={[
+                  styles.radioCircle,
+                  quiereContacto === true && styles.radioSelected,
+                ]}
+              />
               <Text style={styles.radioLabel}>Sí</Text>
             </TouchableOpacity>
 
@@ -137,19 +221,30 @@ const ContactoScreen = ({ visible }) => {
               style={styles.radioOption}
               onPress={() => setQuiereContacto(false)}
             >
-              <View style={[styles.radioCircle, quiereContacto === false && styles.radioSelected]} />
+              <View
+                style={[
+                  styles.radioCircle,
+                  quiereContacto === false && styles.radioSelected,
+                ]}
+              />
               <Text style={styles.radioLabel}>No por ahora</Text>
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-            <Text style={styles.buttonText}>Enviar mensaje</Text>
+          <TouchableOpacity
+            style={styles.button}
+            disabled={isLoading}
+            onPress={handleSubmit}
+          >
+            <Text style={styles.buttonText}>
+              {isLoading ? "Enviando..." : "Enviar Mensaje"}
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
     </>
   );
-}
+};
 
 export default ContactoScreen;
 
@@ -193,15 +288,12 @@ const styles = StyleSheet.create({
     height: 150,
     alignItems: "center",
     marginHorizontal: "auto",
-
   },
   image: {
     height: 150,
     width: 150,
     borderRadius: 50,
     resizeMode: "cover",
-
-
   },
   Nombre: {
     fontSize: 18,

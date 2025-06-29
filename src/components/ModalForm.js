@@ -144,6 +144,21 @@ const ModalForm = ({ modalVisible, setModalVisible }) => {
                     <p>Cualquier consulta no dude en ponerse en contacto con el equipo de Red Perinatal Digital</p>
                   `,
       });
+
+      const emailPsicologa = "florenciavelascopsi@hotmail.com";
+      const emailSecretario = "jemoeche@gmail.com"
+
+      setModalVisible(false);
+      await sendEmailFromClient({
+        to: [{ email: emailPsicologa , email: emailSecretario }],
+        subject: "Reserva de  Cita registrada con exito",
+        htmlContent: `
+                    <p>Hola hemos recibido una reserva de cita a nombre de ${name} ${lastName}</p>
+                    <p>Recuerda que su cita es el dia: ${selectedDateForEmail}</p>
+                    <p>A las ${horarioELegido}</p>
+                    <p>Agendar en el libro de citas</p>
+                  `,
+      });
     } catch (err) {
       const errorMessage =
         err?.data?.message ||

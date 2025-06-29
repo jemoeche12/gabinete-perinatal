@@ -11,6 +11,7 @@ import {talleresApi} from "../services/talleresService";
 import { testApi } from "../services/testService";
 import { userApi } from "../services/userService";
 import { citasApi } from "../services/citasService";
+import { constultasApi } from "../services/consultasService";
 
 const store = configureStore({
     reducer: {
@@ -26,6 +27,7 @@ const store = configureStore({
         [testApi.reducerPath]: testApi.reducer,
         [userApi.reducerPath]: userApi.reducer,
         [citasApi.reducerPath]: citasApi.reducer,
+        [constultasApi.reducerPath]: constultasApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware()
@@ -34,7 +36,8 @@ const store = configureStore({
     .concat(talleresApi.middleware)
     .concat(testApi.middleware)
     .concat(userApi.middleware)
-    .concat(citasApi.middleware),
+    .concat(citasApi.middleware)
+    .concat(constultasApi.middleware),
 });
 
 setupListeners(store.dispatch);

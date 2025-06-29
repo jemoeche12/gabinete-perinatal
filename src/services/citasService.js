@@ -1,4 +1,4 @@
-import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
 import { app } from "../config/firebaseConfig";
 import {
   getDatabase,
@@ -13,20 +13,16 @@ import {
 
 export const citasApi = createApi({
   reducerPath: "citasApi",
-  baseQuery: fakeBaseQuery(),
   tagTypes: ["Cita"],
   endpoints: (builder) => ({
     createCita: builder.mutation({
       async queryFn(citaData) {
         try {
           const db = getDatabase(app);
-
           const citasRef = ref(db, "citas");
-
           const { fechaSeleccionada, horarioElegido } = citaData;
 
           let isDuplicate = false;
-
           const snapshot = await get(citasRef);
 
           if (snapshot.exists()) {
