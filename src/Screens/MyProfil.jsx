@@ -5,7 +5,6 @@ import { useGetProfileImageQuery } from "../services/recursosService";
 import { useDBContext } from "../context/DBContext";
 import { clearUser } from "../features/user/UserSlice";
 import Card from "../components/Card";
-import Feather from "@expo/vector-icons/Feather";
 import Fontisto from "@expo/vector-icons/Fontisto";
 import { useGetProfileQuery } from "../services/userService";
 
@@ -29,14 +28,20 @@ const MyProfil = ({ navigation }) => {
   const cerrarSesion = async () => {
     try {
       if (!dbInitialized) {
-        Alert.alert("Error de DB", "La base de datos no está lista. Intente de nuevo.");
+        Alert.alert(
+          "Error de DB",
+          "La base de datos no está lista. Intente de nuevo."
+        );
         return;
       }
 
       await truncateSessionTable();
       dispatch(clearUser());
     } catch (error) {
-      Alert.alert("Error al cerrar sesión", error.message || "Error desconocido al cerrar sesión.");
+      Alert.alert(
+        "Error al cerrar sesión",
+        error.message || "Error desconocido al cerrar sesión."
+      );
     }
   };
 
@@ -78,10 +83,7 @@ const MyProfil = ({ navigation }) => {
             <Text style={styles.Nombre}>Nombre: {name}</Text>
             <Text style={styles.Nombre}>Apellido: {lastName}</Text>
           </View>
-          <View style={styles.cardContent}>
-            <Feather name="phone-call" size={24} color="black" />
-            <Text style={styles.textCard}> +33 777989701</Text>
-          </View>
+
           <View style={styles.cardContent}>
             <Fontisto name="email" size={24} color="black" />
             <Text style={styles.textCard}> {email}</Text>
@@ -100,8 +102,6 @@ const MyProfil = ({ navigation }) => {
 };
 
 export default MyProfil;
-
-
 
 const styles = StyleSheet.create({
   container: {

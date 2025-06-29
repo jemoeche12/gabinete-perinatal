@@ -1,4 +1,3 @@
-// useDB.js
 import { useCallback, useState, useEffect, useRef } from "react";
 import * as SQLite from "expo-sqlite";
 import { Alert } from "react-native";

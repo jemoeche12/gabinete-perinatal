@@ -7,6 +7,7 @@ import ContactoScreen from '../Screens/ContactoScreen'
 import SobreNosotros from '../Screens/SobreNosotros'
 import Cart from '../Screens/Cart'
 import TerminosYCondiciones from '../Screens/TerminosYCondiciones'
+import MisCitas from '../Screens/MisCitas'
 
 const RootStackNavigator = () => {
     const Stack = createNativeStackNavigator()
@@ -20,6 +21,7 @@ const RootStackNavigator = () => {
             <Stack.Screen name="Main" component={BottonTabNavigator} />
             <Stack.Screen name="AboutApp" component={AboutApp} />
             <Stack.Screen name="FaQ" component={FaqScreen} />
+            <Stack.Screen name='MiCita' component={MisCitas} />
             <Stack.Screen name="SobreNosotros" component={SobreNosotros} />
             <Stack.Screen name="ContactoScreen" component={ContactoScreen} />
             <Stack.Screen name="Cart" component={Cart} />

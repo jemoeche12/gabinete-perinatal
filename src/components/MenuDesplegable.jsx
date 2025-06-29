@@ -6,17 +6,14 @@ import {
   Pressable,
   Image,
   StyleSheet,
-  Dimensions, // Necesitamos Dimensions para el ancho
+  Dimensions, 
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-const { width } = Dimensions.get("window"); // Obtener el ancho de la pantalla
-
+const { width } = Dimensions.get("window"); 
 const MenuDesplegable = ({ visible, onClose }) => {
   const navigation = useNavigation();
-  // Calcular el ancho del menú (70% del ancho de la pantalla)
   const menuWidth = width * 0.7;
-  // slideAnim inicia en un valor negativo igual al ancho del menú para estar fuera de la pantalla a la izquierda
   const slideAnim = useRef(new Animated.Value(-menuWidth));
   const opacityAnim = useRef(new Animated.Value(0));
 
@@ -24,7 +21,7 @@ const MenuDesplegable = ({ visible, onClose }) => {
     if (visible) {
       Animated.parallel([
         Animated.timing(slideAnim.current, {
-          toValue: 0, // Animar a 0 para que el menú esté en su posición (left: 0)
+          toValue: 0, 
           duration: 400,
           useNativeDriver: true,
           easing: Easing.ease,
@@ -39,7 +36,7 @@ const MenuDesplegable = ({ visible, onClose }) => {
     } else {
       Animated.parallel([
         Animated.timing(slideAnim.current, {
-          toValue: -menuWidth, // Animar de vuelta a la posición inicial (fuera de pantalla izquierda)
+          toValue: -menuWidth, 
           duration: 400,
           useNativeDriver: true,
           easing: Easing.ease,
@@ -99,11 +96,11 @@ const MenuDesplegable = ({ visible, onClose }) => {
       </Pressable>
       <Pressable
         onPress={() => {
-          navigation.navigate("Cart");
+          navigation.navigate('MiCita');
           onClose?.();
         }}
       >
-        <Text style={styles.menuItem}>Mis Talleres</Text>
+        <Text style={styles.menuItem}>Mis Citas</Text>
       </Pressable>
       <Pressable
         onPress={() => {
@@ -126,7 +123,7 @@ const styles = StyleSheet.create({
   menuContainer: {
     position: "absolute",
     top: 0,
-    left: 0, // Anclar a la izquierda
+    left: 0, 
     bottom: 0,
     backgroundColor: "rgba(35, 35, 35, 0.8)",
     justifyContent: "center",
