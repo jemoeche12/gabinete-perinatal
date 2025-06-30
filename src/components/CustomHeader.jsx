@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 15,
-    paddingVertical: 25,
+    paddingVertical: 15,
     width: "100%",
   },
   menuIconWrapper: {
