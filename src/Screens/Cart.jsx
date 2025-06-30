@@ -1,11 +1,17 @@
-import { StyleSheet, Text, View, FlatList } from 'react-native'; 
-import React from 'react';
-import { useSelector } from 'react-redux';
-import CartItem from '../components/CartItem'; 
+import { StyleSheet, Text, View, FlatList, Pressable } from "react-native";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { useDispatch, useSelector } from "react-redux";
+import CartItem from "../components/CartItem";
+import { clearCart } from "../features/cart/CartSlice";
 
 const Cart = () => {
   const cartItems = useSelector((state) => state.cart.value.itemCart);
-  const total = useSelector((state) => state.cart.value.totalPrecioCarrito); 
+  const total = useSelector((state) => state.cart.value.totalPrecioCarrito);
+  const dispatch = useDispatch();
+
+  const handleClearCart = () => {
+    dispatch(clearCart());
+  };
 
   return (
     <View style={styles.container}>
@@ -14,14 +20,18 @@ const Cart = () => {
         <Text style={styles.emptyCartText}>El carrito está vacío.</Text>
       ) : (
         <FlatList
-          data={cartItems} 
-          keyExtractor={(item, index) => (item && item.id) ? item.id.toString() : index.toString()}
-          renderItem={({ item }) => (
-            <CartItem item={item} /> 
-          )}
+          showsVerticalScrollIndicator={false}
+          data={cartItems}
+          keyExtractor={(item, index) =>
+            item && item.id ? item.id.toString() : index.toString()
+          }
+          renderItem={({ item }) => <CartItem item={item} />}
         />
       )}
       <View style={styles.totalContainer}>
+        <Pressable style={styles.clearCart} onPress={handleClearCart}>
+          <FontAwesome name="trash-o" size={24} color="black" />
+        </Pressable>
         <Text style={styles.totalText}>Total: ${total}</Text>
       </View>
     </View>
@@ -34,33 +44,37 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#F8EDE3',
+    backgroundColor: "#F8EDE3",
   },
   header: {
     fontSize: 28,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
-    textAlign: 'center',
-    color: '#333',
+    textAlign: "center",
+    color: "#333",
   },
   emptyCartText: {
     fontSize: 18,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 50,
-    color: '#666',
+    color: "#666",
   },
   totalContainer: {
+    justifyContent: "space-between",
+    flexDirection: "row",
     marginTop: 20,
     borderTopWidth: 1,
-    borderTopColor: '#ccc',
+    borderTopColor: "#ccc",
     paddingTop: 10,
-    alignItems: 'flex-end',
+    alignItems: "flex-end",
+    marginHorizontal: 20,
   },
   totalText: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#007bff',
-    marginRight: 30
+    fontWeight: "bold",
+    color: "#007bff",
   },
-  
+  clearCart: {
+    padding: 10,
+  },
 });

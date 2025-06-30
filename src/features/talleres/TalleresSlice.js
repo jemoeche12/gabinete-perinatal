@@ -17,6 +17,7 @@ export const TalleresSlice = createSlice({
         setTallerIdSelected(state, {payload}){
             state.value.tallerIdSelected = payload
         },
+        
     }
 })
 

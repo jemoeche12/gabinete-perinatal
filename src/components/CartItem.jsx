@@ -1,12 +1,21 @@
-import { StyleSheet, Text, View } from "react-native";
-import React from "react";
+import { StyleSheet, Text, View, Pressable } from "react-native";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { useDispatch } from "react-redux";
+import { removeItem } from "../features/cart/CartSlice";
 
 const CartItem = ({ item }) => {
+
+  const dispatch = useDispatch()
+
+  const handleClearItem = () => {
+    dispatch(removeItem({id: item.id}))
+  }
   if (!item) {
     return null;
   }
 
   const {
+    id,
     titulo = "Taller sin título",
     beneficios = "Beneficios no listados",
     price = 0,
@@ -16,7 +25,12 @@ const CartItem = ({ item }) => {
     <View style={styles.card}>
       <Text style={styles.title}>{titulo}</Text>
       <Text style={styles.text}>{beneficios}</Text>
-      <Text style={styles.price}>Precio: ${price.toFixed(2)}</Text>
+      <View style={styles.totalContainer}>
+        <Pressable style={styles.clearItem} onPress={handleClearItem}>
+          <FontAwesome name="trash-o" size={24} color="black" />
+        </Pressable>
+        <Text style={styles.price}>Precio: ${price.toFixed(2)}</Text>
+      </View>
     </View>
   );
 };
@@ -45,7 +59,17 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#555",
     marginBottom: 3,
-    fontFamily: "Crafty"
+    fontFamily: "Crafty",
+  },
+  totalContainer: {
+    justifyContent: "space-between",
+    flexDirection: "row",
+    marginTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: "#ccc",
+    paddingTop: 10,
+    alignItems: "flex-end",
+    marginHorizontal: 20
   },
   price: {
     fontSize: 16,
