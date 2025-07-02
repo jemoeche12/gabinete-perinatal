@@ -1,16 +1,49 @@
-import { StyleSheet, Text, View, FlatList, Pressable } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  Pressable,
+  Alert,
+} from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useDispatch, useSelector } from "react-redux";
 import CartItem from "../components/CartItem";
 import { clearCart } from "../features/cart/CartSlice";
+import { useOrderConfirmMutation } from "../services/orderService";
+import AddButton from "../components/AddButton";
+
 
 const Cart = () => {
   const cartItems = useSelector((state) => state.cart.value.itemCart);
   const total = useSelector((state) => state.cart.value.totalPrecioCarrito);
+  const { user } = useSelector((state) => state.auth.value);
   const dispatch = useDispatch();
+  const [triggerOrderConfirm] = useOrderConfirmMutation();
 
   const handleClearCart = () => {
     dispatch(clearCart());
+  };
+
+  const handlerOrderConfirm = async () => {
+    try {
+      const result = await triggerOrderConfirm({
+        cartItems,
+        total,
+        user,
+        
+      }).unwrap();
+      Alert.alert("La orden se ha confirmado con exito");
+      dispatch(clearCart());
+      
+
+      
+    } catch (error) {
+      Alert.alert(
+        "Error",
+        error.message || "Ocurrió un error al confirmar la orden."
+      );
+    }
   };
 
   return (
@@ -27,6 +60,16 @@ const Cart = () => {
           }
           renderItem={({ item }) => <CartItem item={item} />}
         />
+      )}
+
+      {cartItems.length > 0 && (
+        <View style={styles.button}>
+          <AddButton
+            style={styles.button}
+            title="CONFIRMAR"
+            onPress={handlerOrderConfirm}
+          />
+        </View>
       )}
       <View style={styles.totalContainer}>
         <Pressable style={styles.clearCart} onPress={handleClearCart}>
@@ -73,6 +116,10 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     color: "#007bff",
+  },
+  button: {
+    alignItems: "center",
+    marginVertical: 20,
   },
   clearCart: {
     padding: 10,
