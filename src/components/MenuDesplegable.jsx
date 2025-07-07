@@ -6,11 +6,11 @@ import {
   Pressable,
   Image,
   StyleSheet,
-  Dimensions, 
+  Dimensions,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-const { width } = Dimensions.get("window"); 
+const { width } = Dimensions.get("window");
 const MenuDesplegable = ({ visible, onClose }) => {
   const navigation = useNavigation();
   const menuWidth = width * 0.7;
@@ -21,7 +21,7 @@ const MenuDesplegable = ({ visible, onClose }) => {
     if (visible) {
       Animated.parallel([
         Animated.timing(slideAnim.current, {
-          toValue: 0, 
+          toValue: 0,
           duration: 400,
           useNativeDriver: true,
           easing: Easing.ease,
@@ -36,7 +36,7 @@ const MenuDesplegable = ({ visible, onClose }) => {
     } else {
       Animated.parallel([
         Animated.timing(slideAnim.current, {
-          toValue: -menuWidth, 
+          toValue: -menuWidth,
           duration: 400,
           useNativeDriver: true,
           easing: Easing.ease,
@@ -72,7 +72,7 @@ const MenuDesplegable = ({ visible, onClose }) => {
 
       <Pressable
         onPress={() => {
-          navigation.navigate("Home");
+          navigation.navigate("Main", { screen: "Home" });
           onClose?.();
         }}
       >
@@ -96,7 +96,7 @@ const MenuDesplegable = ({ visible, onClose }) => {
       </Pressable>
       <Pressable
         onPress={() => {
-          navigation.navigate('MiCita');
+          navigation.navigate("MiCita");
           onClose?.();
         }}
       >
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
   menuContainer: {
     position: "absolute",
     top: 0,
-    left: 0, 
+    left: 0,
     bottom: 0,
     backgroundColor: "rgba(35, 35, 35, 0.8)",
     justifyContent: "center",

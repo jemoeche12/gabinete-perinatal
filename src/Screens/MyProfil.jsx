@@ -86,7 +86,7 @@ const MyProfil = ({ navigation }) => {
 
           <View style={styles.cardContent}>
             <Fontisto name="email" size={24} color="black" />
-            <Text style={styles.textCard}> {email}</Text>
+            <Text style={styles.textCard}>Email: {email}</Text>
           </View>
         </Card>
       </View>
