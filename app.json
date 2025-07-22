@@ -11,10 +11,7 @@
       "image": "./assets/IconApp7.png",
       "resizeMode": "cover",
       "backgroundColor": "#ffffff",
-      "imageSize": [
-        500,
-        500
-      ]
+      "imageSize": [500, 500]
     },
     "ios": {
       "supportsTablet": true
@@ -31,7 +28,14 @@
     },
     "plugins": [
       "expo-sqlite",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "@stripe/stripe-react-native",
+        {
+          "merchantIdentifier": "merchant.com.gabinete-perinatal",
+          "enableGooglePay": true
+        }
+      ]
     ],
     "extra": {
       "eas": {

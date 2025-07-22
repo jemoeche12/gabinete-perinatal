@@ -5,6 +5,7 @@ import {
   FlatList,
   Pressable,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,6 +15,8 @@ import { useOrderConfirmMutation } from "../services/orderService";
 import AddButton from "../components/AddButton";
 import { sendEmailFromClient } from "../services/emailService";
 import { useGetProfileQuery } from "../services/userService";
+import { useStripe } from "@stripe/stripe-react-native";
+import { useState } from "react";
 
 const Cart = () => {
   const cartItems = useSelector((state) => state.cart.value.itemCart);
@@ -24,43 +27,161 @@ const Cart = () => {
 
   const { data: profileData } = useGetProfileQuery(localId);
 
-  const handleClearCart = () => {
-    dispatch(clearCart());
-  };
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
+
+  const [loading, setLoading] = useState(false);
+
   const email = user || "";
   const emailEquipo = "florenciavelascopsi@hotmail.com";
   const name = profileData?.name;
   const lastName = profileData?.lastName;
   const tallerComprado = cartItems.map((item) => item.titulo).join(", ");
 
-  const handlerOrderConfirm = async () => {
+  const handleClearCart = () => {
+    dispatch(clearCart());
+  };
+
+  const fetchPaymentIntent = async () => {
     try {
+      if (!total || total <= 0) {
+        throw new Error("El monto del total no es válido");
+      }
+
+      const response = await fetch(
+        "http://192.168.1.20:3000/create-payment-intent",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            cartItems,
+            total,
+            amount: Math.round(total * 100),
+            currency: "eur",
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Server error: ${response.status} - ${errorText}`);
+      }
+
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      if (!data.clientSecret) {
+        throw new Error("No se recibió el clientSecret del servidor");
+      }
+
+      return data.clientSecret;
+    } catch (error) {
+      Alert.alert(
+        "Error de Conexión",
+        `No se pudo conectar con el servidor de pagos: ${error.message}.`
+      );
+      return null;
+    }
+  };
+
+  const initializePaymentSheet = async () => {
+    try {
+      const clientSecret = await fetchPaymentIntent();
+
+      if (!clientSecret) {
+        return false;
+      }
+
+      const { error } = await initPaymentSheet({
+        paymentIntentClientSecret: clientSecret,
+        merchantDisplayName: "Gabinete Perinatal",
+        allowsDelayedPaymentMethods: true,
+      });
+
+      if (error) {
+        Alert.alert(
+          "Error de Configuración",
+          `Error al configurar el pago: ${error.message}
+           Código de error: ${error.code}`
+        );
+        return false;
+      } else {
+        return true;
+      }
+    } catch (error) {
+      Alert.alert("Error", `Error inesperado: ${error.message}`);
+      return false;
+    }
+  };
+
+  const handlerOrderConfirm = async () => {
+    if (cartItems.length === 0) {
+      Alert.alert("Error", "El carrito está vacío.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const paymentSheetReady = await initializePaymentSheet();
+
+      if (!paymentSheetReady) {
+        setLoading(false);
+        return;
+      }
+
+      const { error } = await presentPaymentSheet();
+
+      if (error) {
+        if (error.code === "Canceled") {
+          Alert.alert("Pago Cancelado", "Has cancelado el proceso de pago.");
+        } else {
+          Alert.alert(
+            "Error de Pago",
+            `El pago no se pudo completar: ${error.message}
+             Código: ${error.code}`
+          );
+        }
+        setLoading(false);
+        return;
+      }
+
       const result = await triggerOrderConfirm({
         cartItems,
         total,
-        user
+        user,
       }).unwrap();
-      Alert.alert("La orden se ha confirmado con exito");
+
       dispatch(clearCart());
 
       await sendEmailFromClient({
         to: [{ email: email }],
         subject: "Felicitaciones Por la compra del Taller",
-        htmlContent: `Felicitaciones por comprar del Taller ${tallerComprado}, una de nuestras psicologas se va a comunicar para brindarte la informacion que necesitas para hacer el taller`,
+        htmlContent: `Felicitaciones por comprar el Taller ${tallerComprado}, una de nuestras psicólogas se va a comunicar para brindarte la información que necesitas para hacer el taller.`,
       });
+
       await sendEmailFromClient({
         to: [{ email: emailEquipo }],
-        subject: "Felicitaciones Por la venta del Taller",
-        htmlContent: `Felicitaciones por comprar del Taller ${tallerComprado}, comunicate con Nombre y Apellido: ${name} ${lastName}
-        
-        el email es: ${email}`,
+        subject: "Nueva Venta de Taller",
+        htmlContent: `¡Felicitaciones! Se ha vendido el Taller ${tallerComprado}. Comunícate con Nombre y Apellido: ${name} ${lastName}. El email es: ${email}.`,
       });
-      
-    } catch (error) {
+
+      Alert.alert(
+        "¡Éxito!",
+        "Tu orden ha sido confirmada y el pago procesado con éxito. Recibirás un email de confirmación."
+      );
+    } catch (orderError) {
       Alert.alert(
         "Error",
-        error.message || "Ocurrió un error al confirmar la orden."
+        orderError.message ||
+          "Ocurrió un error al confirmar la orden después del pago."
       );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -82,14 +203,26 @@ const Cart = () => {
 
       {cartItems.length > 0 && (
         <View style={styles.button}>
-          <AddButton title="CONFIRMAR" onPress={handlerOrderConfirm} />
+          {loading ? (
+            <View style={{ alignItems: "center" }}>
+              <ActivityIndicator size="large" color="#0000ff" />
+              <Text style={{ marginTop: 10 }}>Procesando pago...</Text>
+            </View>
+          ) : (
+            <AddButton
+              title="PAGAR Y CONFIRMAR"
+              onPress={handlerOrderConfirm}
+              disabled={loading || cartItems.length === 0}
+            />
+          )}
         </View>
       )}
+
       <View style={styles.totalContainer}>
         <Pressable style={styles.clearCart} onPress={handleClearCart}>
           <FontAwesome name="trash-o" size={24} color="black" />
         </Pressable>
-        <Text style={styles.totalText}>Total: ${total}</Text>
+        <Text style={styles.totalText}>Total: €{total}</Text>
       </View>
     </View>
   );
@@ -100,41 +233,42 @@ export default Cart;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#fff",
     padding: 16,
-    backgroundColor: "#F8EDE3",
   },
   header: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 20,
     textAlign: "center",
+    marginBottom: 20,
     color: "#333",
   },
   emptyCartText: {
     fontSize: 18,
     textAlign: "center",
-    marginTop: 50,
     color: "#666",
-  },
-  totalContainer: {
-    justifyContent: "space-between",
-    flexDirection: "row",
-    borderTopWidth: 1,
-    borderTopColor: "#ccc",
-    paddingTop: 10,
-    alignItems: "flex-end",
-    marginHorizontal: 20,
-  },
-  totalText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#007bff",
+    marginTop: 50,
   },
   button: {
+    marginVertical: 20,
+    paddingHorizontal: 16,
+  },
+  totalContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 20,
+    borderTopWidth: 1,
+    borderTopColor: "#eee",
+    backgroundColor: "#f9f9f9",
   },
   clearCart: {
     padding: 10,
+  },
+  totalText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
   },
 });

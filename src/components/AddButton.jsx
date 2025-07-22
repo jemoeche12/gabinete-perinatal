@@ -1,27 +1,41 @@
-import { Pressable, StyleSheet, Text } from 'react-native'
-import React from 'react'
+import { Pressable, Text, StyleSheet } from 'react-native';
 
-const AddButton = ({ title, onPress = () => { }, }) => {
+const AddButton = ({ title, onPress, disabled = false }) => {
   return (
-    <Pressable onPress={onPress} style={styles.btn}>
-      <Text style={styles.btnText}>{title}</Text>
+    <Pressable 
+      style={[styles.button, disabled && styles.buttonDisabled]} 
+      onPress={onPress}
+      disabled={disabled}
+    >
+      <Text style={[styles.buttonText, disabled && styles.buttonTextDisabled]}>
+        {title}
+      </Text>
     </Pressable>
-  )
-}
-
-export default AddButton
+  );
+};
 
 const styles = StyleSheet.create({
-  btn: {
-    borderRadius: 10,
-    backgroundColor: "#B78270",
-    paddingVertical: 18,
-    paddingHorizontal: 25,
-    marginBottom: 40
+  button: {
+    backgroundColor: '#E6C6B7',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+    shadowColor: '#000',
   },
-  btnText: {
-    color: "#fff",
-    fontSize: 20,
-    fontFamily: "Crafty",
+  buttonDisabled: {
+    backgroundColor: '#ccc',
+    opacity: 0.6,
   },
-})
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  buttonTextDisabled: {
+    color: '#999',
+  },
+});
+
+export default AddButton;

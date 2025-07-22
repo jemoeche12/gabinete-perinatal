@@ -21,7 +21,7 @@ const Talleres = ({ navigation, visible }) => {
                 <ScrollView contentContainerStyle={styles.scrollContainer}>
                     <Text style={styles.title}>Te damos la bienvenida a la sección TALLERES de  Red de Apoyo Perinatal Digital, un espacio diseñado para acompañarte en el camino de la maternidad y paternidad con información especializada y un espacio de escucha profesional.</Text>
                     <FuncionTalleres />
-                    <AddButton title="Descubrir Talleres" onPress={() => navigation.navigate('ListTalleres')} />
+                    <AddButton style={{ marginBottom: 20, backgroundColor: '#E6C6B7' }} title="Descubrir Talleres" onPress={() => navigation.navigate('ListTalleres')} />
                 </ScrollView>
             </ImageBackground>
         </>
