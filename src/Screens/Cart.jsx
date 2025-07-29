@@ -48,13 +48,15 @@ const Cart = () => {
       }
 
       const response = await fetch(
-        "http://192.168.1.20:3000/create-payment-intent",
+        `https://api-yela3b24ha-uc.a.run.app/create-payment-intent`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
+            customerName: `${name} ${lastName}`,
+            customerEmail: email,
             cartItems,
             total,
             amount: Math.round(total * 100),

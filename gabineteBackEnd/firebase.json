@@ -3,6 +3,7 @@
     {
       "source": "functions",
       "codebase": "default",
+      "rawRequest": true,
       "ignore": [
         "node_modules",
         ".git",
@@ -10,8 +11,7 @@
         "firebase-debug.*.log",
         "*.local"
       ],
-      "predeploy": [
-      ]
+      "predeploy": []
     }
   ]
 }
