@@ -24,6 +24,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontSize: 18,
-    fontFamily: 'Crafty',
+    fontFamily: 'Roboto400',
   },
 });

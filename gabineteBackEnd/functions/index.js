@@ -1,30 +1,106 @@
-const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
 const Stripe = require("stripe");
 const Mailjet = require("node-mailjet");
-const { onCall } = require("firebase-functions/v2/https"); 
+const { onRequest, onCall, HttpsError } = require("firebase-functions/v2/https");
 
-
-if (process.env.NODE_ENV !== "production") {
-  require("dotenv").config();
-}
+const stripeSecretKey = "sk_test_51RgMQYFJ1XWiS5lgSH6lIeJxFIuVj6eLvn2oLRRYCFLpGG6dmNs7qC08eZB54J130KR6H8XcKRaL9SRfH27FkP0O009PZXRiqN";
+const stripeWebhookSecret = "whsec_OPmKusDitS57VinkAcZOj0rduFu2Ocr9";
+const mailjetApiKey = "3326de0752c681ca2eda3da28b76ecfd";
+const mailjetApiSecret = "a49d76568733421067b6ebb48844059b";
 
 const app = express();
 app.use(cors({ origin: true }));
-app.use(express.json());
+
+const admin = require("firebase-admin");
+if (!admin.apps.length) admin.initializeApp();
+
+const sendEmailFromClient = async ({ email, subject, body }) => {
+ 
+  return Promise.resolve();
+};
+
+app.use(
+  express.json({
+    verify: (req, res, buf) => {
+      req.rawBody = buf;
+    },
+  })
+);
+
+app.post("/webhook", async (request, response) => {
+  const signature = request.headers["stripe-signature"];
+  let event;
+
+  const stripe = new Stripe(stripeSecretKey, {
+    apiVersion: "2024-06-20",
+  });
+
+  try {
+    event = stripe.webhooks.constructEvent(
+      request.rawBody,
+      signature,
+      stripeWebhookSecret
+    );
+  } catch (err) {
+    console.error("⚠️  Error verificando firma del webhook:", err.message);
+    return response.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  switch (event.type) {
+    case "payment_intent.succeeded": {
+      const paymentIntent = event.data.object;
+      const orderId = paymentIntent.metadata.order_id;
+      const customerEmail = paymentIntent.metadata.customer_email;
+      const customerName = paymentIntent.metadata.customer_name;
+      const totalAmount = paymentIntent.metadata.total_amount;
+
+      try {
+        await admin.database().ref(`/ordenes/${orderId}`).update({
+          estado: "pagado",
+          fecha_pago: Date.now(),
+        });
+        
+        await sendEmailFromClient({
+          email: customerEmail,
+          subject: "Pago exitoso",
+          body: `Hola ${customerName}, tu pago de $${totalAmount} ha sido recibido con éxito. Gracias por tu compra!`,
+        });
+        
+        await sendEmailFromClient({
+          email: "florenciavelascopsi@hotmail.com",
+          subject: "Nueva orden",
+          body: `Se ha recibido una nueva orden: ${orderId}`,
+        });
+      } catch (error) {
+        console.error(`❌ Error actualizando orden ${orderId}:`, error);
+      }
+
+      break;
+    }
+
+    case "payment_method.attached": {
+      const paymentMethod = event.data.object;
+      console.log(
+        `💳 PaymentMethod ${paymentMethod.id} attached to customer ${paymentMethod.customer}`
+      );
+      break;
+    }
+
+    default:
+  }
+
+  response.json({ received: true });
+});
 
 app.post("/create-payment-intent", async (req, res) => {
-  
-  const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-
   if (!stripeSecretKey) {
     console.error("Falta STRIPE_SECRET_KEY en las variables de entorno.");
     return res.status(500).json({ error: "Stripe no está configurado." });
   }
 
   const stripe = new Stripe(stripeSecretKey, {
-    apiVersion: "2024-06-20", 
+    apiVersion: "2024-06-20",
   });
 
   try {
@@ -39,7 +115,9 @@ app.post("/create-payment-intent", async (req, res) => {
     }
 
     const orderId = `order_${Date.now()}`;
-    const productNames = cartItems.map((item) => item.titulo || item.name).join(", ");
+    const productNames = cartItems
+      .map((item) => item.titulo || item.name)
+      .join(", ");
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
@@ -61,7 +139,9 @@ app.post("/create-payment-intent", async (req, res) => {
     });
   } catch (error) {
     console.error("Error en /create-payment-intent:", error);
-    res.status(500).json({ error: error.message || "Error interno del servidor" });
+    res
+      .status(500)
+      .json({ error: error.message || "Error interno del servidor" });
   }
 });
 
@@ -75,19 +155,21 @@ app.use((error, req, res, next) => {
 });
 
 const sendEmailFunction = onCall(async (request) => {
- 
-  const mailjetApiKey = functions.config().mailjet.api_key;
-  const mailjetApiSecret = functions.config().mailjet.api_secret;
-
   if (!mailjetApiKey || !mailjetApiSecret) {
-    console.error("Faltan las claves de Mailjet en la configuración de Firebase Functions.");
-    throw new functions.https.HttpsError(
-      "internal",
-      "Mailjet no está configurado correctamente en Firebase Functions. Por favor, configura 'mailjet.api_key' y 'mailjet.api_secret'."
+    console.error(
+      "Faltan las claves de Mailjet en la configuración de Firebase Functions."
+    );
+    throw new HttpsError(
+      "failed-precondition",
+      "Mailjet no está configurado correctamente en Firebase Functions. Por favor, configura 'MAILJET_API_KEY' y 'MAILJET_API_SECRET'."
     );
   }
 
-  const mailer = new Mailjet({ apiKey: mailjetApiKey, apiSecret: mailjetApiSecret });
+  const mailer = new Mailjet({
+    apiKey: mailjetApiKey,
+    apiSecret: mailjetApiSecret,
+  });
+
   const { to, subject, htmlContent } = request.data;
 
   if (
@@ -95,7 +177,7 @@ const sendEmailFunction = onCall(async (request) => {
     to.length === 0 ||
     to.some((r) => !r?.email || !r.email.includes("@"))
   ) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "invalid-argument",
       "Destinatarios de email inválidos. Se requiere un array de objetos con propiedad 'email'."
     );
@@ -106,7 +188,7 @@ const sendEmailFunction = onCall(async (request) => {
       Messages: [
         {
           From: {
-            email: "info@redperinataldigital.com", 
+            email: "info@redperinataldigital.com",
             name: "Red Perinatal Digital",
           },
           To: to.map((recipient) => ({
@@ -115,25 +197,38 @@ const sendEmailFunction = onCall(async (request) => {
           })),
           Subject: subject,
           HTMLPart: htmlContent,
-          // agregar texto plano si es que lo necesito, revisar con flor 
         },
       ],
     };
 
-    const response = await mailer.post("send", { version: "v3.1" }).request(messagePayload);
+    const response = await mailer
+      .post("send", { version: "v3.1" })
+      .request(messagePayload);
 
-    console.log("Respuesta de Mailjet:", JSON.stringify(response.body, null, 2));
+    console.log(
+      "Respuesta de Mailjet:",
+      JSON.stringify(response.body, null, 2)
+    );
 
-    if (response.body && response.body.Messages && response.body.Messages[0].Status === "success") {
+    if (
+      response.body &&
+      response.body.Messages &&
+      response.body.Messages[0].Status === "success"
+    ) {
       return {
         status: "success",
         message: "Email enviado exitosamente",
-        data: response.body, 
+        data: response.body,
       };
     } else {
-      const mailjetErrorMessage = response.body?.Messages?.[0]?.Errors?.[0]?.ErrorMessage || "Error desconocido en Mailjet.";
-      console.error("Mailjet no reportó éxito en el envío:", JSON.stringify(response.body, null, 2));
-      throw new functions.https.HttpsError(
+      const mailjetErrorMessage =
+        response.body?.Messages?.[0]?.Errors?.[0]?.ErrorMessage ||
+        "Error desconocido en Mailjet.";
+      console.error(
+        "Mailjet no reportó éxito en el envío:",
+        JSON.stringify(response.body, null, 2)
+      );
+      throw new HttpsError(
         "internal",
         `Mailjet no pudo enviar el email: ${mailjetErrorMessage}`
       );
@@ -141,12 +236,17 @@ const sendEmailFunction = onCall(async (request) => {
   } catch (error) {
     console.error("Error al enviar email (catch general):", error);
     const errorMessage = error.statusCode
-      ? `Mailjet API Error (${error.statusCode}): ${error.message || JSON.stringify(error)}`
+      ? `Mailjet API Error (${error.statusCode}): ${
+          error.message || JSON.stringify(error)
+        }`
       : error.message;
 
-    throw new functions.https.HttpsError("internal", errorMessage || "Error interno al enviar email.");
+    throw new HttpsError(
+      "internal",
+      errorMessage || "Error interno al enviar email."
+    );
   }
 });
 
-exports.api = functions.https.onRequest(app);
+exports.api = onRequest(app);
 exports.sendEmailFunction = sendEmailFunction;

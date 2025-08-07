@@ -7,6 +7,7 @@ import {
   Image,
   StyleSheet,
   Dimensions,
+  View,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
@@ -65,11 +66,10 @@ const MenuDesplegable = ({ visible, onClose }) => {
         },
       ]}
     >
-      <Image
-        source={require("../../assets/IconApp7.png")}
-        style={styles.imgIcon}
-      />
-
+        <Image
+          source={require("../../assets/Red.png")}
+          style={styles.imgIcon}
+        />
       <Pressable
         onPress={() => {
           navigation.navigate("Main", { screen: "Home" });
@@ -142,25 +142,29 @@ const styles = StyleSheet.create({
     backgroundColor: "#B78270",
     borderRadius: 5,
     color: "white",
-    fontFamily: "Crafty",
+    fontFamily: 'Roboto400',
     borderColor: "transparent",
   },
   closeBtnText: {
     fontSize: 18,
     color: "white",
-    fontFamily: "Crafty",
+    fontFamily: 'Roboto400',
   },
   menuItem: {
     fontSize: 22,
     color: "white",
     paddingVertical: 15,
-    fontFamily: "Crafty",
+    fontFamily: 'Roboto400',
+    textAlign: "center",
   },
+  
   imgIcon: {
-    width: 225,
-    height: 225,
+    width: 150,
+    height: 150,
     marginBottom: 5,
     marginTop: -200,
-    backgroundColor: "transparent",
+    backgroundColor: "white",
+    borderRadius: 112.5,
+    marginBottom: 20,
   },
-});
+})

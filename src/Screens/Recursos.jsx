@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   text: {
-    fontFamily: "Crafty",
+    fontFamily: 'Roboto400',
     width: "90%",
     marginHorizontal: "5%",
     fontSize: 24,

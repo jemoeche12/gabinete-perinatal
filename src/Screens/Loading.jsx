@@ -7,7 +7,7 @@ import {
     StyleSheet,
     Alert 
 } from "react-native";
-import fondoInicio from "../../assets/img/fondo.jpg"; 
+import fondoInicio from "../../assets/fondoApp.png"; 
 
 import { useDBContext } from '../context/DBContext'; 
 
@@ -18,7 +18,7 @@ const Loading = ({ navigation }) => {
         if (dbInitialized && !dbError) {
             const timer = setTimeout(() => {
                 navigation.replace("Login");
-            }, 3500); 
+            }, 5000); 
             return () => clearTimeout(timer); 
         } else if (dbError) {
             Alert.alert(
@@ -32,7 +32,6 @@ const Loading = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <ImageBackground source={fondoInicio} style={styles.background} >
-                <Text style={styles.appName}>Bienvenidos a tu red Perinatal Digital</Text>
                 {!dbInitialized && !dbError && (
                     <ActivityIndicator size="large" color="#B78270" style={styles.loader} />
                 )}
@@ -49,15 +48,6 @@ export default Loading;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-    },
-    appName: {
-        color: "#B78270",
-        fontSize: 36,
-        textAlign: "center",
-        fontFamily: "Crafty",
-        marginBottom: "90%",
-        width: "70%",
-        marginLeft: -75
     },
     background: {
         flex: 1,

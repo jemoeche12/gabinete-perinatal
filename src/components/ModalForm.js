@@ -21,14 +21,14 @@ import { Picker } from "@react-native-picker/picker";
 import { sendEmailFromClient } from "../services/emailService";
 
 const horariosDisponibles = [
-  "08:00 - 09:00",
-  "09:00 - 10:00",
-  "10:00 - 11:00",
-  "11:00 - 12:00",
-  "14:00 - 15:00",
-  "15:00 - 16:00",
-  "16:00 - 17:00",
-  "17:00 - 18:00",
+  "09:00 - 09:40",
+  "10:00 - 10:40",
+  "11:00 - 11:40",
+  "14:00 - 14:40",
+  "15:00 - 15:40",
+  "16:00 - 16:40",
+  "17:00 - 17:40",
+  "18:00 - 18:40",
 ];
 
 const ModalForm = ({ modalVisible, setModalVisible }) => {
@@ -171,7 +171,7 @@ const ModalForm = ({ modalVisible, setModalVisible }) => {
   return (
     <Modal visible={modalVisible} animationType="slide">
       <ScrollView contentContainerStyle={styles.modalContainer}>
-        <Text style={styles.modalTitle}>Formulario de Cita</Text>
+        <Text style={styles.modalTitle}>Formulario</Text>
 
         {profileLoading ? (
           <Text style={styles.loadingText}>Cargando datos de perfil...</Text>
@@ -201,7 +201,7 @@ const ModalForm = ({ modalVisible, setModalVisible }) => {
           placeholderTextColor="#999"
         />
         <View style={styles.containerCalendar}>
-          <Text style={styles.textCalendar}>Fecha de la Cita</Text>
+          <Text style={styles.textCalendar}>Fecha:</Text>
           <DateTimePicker
             styles={{
               today: {
@@ -220,7 +220,7 @@ const ModalForm = ({ modalVisible, setModalVisible }) => {
             minDate={today}
             disabledDates={(date) => [0, 6].includes(dayjs(date).day())}
           />
-          <Text style={styles.textCalendar}>Horario de la Cita</Text>
+          <Text style={styles.textCalendar}>Horario</Text>
           <View style={styles.pickerContainer}>
             {todasLasCitasLoading ? (
               <Text style={styles.loadingText}>Cargando horarios...</Text>
@@ -268,7 +268,7 @@ const ModalForm = ({ modalVisible, setModalVisible }) => {
           }
         >
           <Text style={styles.buttonText}>
-            {isCrearCita ? "Enviando Solicitud..." : "Solicitar Cita"}
+            {isCrearCita ? "Enviando Solicitud..." : "Solicitar"}
           </Text>
         </Pressable>
         <Pressable
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 30,
-    fontFamily: "Crafty",
+    fontFamily: 'Roboto400',
     color: "#B78270",
     marginBottom: 20,
     textAlign: "center",
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 18,
     color: "#333",
-    fontFamily: "Crafty",
+    fontFamily: 'Roboto400',
     marginTop: 10,
     marginBottom: 5,
     width: "90%",
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     fontSize: 16,
-    fontFamily: "Crafty",
+    fontFamily: 'Roboto400',
     backgroundColor: "#fff",
     marginBottom: 10,
     width: "90%",
@@ -356,10 +356,10 @@ const styles = StyleSheet.create({
   picker: {
     width: "100%",
     height: 50,
-    fontFamily: "Crafty",
+    fontFamily: 'Roboto400',
   },
   pickerItem: {
-    fontFamily: "Crafty",
+    fontFamily: 'Roboto400',
     fontSize: 16,
   },
 
@@ -375,7 +375,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontSize: 18,
-    fontFamily: "Crafty",
+    fontFamily: 'Roboto400',
   },
   closeButton: {
     backgroundColor: "#6c757d",
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
   loadingText: {
     fontSize: 16,
     color: "#888",
-    fontFamily: "Crafty",
+    fontFamily: 'Roboto400',
     marginBottom: 10,
   },
 });

@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#555",
     marginBottom: 3,
-    fontFamily: "Crafty",
+    fontFamily: 'Roboto400',
   },
   totalContainer: {
     justifyContent: "space-between",

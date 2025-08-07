@@ -4,7 +4,7 @@ import MenuDesplegable from "../components/MenuDesplegable";
 import React, { useState } from "react";
 import { useGetTestTituloQuery } from "../services/testService";
 import TestComponent from "../components/TestComponent";
-import iconImageLoading from '../../assets/IconApp7.png';
+import iconImageLoading from '../../assets/Red.png';
 
 
 const TestListScreen = ({ navigation, visible }) => {
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   text: {
-    fontFamily: "Crafty",
+    fontFamily: 'Roboto400',
     width: "90%",
     marginHorizontal: "5%",
     fontSize: 24,

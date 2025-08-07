@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { View, Text, Pressable, StyleSheet, Alert } from "react-native";
+import { View, Text, Pressable, StyleSheet, Alert, ImageBackground } from "react-native";
 import InputForm from "../components/InputForm";
 import { useDispatch } from "react-redux";
 import { useSignInMutation } from "../services/authService";
@@ -7,6 +7,7 @@ import { setUser } from "../features/user/UserSlice";
 import SubmitButton from "../components/SubmitButton";
 import { useDBContext } from "../context/DBContext";
 import { useLazyGetProfileQuery } from "../services/userService";
+import fondoLogin from "../../assets/fondos/CONTACTO.jpg";
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -87,7 +88,7 @@ const Login = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <ImageBackground source={fondoLogin} style={styles.container}>
       <View style={styles.form}>
         <Text style={styles.title}>Bienvenida/o {profileDate?.name}</Text>
         <InputForm label={"Email"} onChangeText={setEmail} error={errorMail} />
@@ -107,7 +108,7 @@ const Login = ({ navigation }) => {
           <Text style={styles.buttonText}>Registrarse</Text>
         </Pressable>
       </View>
-    </View>
+    </ImageBackground>
   );
 };
 
@@ -118,7 +119,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#F8EDE3",
   },
   form: {
     width: "80%",
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 30,
-    fontFamily: "Crafty",
+    fontFamily: 'Roboto400',
     color: "#B78270",
     marginBottom: 20,
     textAlign: "center",
@@ -150,11 +150,11 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontSize: 18,
-    fontFamily: "Crafty",
+    fontFamily: 'Roboto400',
   },
   placeholder: {
     color: "black",
     fontSize: 18,
-    fontFamily: "Crafty",
+    fontFamily: 'Roboto400',
   },
 });

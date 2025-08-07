@@ -17,6 +17,8 @@ import { sendEmailFromClient } from "../services/emailService";
 import { useGetProfileQuery } from "../services/userService";
 import { useStripe } from "@stripe/stripe-react-native";
 import { useState } from "react";
+import { colors } from "../utils/customerStyle";
+import payment from "../../assets/icon/pagoConfirm.png";
 
 const Cart = () => {
   const cartItems = useSelector((state) => state.cart.value.itemCart);
@@ -211,11 +213,19 @@ const Cart = () => {
               <Text style={{ marginTop: 10 }}>Procesando pago...</Text>
             </View>
           ) : (
-            <AddButton
-              title="PAGAR Y CONFIRMAR"
-              onPress={handlerOrderConfirm}
-              disabled={loading || cartItems.length === 0}
-            />
+            <View style={{ alignItems: "center" }}>
+              <AddButton
+                onPress={handlerOrderConfirm}
+                disabled={loading || cartItems.length === 0}
+                iconSource={payment}
+                iconSize={42}
+                color="black"
+                style={styles.addButton}
+              />
+              <Text style={{ textAlign: "center", marginTop: 10 }}>
+                PAGAR Y CONFIRMAR
+              </Text>
+            </View>
           )}
         </View>
       )}
@@ -273,4 +283,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#333",
   },
+addButton: {
+  backgroundColor: colors.btnGuia,
+  alignItems: "center",
+  justifyContent: "center",
+  paddingTop: 20, 
+  paddingBottom: 0,
+  marginBottom: 20,
+},
 });

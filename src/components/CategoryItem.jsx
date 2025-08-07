@@ -59,6 +59,6 @@ const styles = StyleSheet.create({
   productText: {
     fontSize: 18,
     color: "black",
-    fontFamily:"Crafty"
+    fontFamily:'Roboto400',
   },
 });

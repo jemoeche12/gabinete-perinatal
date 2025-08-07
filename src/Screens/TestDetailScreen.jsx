@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { useGetTestByIdQuery } from "../services/testService";
-import iconImageLoading from "../../assets/IconApp7.png";
+import iconImageLoading from "../../assets/Red.png";
 
 const TestDetailScreen = ({ route, navigation }) => {
   const { id } = route.params;
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontFamily: "Crafty",
+    fontFamily: 'Roboto400',
     textAlign: "center",
     marginVertical: 25,
   },
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontSize: 18,
-    fontFamily: "Crafty",
+    fontFamily: 'Roboto400',
   },
   centeredView: {
     flex: 1,
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
   },
   scoreText: {
     fontSize: 26,
-    fontFamily: "Crafty",
+    fontFamily: 'Roboto400',
     color: "#B78270",
     marginBottom: 25,
   },

@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "300",
     marginBottom: 40,
-    fontFamily: "Crafty"
+    fontFamily: 'Roboto400',
   },
   scrollContainer: {
     flexGrow: 1,

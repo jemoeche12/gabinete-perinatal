@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, Pressable, ScrollView, Image } from 'react-native';
 import React, { useState } from 'react';
 import { useGetTallerByIdQuery } from '../services/talleresService';
-import iconImageLoading from '../../assets/IconApp7.png';
+import iconImageLoading from '../../assets/Red.png';
 import CustomHeader from '../components/CustomHeader';
 import MenuDesplegable from '../components/MenuDesplegable';
 import { useDispatch, useSelector } from 'react-redux';
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'justify',
     marginBottom: 24,
-    fontFamily: 'Crafty',
+    fontFamily: 'Roboto400',
     padding: 10,
     lineHeight: 28,
   },
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'justify',
     marginBottom: 32,
-    fontFamily: 'Crafty',
+    fontFamily: 'Roboto400',
     padding: 10,
     lineHeight: 28,
   },
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
   modalidadText: {
     fontSize: 18,
     color: 'black',
-    fontFamily: 'Crafty',
+    fontFamily: 'Roboto400',
     lineHeight: 26,
   },
   containImageLoading: {
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
     height: 250,
     resizeMode: 'contain',
   },
-  cartStatusText: { // Nuevo estilo para el mensaje del carrito
+  cartStatusText: {
     fontSize: 16,
     textAlign: 'center',
     marginTop: 20,

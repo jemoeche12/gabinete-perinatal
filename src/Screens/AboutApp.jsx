@@ -52,21 +52,21 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     title:{
-        fontFamily: "Crafty",
+        fontFamily: 'Roboto400',
         fontSize: 20,
         width: "90%",
         marginHorizontal: "5%", 
         marginTop: 20
     },
     subtitle:{
-        fontFamily: "Crafty",
+        fontFamily: 'Roboto400',
         fontSize: 20,
         width: "90%",
         marginHorizontal: "5%", 
         marginVertical: 30
     },
     subtitleTaller:{
-        fontFamily: "Crafty",
+        fontFamily: 'Roboto400',
         fontSize: 20,
         width: "90%",
         marginHorizontal: "5%", 
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     },
     
     subtitleCalendar:{
-        fontFamily: "Crafty",
+        fontFamily: 'Roboto400',
         fontSize: 20,
         width: "90%",
         marginHorizontal: "5%", 

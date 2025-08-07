@@ -1,11 +1,13 @@
 import React from 'react';
-import { FlatList, Pressable, Text, View, Image, StyleSheet } from 'react-native';
+import { FlatList, Pressable, Text, View, Image, StyleSheet, ImageBackground } from 'react-native';
 import TalleresByTitle from '../components/TalleresByTitle';
 import { useGetTalleresQuery } from '../services/talleresService';
 import { useState } from 'react';
-import iconImageLoading from '../../assets/IconApp7.png';
+import iconImageLoading from '../../assets/Red.png';
 import CustomHeader from '../components/CustomHeader';
 import MenuDesplegable from '../components/MenuDesplegable';
+import fondo from '../../assets/fondos/fondoTalleres.jpg'
+
 
 const ListTalleres = ({ navigation, visible }) => {
     const [isMenuVisible, setIsMenuVisible] = useState(visible);
@@ -26,7 +28,7 @@ const ListTalleres = ({ navigation, visible }) => {
         <>
         <CustomHeader onMenuPress={toggleMenu} />
         {isMenuVisible && <MenuDesplegable onClose={toggleMenu} visible={isMenuVisible} />} 
-        <View style={styles.container}>
+        <ImageBackground source={fondo} style={styles.container}>
             <FlatList
               contentContainerStyle={{ paddingBottom: 150 }} 
                 data={data}
@@ -38,7 +40,7 @@ const ListTalleres = ({ navigation, visible }) => {
                     </Pressable>
                 )}
             />
-        </View>
+        </ImageBackground>
         </>
     )
 }

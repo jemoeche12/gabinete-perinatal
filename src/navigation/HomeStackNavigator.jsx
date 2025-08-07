@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Home from "../Screens/Home";
 import TalleresStackNavigator from "./TalleresStackNavigator";
 import Cart from "../Screens/Cart";
+import InstructivoScreen from "../Screens/InstructivoScreen";
 
 const HomeStackNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -22,6 +23,7 @@ const HomeStackNavigator = () => {
         component={TalleresStackNavigator}
         options={{ headerBackVisible: false, headerShown: false }}
       />
+      
       <Stack.Screen name="ShopingCart" component={Cart} />
     </Stack.Navigator>
   );

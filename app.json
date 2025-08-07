@@ -4,27 +4,30 @@
     "slug": "gabinete-perinatal",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/IconApp8.png",
-    "userInterfaceStyle": "light",
+    "icon": "./assets/Red.png",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/IconApp7.png",
+      "image": "./assets/Red.png",
       "resizeMode": "cover",
       "backgroundColor": "#ffffff",
-      "imageSize": [500, 500]
+      "imageSize": [
+        500,
+        500
+      ]
     },
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/IconApp7.png",
+        "foregroundImage": "./assets/Red.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.jemoeche.gabineteperinatal"
     },
     "web": {
-      "favicon": "./assets/IconApp7.png"
+      "favicon": "./assets/Red.png"
     },
     "plugins": [
       "expo-sqlite",
@@ -35,7 +38,9 @@
           "merchantIdentifier": "merchant.com.gabinete-perinatal",
           "enableGooglePay": true
         }
-      ]
+      ],
+      "expo-font",
+      "expo-video"
     ],
     "extra": {
       "eas": {

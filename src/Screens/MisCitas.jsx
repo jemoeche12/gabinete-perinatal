@@ -11,11 +11,17 @@ import { useGetCitaQuery } from "../services/citasService";
 import { useSelector } from "react-redux";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
+import ModalForm from "../components/ModalForm";
+import AddButton from "../components/AddButton";
+import { colors } from "../utils/customerStyle";
+import iconCita from "../../assets/icon/citaApp.png";
+import home from "../../assets/icon/home.png";
 
 dayjs.locale("es");
 
-const MisCitas = () => {
+const MisCitas = ({ navigation }) => {
   const localId = useSelector((state) => state.auth.value.localId);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const [fechaElegida, setFechaElegida] = useState(
     dayjs().format("YYYY-MM-DD")
@@ -66,6 +72,24 @@ const MisCitas = () => {
         <Text style={styles.emptyText}>
           ¡Solicita una nueva cita si lo deseas!
         </Text>
+        <AddButton
+          title="Pedir Cita"
+          onPress={() => setModalVisible(true)}
+          style={styles.addButtonStyle}
+          iconSource={iconCita}
+        />
+        <AddButton
+        title="Inicio"
+        onPress={() => {
+          navigation.navigate("Main");
+        }}
+        style={styles.addButtonIncioStyle}
+        iconSource={home}
+      />
+        <ModalForm
+          modalVisible={modalVisible}
+          setModalVisible={setModalVisible}
+        />
       </View>
     );
   }
@@ -78,14 +102,35 @@ const MisCitas = () => {
       </Text>
       <FlatList
         data={citasPorUsuario}
+        showsVerticalScrollIndicator={false}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.citaCard}>
             <Text style={styles.citaText}>Fecha: {item.fechaSeleccionada}</Text>
-            <Text style={styles.citaText}>Horario: {item.horarioELegido}</Text>
+            <Text style={styles.citaText}>
+              Horario de llamada: {item.horarioELegido}
+            </Text>
             <Text style={styles.citaText}>Consulta: {item.consulta}</Text>
           </View>
         )}
+      />
+      <AddButton
+        title="Pedir Cita"
+        onPress={() => setModalVisible(true)}
+        style={styles.addButton}
+        iconSource={iconCita}
+      />
+      <AddButton
+        title="Inicio"
+        onPress={() => {
+          navigation.navigate("Main");
+        }}
+        style={styles.addButtonIncio}
+        iconSource={home}
+      />
+      <ModalForm
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
       />
     </View>
   );
@@ -96,13 +141,14 @@ export default MisCitas;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: "flex-start",
     padding: 20,
     backgroundColor: "#F8EDE3",
-    paddingTop: 50,
+    paddingTop: 20,
   },
   header: {
     fontSize: 24,
-    fontFamily: "Crafty",
+    fontFamily: "Roboto400",
     color: "#B78270",
     marginBottom: 20,
     textAlign: "center",
@@ -116,7 +162,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 10,
     fontSize: 18,
-    fontFamily: "Crafty",
+    fontFamily: "Roboto400",
     color: "#B78270",
   },
   errorContainer: {
@@ -131,7 +177,7 @@ const styles = StyleSheet.create({
     color: "red",
     textAlign: "center",
     marginBottom: 5,
-    fontFamily: "Crafty",
+    fontFamily: "Roboto400",
   },
   refreshButton: {
     backgroundColor: "#B78270",
@@ -142,7 +188,7 @@ const styles = StyleSheet.create({
   refreshButtonText: {
     color: "#fff",
     fontSize: 16,
-    fontFamily: "Crafty",
+    fontFamily: "Roboto400",
   },
   emptyContainer: {
     flex: 1,
@@ -155,7 +201,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#555",
     textAlign: "center",
-    fontFamily: "Crafty",
+    fontFamily: "Roboto400",
     marginBottom: 10,
   },
   citaCard: {
@@ -173,6 +219,29 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 5,
     color: "#333",
-    fontFamily: "Crafty",
+    fontFamily: "Roboto400",
+  },
+  addButton: {
+    backgroundColor: colors.btnCita,
+    position: "absolute",
+    bottom: 60,
+    right: 20,
+  },
+  addButtonStyle: {
+    backgroundColor: colors.btnCita,
+    position: "absolute",
+    top: 80,
+    left: 50,
+  },
+  addButtonIncio: {
+    backgroundColor: colors.btnAsesorias,
+    top: -50,
+    left: 105,
+  },
+  addButtonIncioStyle: {
+    backgroundColor: colors.btnAsesorias,
+    position: "absolute",
+    top: 180,
+    left: 50,
   },
 });

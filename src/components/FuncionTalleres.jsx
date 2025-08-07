@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
         color: "black",
         marginTop: 30,
         textAlign: "center",
-        fontFamily: "Crafty",
+        fontFamily: 'Roboto400',
         padding: 20,
 
     },
@@ -42,6 +42,6 @@ const styles = StyleSheet.create({
         textAlign: "center",
         padding: 20,
         marginBottom: 50,
-        fontFamily:"Crafty"
+        fontFamily:'Roboto400',
     }
 })

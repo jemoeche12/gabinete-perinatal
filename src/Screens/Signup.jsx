@@ -5,6 +5,7 @@ import {
   View,
   Alert,
   ActivityIndicator,
+  ImageBackground,
 } from "react-native";
 import { useEffect, useState } from "react";
 import InputForm from "../components/InputForm";
@@ -15,7 +16,7 @@ import { setUser } from "../features/user/UserSlice";
 import { useDBContext } from "../context/DBContext";
 import { sendEmailFromClient } from "../services/emailService";
 import { useUpdateUserProfileMutation } from "../services/userService";
-import { HomeStackNavigator } from "../navigation/HomeStackNavigator";
+import fondoSignUp from "../../assets/fondos/CONTACTO.jpg";
 
 const Signup = ({ navigation }) => {
   const [name, setName] = useState("");
@@ -111,7 +112,7 @@ const Signup = ({ navigation }) => {
     name,
     lastName,
     dbInitialized,
-  ]); // Agrega dbInitialized
+  ]); 
 
   const onSubmit = () => {
     setErrorMail("");
@@ -127,7 +128,7 @@ const Signup = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <ImageBackground source={fondoSignUp} style={styles.container}>
       <View style={styles.form}>
         <Text style={styles.title}>Registro</Text>
         <InputForm label="Nombre" value={name} onChangeText={setName} />
@@ -153,7 +154,7 @@ const Signup = ({ navigation }) => {
         <SubmitButton
           onPress={onSubmit}
           title={result.isLoading || profileLoading ? "" : "Enviar"}
-          disabled={result.isLoading || profileLoading || !dbInitialized} // Deshabilita si la DB no está lista
+          disabled={result.isLoading || profileLoading || !dbInitialized} 
         >
           {result.isLoading || profileLoading ? (
             <ActivityIndicator size="small" color="#fff" />
@@ -166,7 +167,7 @@ const Signup = ({ navigation }) => {
           <Text style={styles.subLink}>Iniciar Sesión</Text>
         </Pressable>
       </View>
-    </View>
+    </ImageBackground>
   );
 };
 
@@ -177,7 +178,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#F8EDE3",
   },
   form: {
     width: "80%",
@@ -194,7 +194,6 @@ const styles = StyleSheet.create({
     color: "#B78270",
     fontSize: 30,
     marginBottom: 20,
-    // fontFamily: "Crafty",
   },
   sub: {
     color: "#555",

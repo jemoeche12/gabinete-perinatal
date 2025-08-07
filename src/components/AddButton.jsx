@@ -1,41 +1,77 @@
-import { Pressable, Text, StyleSheet } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  Pressable,
+  Image,
+} from "react-native";
+import Ionicons from '@expo/vector-icons/Ionicons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
-const AddButton = ({ title, onPress, disabled = false }) => {
+const iconSets = {
+  Ionicons,
+  MaterialCommunityIcons,
+};
+
+const AddButton = ({ title, onPress, disabled = false, iconName, iconSet = "Ionicons", iconSize = 42, style, iconSource }) => {
+  const IconComponent = iconSets[iconSet];
+
   return (
-    <Pressable 
-      style={[styles.button, disabled && styles.buttonDisabled]} 
+    <Pressable
+      style={[styles.container, disabled && styles.buttonDisabled]}
       onPress={onPress}
       disabled={disabled}
     >
-      <Text style={[styles.buttonText, disabled && styles.buttonTextDisabled]}>
-        {title}
-      </Text>
+      <View style={[styles.button, style]}>
+        {iconSource ? (
+          <Image source={iconSource} style={styles.imageIcon} />
+        ) : (
+          IconComponent && <IconComponent name={iconName} size={iconSize} color="white" />
+        )}
+        <Text style={[styles.buttonText, disabled && styles.buttonTextDisabled]}>{title}</Text>
+      </View>
     </Pressable>
   );
 };
 
+export default AddButton;
+
 const styles = StyleSheet.create({
+  container: {
+    paddingTop: 10,
+    alignItems: 'center',
+  },
   button: {
-    backgroundColor: '#E6C6B7',
-    padding: 15,
-    borderRadius: 8,
+    width: 95,
+    height: 95,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 20,
-    shadowColor: '#000',
+    borderRadius: 45,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   buttonDisabled: {
-    backgroundColor: '#ccc',
     opacity: 0.6,
   },
   buttonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
+    textAlign: "center",
+    fontFamily: "Roboto400",
+    fontSize: 15,
+    color: "black",
+    justifyContent: "center",
   },
   buttonTextDisabled: {
-    color: '#999',
+    color: "#999",
+  },
+  imageIcon: {
+    width: 50, 
+    height: 50,
+    resizeMode: 'contain',
   },
 });
-
-export default AddButton;

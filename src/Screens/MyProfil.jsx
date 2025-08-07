@@ -7,6 +7,9 @@ import { clearUser } from "../features/user/UserSlice";
 import Card from "../components/Card";
 import Fontisto from "@expo/vector-icons/Fontisto";
 import { useGetProfileQuery } from "../services/userService";
+import  addImg  from "../../assets/icon/addImg.png";
+import closeSession from "../../assets/icon/closeSession.png";
+import { colors } from "../utils/customerStyle";
 
 const MyProfil = ({ navigation }) => {
   const { imageCamera, localId, user } = useSelector(
@@ -37,6 +40,7 @@ const MyProfil = ({ navigation }) => {
 
       await truncateSessionTable();
       dispatch(clearUser());
+      Alert.alert("Sesión cerrada", "Has cerrado sesión correctamente.");
     } catch (error) {
       Alert.alert(
         "Error al cerrar sesión",
@@ -90,11 +94,25 @@ const MyProfil = ({ navigation }) => {
           </View>
         </Card>
       </View>
-      <AddButton onPress={tomarImagen} title="Agregar Imagen" />
-      <AddButton onPress={cerrarSesion} title="Cerrar Sesion" />
+      <View style={styles.btnContainer}>
+        <AddButton
+          style={[styles.addButton, { backgroundColor: colors.btnPodcast }]}
+          onPress={tomarImagen}
+          title="Subir Imagen"
+          iconSource={addImg}
+
+        />
+        <AddButton
+          style={[styles.addButton, { backgroundColor: colors.btnAsesorias }]}
+          onPress={cerrarSesion}
+          title="Cerrar Sesion"
+          iconSource={closeSession}
+
+        />
+      </View>
       <Image
         style={styles.imagen}
-        source={require("../../assets/IconApp7.png")}
+        source={require("../../assets/Red.png")}
         resizeMode="cover"
       />
     </View>
@@ -132,6 +150,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     gap: 12,
   },
+  btnContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    width: "100%",
+    gap: 20,
+  },
+  addButton: {
+    marginVertical: 10,
+    alignItems: "center",
+    marginHorizontal: 10,
+    width: 120,
+    height: 100,
+  },
   imageContainer: {
     borderWidth: 3,
     borderColor: "black",
@@ -152,19 +183,20 @@ const styles = StyleSheet.create({
   },
   Nombre: {
     fontSize: 18,
-    fontFamily: "Crafty",
+    fontFamily: "Roboto400",
     color: "black",
     margin: 10,
   },
   textCard: {
     fontSize: 18,
-    fontFamily: "Crafty",
+    fontFamily: "Roboto400",
     color: "black",
   },
   imagen: {
-    marginTop: -70,
-    height: 300,
-    width: 300,
+    marginVertical: 20,
+    marginHorizontal: "auto",
+    height: 200,
+    width: 200,
     alignItems: "center",
   },
 });

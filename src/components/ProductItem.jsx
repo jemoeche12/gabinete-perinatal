@@ -26,6 +26,6 @@ const styles = StyleSheet.create({
         backgroundColor: "#DEC3B2",
     },
     title:{
-        fontFamily: "Crafty"
+        fontFamily: 'Roboto400',
     }
 })

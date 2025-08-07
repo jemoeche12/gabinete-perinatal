@@ -1,8 +1,9 @@
-import { StyleSheet, Text, View, Pressable } from "react-native";
+import { StyleSheet, Text, View, Pressable, ImageBackground } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
+import fondo from "../../assets/fondos/fondo_APP.jpg";
 
 const CustomHeader = ({ onMenuPress }) => {
   const navigation = useNavigation();
@@ -16,7 +17,7 @@ const CustomHeader = ({ onMenuPress }) => {
   };
 
   return (
-    <View style={styles.safeArea}>
+    <ImageBackground source={fondo} style={styles.safeArea}>
       <View style={styles.container}>
         <Pressable onPress={onMenuPress} style={styles.menuIconWrapper}>
           <Ionicons name="menu" size={30} color="black" />
@@ -38,7 +39,7 @@ const CustomHeader = ({ onMenuPress }) => {
           <Text style={styles.numberCart}>{total}</Text>
         </View>
       </View>
-    </View>
+    </ImageBackground>
   );
 };
 
@@ -72,7 +73,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   headerText: {
-    fontFamily: "Crafty",
+    fontFamily: 'Roboto400',
     fontSize: 18,
     color: "black",
   },
@@ -84,7 +85,7 @@ const styles = StyleSheet.create({
     flexDirection: "row"
   },
   numberCart:{
-    fontFamily: "Crafty",
+    fontFamily: 'Roboto400',
     fontSize: 20,
     position: "absolute",
     marginTop: 40,

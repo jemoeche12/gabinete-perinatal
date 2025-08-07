@@ -40,6 +40,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: 'black',
     textAlign: 'center',
-    fontFamily: 'Crafty',
+    fontFamily: 'Roboto400',
   },
 });
