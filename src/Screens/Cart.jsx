@@ -19,8 +19,9 @@ import { useStripe } from "@stripe/stripe-react-native";
 import { useState } from "react";
 import { colors } from "../utils/customerStyle";
 import payment from "../../assets/icon/pagoConfirm.png";
+import home from "../../assets/icon/home.png";
 
-const Cart = () => {
+const Cart = ({ navigation }) => {
   const cartItems = useSelector((state) => state.cart.value.itemCart);
   const total = useSelector((state) => state.cart.value.totalPrecioCarrito);
   const { user, localId } = useSelector((state) => state.auth.value);
@@ -43,11 +44,28 @@ const Cart = () => {
     dispatch(clearCart());
   };
 
+  const validateTotal = () => {
+    const numericTotal = parseFloat(total);
+    return !isNaN(numericTotal) && numericTotal >= 0.5;
+  };
+
   const fetchPaymentIntent = async () => {
     try {
-      if (!total || total <= 0) {
-        throw new Error("El monto del total no es válido");
+      if (!validateTotal()) {
+        throw new Error(`El monto del total no es válido: ${total}`);
       }
+
+      const numericTotal = parseFloat(total).toFixed(2);
+
+      const requestData = {
+        customerName: `${name} ${lastName}`,
+        customerEmail: email,
+        cartItems,
+        amount: Number(numericTotal),
+        currency: "eur",
+      };
+
+      console.log("Enviando datos al servidor:", requestData);
 
       const response = await fetch(
         `https://api-yela3b24ha-uc.a.run.app/create-payment-intent`,
@@ -56,23 +74,18 @@ const Cart = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            customerName: `${name} ${lastName}`,
-            customerEmail: email,
-            cartItems,
-            total,
-            amount: Math.round(total * 100),
-            currency: "eur",
-          }),
+          body: JSON.stringify(requestData),
         }
       );
 
       if (!response.ok) {
         const errorText = await response.text();
+        console.error("Error del servidor:", errorText);
         throw new Error(`Server error: ${response.status} - ${errorText}`);
       }
 
       const data = await response.json();
+      console.log("Respuesta del servidor:", data);
 
       if (data.error) {
         throw new Error(data.error);
@@ -84,6 +97,7 @@ const Cart = () => {
 
       return data.clientSecret;
     } catch (error) {
+      console.error("Error en fetchPaymentIntent:", error);
       Alert.alert(
         "Error de Conexión",
         `No se pudo conectar con el servidor de pagos: ${error.message}.`
@@ -104,9 +118,14 @@ const Cart = () => {
         paymentIntentClientSecret: clientSecret,
         merchantDisplayName: "Gabinete Perinatal",
         allowsDelayedPaymentMethods: true,
+        defaultBillingDetails: {
+          name: `${name} ${lastName}`,
+          email: email,
+        },
       });
 
       if (error) {
+        console.error("Error al inicializar PaymentSheet:", error);
         Alert.alert(
           "Error de Configuración",
           `Error al configurar el pago: ${error.message}
@@ -117,6 +136,7 @@ const Cart = () => {
         return true;
       }
     } catch (error) {
+      console.error("Error inesperado en initializePaymentSheet:", error);
       Alert.alert("Error", `Error inesperado: ${error.message}`);
       return false;
     }
@@ -125,6 +145,16 @@ const Cart = () => {
   const handlerOrderConfirm = async () => {
     if (cartItems.length === 0) {
       Alert.alert("Error", "El carrito está vacío.");
+      return;
+    }
+
+    if (!validateTotal()) {
+      Alert.alert("Error", "El total del carrito no es válido. Por favor, verifica los productos.");
+      return;
+    }
+
+    if (!name || !lastName || !email) {
+      Alert.alert("Error", "Faltan datos del perfil. Por favor, completa tu información.");
       return;
     }
 
@@ -144,6 +174,7 @@ const Cart = () => {
         if (error.code === "Canceled") {
           Alert.alert("Pago Cancelado", "Has cancelado el proceso de pago.");
         } else {
+          console.error("Error en presentPaymentSheet:", error);
           Alert.alert(
             "Error de Pago",
             `El pago no se pudo completar: ${error.message}
@@ -156,7 +187,7 @@ const Cart = () => {
 
       const result = await triggerOrderConfirm({
         cartItems,
-        total,
+        amount: parseFloat(total),
         user,
       }).unwrap();
 
@@ -179,6 +210,7 @@ const Cart = () => {
         "Tu orden ha sido confirmada y el pago procesado con éxito. Recibirás un email de confirmación."
       );
     } catch (orderError) {
+      console.error("Error en la confirmación de la orden:", orderError);
       Alert.alert(
         "Error",
         orderError.message ||
@@ -193,7 +225,9 @@ const Cart = () => {
     <View style={styles.container}>
       <Text style={styles.header}>Tu Carrito</Text>
       {cartItems.length === 0 ? (
-        <Text style={styles.emptyCartText}>El carrito está vacío.</Text>
+        <View>
+          <Text style={styles.emptyCartText}>El carrito está vacío.</Text>
+        </View>
       ) : (
         <FlatList
           showsVerticalScrollIndicator={false}
@@ -213,29 +247,42 @@ const Cart = () => {
               <Text style={{ marginTop: 10 }}>Procesando pago...</Text>
             </View>
           ) : (
-            <View style={{ alignItems: "center" }}>
+            <View style={styles.containerButtons}>
+              <View style={{ alignItems: "center" }}>
+                <AddButton
+                  onPress={handlerOrderConfirm}
+                  disabled={loading || cartItems.length === 0 || !validateTotal()}
+                  iconSource={payment}
+                  iconSize={42}
+                  color="black"
+                  style={styles.addButton}
+                />
+                <Text style={{ textAlign: "center", marginTop: 10 }}>
+                  PAGAR Y CONFIRMAR
+                </Text>
+              </View>
               <AddButton
-                onPress={handlerOrderConfirm}
-                disabled={loading || cartItems.length === 0}
-                iconSource={payment}
-                iconSize={42}
-                color="black"
-                style={styles.addButton}
+                title="Inicio"
+                onPress={() => {
+                  navigation.navigate("Main");
+                }}
+                style={styles.addButtonHome}
+                iconSource={home}
               />
-              <Text style={{ textAlign: "center", marginTop: 10 }}>
-                PAGAR Y CONFIRMAR
-              </Text>
             </View>
           )}
         </View>
       )}
-
+ 
       <View style={styles.totalContainer}>
         <Pressable style={styles.clearCart} onPress={handleClearCart}>
           <FontAwesome name="trash-o" size={24} color="black" />
         </Pressable>
-        <Text style={styles.totalText}>Total: €{total}</Text>
+        <Text style={styles.totalText}>
+          Total: €{validateTotal() ? parseFloat(total).toFixed(2) : "0.00"}
+        </Text>
       </View>
+     
     </View>
   );
 };
@@ -283,12 +330,25 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#333",
   },
-addButton: {
-  backgroundColor: colors.btnGuia,
-  alignItems: "center",
-  justifyContent: "center",
-  paddingTop: 20, 
-  paddingBottom: 0,
-  marginBottom: 20,
-},
+  containerButtons: {
+    flexDirection: "row",
+    gap: 15,
+    justifyContent: "center",
+  },
+  addButton: {
+    backgroundColor: colors.btnGuia,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 20,
+    paddingBottom: 0,
+    marginBottom: 20,
+  },
+  addButtonHome: {
+    backgroundColor: colors.btnAsesorias,
+  },
+  addButtonIncio: {
+    backgroundColor: colors.btnAsesorias,
+    right: 100,
+    top: 450,
+  },
 });

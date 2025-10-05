@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import {
   Modal,
   Text,
@@ -9,27 +9,14 @@ import {
   Pressable,
   Alert,
 } from "react-native";
-import DateTimePicker from "react-native-ui-datepicker";
 import dayjs from "dayjs";
 import { useSelector } from "react-redux";
 import { useGetProfileQuery } from "../services/userService";
-import {
-  useCrearCitaMutation,
-  useGetTodasLasCitasQuery,
-} from "../services/citasService";
+import { useCrearCitaMutation } from "../services/citasService";
 import { Picker } from "@react-native-picker/picker";
 import { sendEmailFromClient } from "../services/emailService";
 
-const horariosDisponibles = [
-  "09:00 - 09:40",
-  "10:00 - 10:40",
-  "11:00 - 11:40",
-  "14:00 - 14:40",
-  "15:00 - 15:40",
-  "16:00 - 16:40",
-  "17:00 - 17:40",
-  "18:00 - 18:40",
-];
+const diasDisponibles = ["LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES"];
 
 const ModalForm = ({ modalVisible, setModalVisible }) => {
   let today = new Date();
@@ -37,95 +24,41 @@ const ModalForm = ({ modalVisible, setModalVisible }) => {
   const { user, localId } = useSelector((state) => state.auth.value);
   const { data: profileData, isLoading: profileLoading } =
     useGetProfileQuery(localId);
+
   const [telefono, setTelefono] = useState("");
   const [textConsulta, setTextConsulta] = useState("");
-
-  const [horarioFiltrado, setHorarioFiltrado] = useState(horariosDisponibles);
-  const [horarioELegido, setHorarioElegido] = useState(null);
+  const [diaSeleccionado, setDiaSeleccionado] = useState("LUNES");
 
   const name = profileData?.name || "";
   const lastName = profileData?.lastName || "";
   const email = user || "";
 
-  const [crearCita, { isLoading: isCrearCita, error: createCitaError }] =
-    useCrearCitaMutation();
-
-  const { data: todasLasCitas = [], isLoading: todasLasCitasLoading } =
-    useGetTodasLasCitasQuery();
-
-  const citasParafecha = todasLasCitas.filter(
-    (cita) => cita.fechaSeleccionada === selectedDate.format("YYYY-MM-DD")
-  );
-
-  useEffect(() => {
-    if (!todasLasCitasLoading) {
-      const horarioOcupado = citasParafecha.map((cita) => cita.horarioELegido);
-
-      const nuevosHorariosDisponibles = horariosDisponibles.filter(
-        (horario) => !horarioOcupado.includes(horario)
-      );
-
-      const areHorariosEqual =
-        nuevosHorariosDisponibles.length === horarioFiltrado.length &&
-        nuevosHorariosDisponibles.every(
-          (horario, index) => horario === horarioFiltrado[index]
-        );
-
-      if (!areHorariosEqual) {
-        setHorarioFiltrado(nuevosHorariosDisponibles);
-      }
-
-      let nuevoHorarioElegido = null;
-      if (nuevosHorariosDisponibles.length > 0) {
-        if (!nuevosHorariosDisponibles.includes(horarioELegido)) {
-          nuevoHorarioElegido = nuevosHorariosDisponibles[0];
-        } else {
-          nuevoHorarioElegido = horarioELegido;
-        }
-      } else {
-        nuevoHorarioElegido = null;
-      }
-
-      if (nuevoHorarioElegido !== horarioELegido) {
-        setHorarioElegido(nuevoHorarioElegido);
-      }
-    }
-  }, [selectedDate, citasParafecha, todasLasCitasLoading, horarioELegido]);
+  const [crearCita, { isLoading: isCrearCita }] = useCrearCitaMutation();
 
   const handleEnvioCita = async () => {
     if (!telefono.trim()) {
-      Alert.alert(
-        "Error de Formulario",
-        "Por favor, ingresa un número de teléfono válido."
-      );
+      Alert.alert("Error de Formulario", "Por favor, ingresa un número de teléfono válido.");
       return;
     }
     if (!textConsulta.trim()) {
       Alert.alert("Error de Formulario", "Por favor, describe tu consulta.");
       return;
     }
-    if (horarioELegido === null) {
-      Alert.alert(
-        "Error de Formulario",
-        "Por favor, selecciona un horario disponible."
-      );
-      return;
-    }
 
-    const selectedDateForEmail = selectedDate.format("YYYY-MM-DD")
+    const selectedDateForEmail = selectedDate.format("YYYY-MM-DD");
 
     try {
-      const result = await crearCita({
+      await crearCita({
         userId: localId,
         name,
         lastName,
         email,
-        telefono: telefono,
+        telefono,
         consulta: textConsulta,
-        fechaSeleccionada: selectedDate.format("YYYY-MM-DD"),
-        horarioELegido: horarioELegido,
-        createdAt: dayjs().toISOString(),
+        diaSeleccionado,
         status: "pendiente",
+        fechaSeleccionada: selectedDateForEmail,
+        createdAt: new Date().toISOString(),
       }).unwrap();
 
       Alert.alert("Éxito", "Su solicitud de cita ha sido enviada con éxito.");
@@ -133,38 +66,37 @@ const ModalForm = ({ modalVisible, setModalVisible }) => {
       setTelefono("");
       setTextConsulta("");
       setModalVisible(false);
+
       await sendEmailFromClient({
         to: [{ email, name: name || "Nuevo Usuario" }],
-        subject: "Su Cita ha sido registrada con exito",
+        subject: "Su solicitud ha sido registrada con éxito",
         htmlContent: `
-                    <p>Hola ${name || "bienvenido"},</p>
-                    <p>¡Gracias por solicitar una cita en la Red Perinatal Digital!</p>
-                    <p>Recuerda que tu cita es el dia: ${selectedDateForEmail}</p>
-                    <p>A las ${horarioELegido}</p>
-                    <p>Cualquier consulta no dude en ponerse en contacto con el equipo de Red Perinatal Digital</p>
-                  `,
+          <p>Hola ${name || "bienvenido"},</p>
+          <p>¡Gracias por solicitar un contacto en la Red Perinatal Digital!</p>
+          <p>Recuerda que tu día de preferencia para el llamado es: <strong>${diaSeleccionado}</strong></p>
+          <p>Cualquier consulta no dudes en ponerte en contacto con el equipo de Red Perinatal Digital</p>
+        `,
       });
 
       const emailPsicologa = "florenciavelascopsi@hotmail.com";
-      const emailSecretario = "jemoeche@gmail.com"
+      const emailSecretario = "jemoeche@gmail.com";
 
-      setModalVisible(false);
       await sendEmailFromClient({
-        to: [{ email: emailPsicologa , email: emailSecretario }],
-        subject: "Reserva de  Cita registrada con exito",
+        to: [
+          { email: emailPsicologa },
+          { email: emailSecretario },
+        ],
+        subject: "Nueva solicitud registrada",
         htmlContent: `
-                    <p>Hola hemos recibido una reserva de cita a nombre de ${name} ${lastName}</p>
-                    <p>Recuerda que su cita es el dia: ${selectedDateForEmail}</p>
-                    <p>A las ${horarioELegido}</p>
-                    <p>Agendar en el libro de citas</p>
-                  `,
+          <p>Hola, hemos recibido una solicitud de contacto a nombre de ${name} ${lastName}</p>
+          <p>Día preferido de contacto: <strong>${diaSeleccionado}</strong></p>
+          <p>Por favor, agendar en el libro de contactos</p>
+        `,
       });
     } catch (err) {
       const errorMessage =
-        err?.data?.message ||
-        err?.message ||
-        "Error desconocido al solicitar la cita.";
-      Alert.alert("Error al Enviar Cita", errorMessage);
+        err?.data?.message || err?.message || "Error desconocido al solicitar la cita.";
+      Alert.alert("Error al Enviar Solicitud", errorMessage);
     }
   };
 
@@ -179,15 +111,8 @@ const ModalForm = ({ modalVisible, setModalVisible }) => {
           <>
             <TextInput style={styles.input} value={name} editable={false} />
             <TextInput style={styles.input} value={lastName} editable={false} />
-            <Text style={styles.label}>
-              Email (Nos contactaremos a este mail):
-            </Text>
-            <TextInput
-              style={styles.input}
-              keyboardType="email-address"
-              value={email}
-              editable={false}
-            />
+            <Text style={styles.label}>Email (Nos contactaremos a este mail):</Text>
+            <TextInput style={styles.input} keyboardType="email-address" value={email} editable={false} />
           </>
         )}
 
@@ -200,53 +125,16 @@ const ModalForm = ({ modalVisible, setModalVisible }) => {
           placeholder="Tu número de teléfono"
           placeholderTextColor="#999"
         />
-        <View style={styles.containerCalendar}>
-          <Text style={styles.textCalendar}>Fecha:</Text>
-          <DateTimePicker
-            styles={{
-              today: {
-                borderColor: "#B78270",
-                borderWidth: 2,
-                borderRadius: 10,
-              },
-              selected: { backgroundColor: "#B78270", borderRadius: 10 },
-              selected_label: { color: "white" },
-            }}
-            locale="es"
-            calendar="gregory"
-            mode="single"
-            date={selectedDate}
-            onChange={({ date }) => setSelectedDate(dayjs(date))}
-            minDate={today}
-            disabledDates={(date) => [0, 6].includes(dayjs(date).day())}
-          />
-          <Text style={styles.textCalendar}>Horario</Text>
-          <View style={styles.pickerContainer}>
-            {todasLasCitasLoading ? (
-              <Text style={styles.loadingText}>Cargando horarios...</Text>
-            ) : horarioFiltrado.length > 0 ? (
-              <Picker
-                style={styles.picker}
-                selectedValue={horarioELegido}
-                onValueChange={(itemValue, itemIndex) =>
-                  setHorarioElegido(itemValue)
-                }
-              >
-                {horarioFiltrado.map((horario, index) => (
-                  <Picker.Item
-                    key={horario}
-                    label={horario}
-                    value={horario}
-                  ></Picker.Item>
-                ))}
-              </Picker>
-            ) : (
-              <Text style={styles.noHorariosText}>
-                No hay horarios disponibles para esta fecha.
-              </Text>
-            )}
-          </View>
+
+        <Text style={styles.label}>Día de preferencia para el contacto:</Text>
+        <View style={styles.pickerContainer}>
+          <Picker selectedValue={diaSeleccionado} onValueChange={setDiaSeleccionado} style={styles.picker}>
+            {diasDisponibles.map((dia) => (
+              <Picker.Item key={dia} label={dia} value={dia} />
+            ))}
+          </Picker>
         </View>
+
         <Text style={styles.label}>Consulta:</Text>
         <TextInput
           style={[styles.input, styles.textArea]}
@@ -257,24 +145,12 @@ const ModalForm = ({ modalVisible, setModalVisible }) => {
           placeholder="Contanos lo que necesitás, te leemos con atención"
           placeholderTextColor="#999"
         />
-        <Pressable
-          style={styles.button}
-          onPress={handleEnvioCita}
-          disabled={
-            isCrearCita ||
-            profileLoading ||
-            todasLasCitasLoading ||
-            horarioELegido === null
-          }
-        >
-          <Text style={styles.buttonText}>
-            {isCrearCita ? "Enviando Solicitud..." : "Solicitar"}
-          </Text>
+
+        <Pressable style={styles.button} onPress={handleEnvioCita} disabled={isCrearCita || profileLoading}>
+          <Text style={styles.buttonText}>{isCrearCita ? "Enviando Solicitud..." : "Solicitar"}</Text>
         </Pressable>
-        <Pressable
-          style={[styles.button, styles.closeButton]}
-          onPress={() => setModalVisible(false)}
-        >
+
+        <Pressable style={[styles.button, styles.closeButton]} onPress={() => setModalVisible(false)}>
           <Text style={styles.buttonText}>Cerrar</Text>
         </Pressable>
       </ScrollView>
@@ -283,6 +159,7 @@ const ModalForm = ({ modalVisible, setModalVisible }) => {
 };
 
 export default ModalForm;
+
 const styles = StyleSheet.create({
   modalContainer: {
     flexGrow: 1,
@@ -293,7 +170,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 30,
-    fontFamily: 'Roboto400',
+    fontFamily: "Roboto400",
     color: "#B78270",
     marginBottom: 20,
     textAlign: "center",
@@ -301,7 +178,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 18,
     color: "#333",
-    fontFamily: 'Roboto400',
+    fontFamily: "Roboto400",
     marginTop: 10,
     marginBottom: 5,
     width: "90%",
@@ -313,30 +190,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     fontSize: 16,
-    fontFamily: 'Roboto400',
+    fontFamily: "Roboto400",
     backgroundColor: "#fff",
     marginBottom: 10,
     width: "90%",
-  },
-  containerCalendar: {
-    marginVertical: 20,
-    backgroundColor: "rgba(190, 153, 141, 0.85)",
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#B78270",
-    shadowColor: "#B78270",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 6,
-    elevation: 6,
-    padding: 16,
-    width: "90%",
-  },
-  textCalendar: {
-    paddingBottom: 10,
-    fontSize: 16,
-    color: "#4E342E",
-    fontWeight: "600",
   },
   textArea: {
     height: 150,
@@ -356,13 +213,8 @@ const styles = StyleSheet.create({
   picker: {
     width: "100%",
     height: 50,
-    fontFamily: 'Roboto400',
+    fontFamily: "Roboto400",
   },
-  pickerItem: {
-    fontFamily: 'Roboto400',
-    fontSize: 16,
-  },
-
   button: {
     backgroundColor: "#B78270",
     padding: 15,
@@ -375,7 +227,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontSize: 18,
-    fontFamily: 'Roboto400',
+    fontFamily: "Roboto400",
   },
   closeButton: {
     backgroundColor: "#6c757d",
@@ -384,7 +236,7 @@ const styles = StyleSheet.create({
   loadingText: {
     fontSize: 16,
     color: "#888",
-    fontFamily: 'Roboto400',
+    fontFamily: "Roboto400",
     marginBottom: 10,
   },
 });

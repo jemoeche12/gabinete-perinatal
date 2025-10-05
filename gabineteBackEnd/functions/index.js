@@ -93,6 +93,8 @@ app.post("/webhook", async (request, response) => {
   response.json({ received: true });
 });
 
+
+
 app.post("/create-payment-intent", async (req, res) => {
   if (!stripeSecretKey) {
     console.error("Falta STRIPE_SECRET_KEY en las variables de entorno.");
@@ -114,13 +116,17 @@ app.post("/create-payment-intent", async (req, res) => {
       return res.status(400).json({ error: "Currency es requerida" });
     }
 
+    const amountInCents = Math.round(amount * 100);
+
+    
+
     const orderId = `order_${Date.now()}`;
     const productNames = cartItems
       .map((item) => item.titulo || item.name)
       .join(", ");
 
     const paymentIntent = await stripe.paymentIntents.create({
-      amount,
+      amount: amountInCents,
       currency,
       automatic_payment_methods: { enabled: true },
       metadata: {
@@ -128,7 +134,7 @@ app.post("/create-payment-intent", async (req, res) => {
         customer_email: customerEmail || "",
         customer_name: customerName || "",
         product_names: productNames,
-        total_amount: (amount / 100).toString(),
+        total_amount: amount.toString(),
         integration_check: "accept_a_payment",
       },
     });
@@ -139,11 +145,10 @@ app.post("/create-payment-intent", async (req, res) => {
     });
   } catch (error) {
     console.error("Error en /create-payment-intent:", error);
-    res
-      .status(500)
-      .json({ error: error.message || "Error interno del servidor" });
+    res.status(500).json({ error: error.message || "Error interno del servidor" });
   }
 });
+
 
 app.get("/health", (req, res) => {
   res.json({ status: "OK", timestamp: new Date().toISOString() });

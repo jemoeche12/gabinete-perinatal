@@ -13,6 +13,7 @@ import app from "../../assets/icon/instApp.png";
 import asesoria from "../../assets/icon/asesoria.png";
 import cita from "../../assets/icon/citaApp.png";
 import talleres from "../../assets/icon/talleres.png";
+import ModalAsesoriaForm from "../components/ModalFormAsesoria";
 
 const Home = ({ visible }) => {
   const [isMenuVisible, setIsMenuVisible] = useState(visible);
@@ -78,7 +79,7 @@ const Home = ({ visible }) => {
               iconSource={podcast}
             />
           </View>
-          <ModalForm
+          <ModalAsesoriaForm
             modalVisible={modalVisible}
             setModalVisible={setModalVisible}
           />

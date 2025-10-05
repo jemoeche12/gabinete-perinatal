@@ -2,7 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import InformacionReducer from "../features/recursos/InformacionSlice";
 import AuthReducer from "../features/user/UserSlice";
 import TalleresReducer from '../features/talleres/TalleresSlice';
-import CartReducer from "../features/cart/CartSlice"
+import CartReducer from "../features/cart/CartSlice";
 import TestReducer from "../features/test/TestSlice";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import { recursosApi } from "../services/recursosService";
@@ -11,8 +11,10 @@ import {talleresApi} from "../services/talleresService";
 import { testApi } from "../services/testService";
 import { userApi } from "../services/userService";
 import { citasApi } from "../services/citasService";
-import { constultasApi } from "../services/consultasService";
+import { consultasApi } from "../services/consultasService";
 import { orderApi } from "../services/orderService";
+import { asesoriasApi } from "../services/asesoriasService";
+import { podcastApi } from "../services/podcastService"
 
 const store = configureStore({
     reducer: {
@@ -28,8 +30,10 @@ const store = configureStore({
         [testApi.reducerPath]: testApi.reducer,
         [userApi.reducerPath]: userApi.reducer,
         [citasApi.reducerPath]: citasApi.reducer,
-        [constultasApi.reducerPath]: constultasApi.reducer,
+        [asesoriasApi.reducerPath]: asesoriasApi.reducer,
+        [consultasApi.reducerPath]: consultasApi.reducer,
         [orderApi.reducerPath]: orderApi.reducer,
+        [podcastApi.reducerPath]: podcastApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware()
@@ -39,8 +43,10 @@ const store = configureStore({
     .concat(testApi.middleware)
     .concat(userApi.middleware)
     .concat(citasApi.middleware)
-    .concat(constultasApi.middleware)
-    .concat(orderApi.middleware),
+    .concat(asesoriasApi.middleware)
+    .concat(consultasApi.middleware)
+    .concat(orderApi.middleware)
+    .concat(podcastApi.middleware),
 });
 
 setupListeners(store.dispatch);

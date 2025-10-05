@@ -34,7 +34,7 @@ const Talleres = ({ navigation, visible }) => {
         </ScrollView>
         <AddButton
           style={styles.btnTalleres}
-          title="Descubrir Talleres"
+          title="ir a Talleres"
           onPress={() => navigation.navigate("ListTalleres")}
           iconSource={iconTalleres}
         />
@@ -68,11 +68,12 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto400",
   },
   btnTalleres: {
-    position: "absolute",
-    right: 40,
-    bottom: 70,
+    left: 100,
+    bottom: 50,
     backgroundColor: "#E6C6B7",
     width: 100,
     height: 100,
+    zIndex: 4, 
+    elevation: 5
   },
 });

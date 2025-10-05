@@ -2,7 +2,7 @@ import { fetchBaseQuery } from "@reduxjs/toolkit/query";
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseUrl } from "../databases/realTimeDataBase";
 
-export const constultasApi = createApi({
+export const consultasApi = createApi({
   reducerPath: "consultasAPi",
   baseQuery: fetchBaseQuery({ baseUrl }),
   tagTypes: ["consulta"],
@@ -18,4 +18,4 @@ export const constultasApi = createApi({
   }),
 });
 
-export const { useCrearConsultaMutation } = constultasApi;
+export const { useCrearConsultaMutation } = consultasApi;

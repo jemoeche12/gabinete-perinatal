@@ -1,6 +1,9 @@
 import { StyleSheet, Text, View } from "react-native";
-import React, { useEffect } from "react";
 import { VideoView, useVideoPlayer } from "expo-video";
+import { colors } from "../utils/customerStyle";
+import home from "../../assets/icon/home.png";
+import AddButton from "../components/AddButton";
+
 
 const InstructivoScreen = ({ navigation }) => {
   const videoUri = {
@@ -22,6 +25,14 @@ const InstructivoScreen = ({ navigation }) => {
         contentFit="contain"
         allowsFullscreen={true}
       />
+      <AddButton
+        
+        onPress={() => {
+          navigation.navigate("Main");
+        }}
+        style={styles.addButtonIncio}
+        iconSource={home}
+      />
     </View>
   );
 };
@@ -36,4 +47,12 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
+  addButtonIncio: {
+  backgroundColor: colors.btnAsesorias,
+  position: "absolute",
+  left: 20,
+  top: 10, 
+  zIndex: 1,
+  elevation: 5,
+}
 });

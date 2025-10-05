@@ -10,26 +10,33 @@ import { StripeProvider } from "@stripe/stripe-react-native";
 import { initStripe } from "@stripe/stripe-react-native";
 import Crafty from './assets/fonts/Roboto-VariableFont_wdth,wght.ttf';
 
-
 export default function App() {
   const [fontsLoaded] = useFonts({
     'Roboto400': Crafty,
   });
+ 
+  const publishableKey = "pk_test_51RgMQYFJ1XWiS5lgnsf5LvM6aKn6ZmrtBjcTGHCwlxPs28n50bmTl61uWTMLjz6IHtvcebTXzFOaiva7tL00UrQR00bbRVxX57";
 
   useEffect(() => {
     const initializeStripe = async () => {
       try {
+        console.log("Initializing Stripe with key:", publishableKey?.substring(0, 20) + "...");
+        
+        if (!publishableKey) {
+          throw new Error("Stripe publishable key is missing");
+        }
+        
         await initStripe({
-          publishableKey: "pk_test_51RgMQYFJ1XWiS5lgnsf5LvM6aKn6ZmrtBjcTGHCwlxPs28n50bmTl61uWTMLjz6IHtvcebTXzFOaiva7tL00bbRVxX57"
+          publishableKey: publishableKey,
         });
+        console.log("Stripe initialized successfully");
       } catch (error) {
-        Alert.alert("❌ Error al inicializar Stripe:", error);
+        console.error("Stripe initialization error:", error);
+        Alert.alert("❌ Error al inicializar Stripe:", error.message);
       }
     };
-
     initializeStripe();
-  }, []);
-
+  }, [publishableKey]);
 
   if (!fontsLoaded) {
     return (
@@ -41,9 +48,7 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StripeProvider
-        publishableKey={process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY}
-      >
+      <StripeProvider publishableKey={publishableKey}>
         <DBProvider>
           <Provider store={store}>
             <Navigator />

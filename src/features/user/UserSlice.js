@@ -9,7 +9,17 @@ export const AuthSlice = createSlice({
             localId: null,
             imageCamera: null,
             name: "",
-            lastName: ""
+            lastName: "",
+            role: null,
+            membresia: {
+                tipo: null,
+                estado: null,
+                fechaInicio: null,
+                fechaFin: null,
+                stripeSubscriptionId: null,
+                stripeCustomerId: null,
+                stripePriceId: null
+            }
         }
     },
     reducers: {
@@ -19,7 +29,16 @@ export const AuthSlice = createSlice({
             state.value.localId = payload.localId || null;
             state.value.name = payload.name || null;
             state.value.lastName = payload.lastName || null;
-
+            state.value.role = payload.role || null;
+            state.value.membresia = payload.membresia || {
+                tipo: null,
+                estado: null,
+                fechaInicio: null,
+                fechaFin: null,
+                stripeSubscriptionId: null,
+                stripeCustomerId: null,
+                stripePriceId: null
+            };
         },
 
         clearUser: (state) => {
@@ -27,8 +46,18 @@ export const AuthSlice = createSlice({
             state.value.idToken = null;
             state.value.localId = null;
             state.value.imageCamera = null;
-            state.value.name = "",
-            state.value.lastName = ""
+            state.value.name = "";
+            state.value.lastName = "";
+            state.value.role = null;
+            state.value.membresia = payload.membresia || {
+                tipo: null,
+                estado: null,
+                fechaInicio: null,
+                fechaFin: null,
+                stripeSubscriptionId: null,
+                stripeCustomerId: null,
+                stripePriceId: null
+            };
         },
         setImageCamera: (state, { payload }) => {
             state.value.imageCamera = payload;

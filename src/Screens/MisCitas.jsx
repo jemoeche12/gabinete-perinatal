@@ -72,20 +72,22 @@ const MisCitas = ({ navigation }) => {
         <Text style={styles.emptyText}>
           ¡Solicita una nueva cita si lo deseas!
         </Text>
-        <AddButton
-          title="Pedir Cita"
-          onPress={() => setModalVisible(true)}
-          style={styles.addButtonStyle}
-          iconSource={iconCita}
-        />
-        <AddButton
-        title="Inicio"
-        onPress={() => {
-          navigation.navigate("Main");
-        }}
-        style={styles.addButtonIncioStyle}
-        iconSource={home}
-      />
+        <View style={styles.containerButton}>
+          <AddButton
+            title="Pedir Cita"
+            onPress={() => setModalVisible(true)}
+            style={styles.addButtonCita}
+            iconSource={iconCita}
+          />
+          <AddButton
+            title="Inicio"
+            onPress={() => {
+              navigation.navigate("Main");
+            }}
+            style={styles.addButtonIncio}
+            iconSource={home}
+          />
+        </View>
         <ModalForm
           modalVisible={modalVisible}
           setModalVisible={setModalVisible}
@@ -106,7 +108,7 @@ const MisCitas = ({ navigation }) => {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.citaCard}>
-            <Text style={styles.citaText}>Fecha: {item.fechaSeleccionada}</Text>
+            <Text style={styles.citaText}>Fecha: {item.fechaElegida}</Text>
             <Text style={styles.citaText}>
               Horario de llamada: {item.horarioELegido}
             </Text>
@@ -114,20 +116,22 @@ const MisCitas = ({ navigation }) => {
           </View>
         )}
       />
-      <AddButton
-        title="Pedir Cita"
-        onPress={() => setModalVisible(true)}
-        style={styles.addButton}
-        iconSource={iconCita}
-      />
-      <AddButton
-        title="Inicio"
-        onPress={() => {
-          navigation.navigate("Main");
-        }}
-        style={styles.addButtonIncio}
-        iconSource={home}
-      />
+      <View style={styles.containerButton}>
+        <AddButton
+          title="Pedir Cita"
+          onPress={() => setModalVisible(true)}
+          style={styles.addButtonCita}
+          iconSource={iconCita}
+        />
+        <AddButton
+          title="Inicio"
+          onPress={() => {
+            navigation.navigate("Main");
+          }}
+          style={styles.addButtonIncio}
+          iconSource={home}
+        />
+      </View>
       <ModalForm
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
@@ -221,27 +225,17 @@ const styles = StyleSheet.create({
     color: "#333",
     fontFamily: "Roboto400",
   },
-  addButton: {
-    backgroundColor: colors.btnCita,
+  containerButton: {
+    flexDirection: "column",
     position: "absolute",
-    bottom: 60,
-    right: 20,
+    gap: 15,
+    right: 30,
+    bottom: 50,
   },
-  addButtonStyle: {
+  addButtonCita: {
     backgroundColor: colors.btnCita,
-    position: "absolute",
-    top: 80,
-    left: 50,
   },
   addButtonIncio: {
     backgroundColor: colors.btnAsesorias,
-    top: -50,
-    left: 105,
-  },
-  addButtonIncioStyle: {
-    backgroundColor: colors.btnAsesorias,
-    position: "absolute",
-    top: 180,
-    left: 50,
   },
 });

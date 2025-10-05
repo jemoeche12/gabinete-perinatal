@@ -20,33 +20,7 @@ export const citasApi = createApi({
         try {
           const db = getDatabase(app);
           const citasRef = ref(db, "citas");
-          const { fechaSeleccionada, horarioElegido } = citaData;
 
-          let isDuplicate = false;
-          const snapshot = await get(citasRef);
-
-          if (snapshot.exists()) {
-            const todasLasCitas = snapshot.val();
-            for (const key in todasLasCitas) {
-              const existeCita = todasLasCitas[key];
-              if (
-                existeCita.fechaSeleccionada === fechaSeleccionada &&
-                existeCita.horarioElegido === horarioElegido
-              ) {
-                isDuplicate = true;
-                break;
-              }
-            }
-          }
-          if (isDuplicate) {
-            return {
-              error: {
-                message:
-                  "Por favor seleccione otro dia, esta fecha, en este horario no esta disponible",
-                code: "DUPLICATE_APPOINTMENT",
-              },
-            };
-          }
           const newCitaRef = push(citasRef);
           await set(newCitaRef, citaData);
 
@@ -57,6 +31,7 @@ export const citasApi = createApi({
       },
       invalidatesTags: ["Cita"],
     }),
+
     getCita: builder.query({
       async queryFn(userId) {
         try {
