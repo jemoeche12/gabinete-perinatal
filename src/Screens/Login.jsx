@@ -30,7 +30,10 @@ const Login = ({ navigation }) => {
       (async () => {
         try {
           if (!dbInitialized) {
-            Alert.alert("Error de DB", "La base de datos no está lista. Intente de nuevo.");
+            Alert.alert(
+              "Error de DB",
+              "La base de datos no está lista. Intente de nuevo."
+            );
             return;
           }
 
@@ -40,7 +43,10 @@ const Login = ({ navigation }) => {
             token: result.data.idToken,
           });
         } catch (error) {
-          Alert.alert("Error de Sesión", error.message || "Error al guardar la sesión.");
+          Alert.alert(
+            "Error de Sesión",
+            error.message || "Error al guardar la sesión."
+          );
         }
         triggerGetProfile(result.data.localId);
       })();
@@ -49,20 +55,32 @@ const Login = ({ navigation }) => {
 
   useEffect(() => {
     if (profileError) {
-      Alert.alert("Disculpe, algo salió mal al cargar la información", JSON.stringify(profileError));
+      Alert.alert(
+        "Disculpe, algo salió mal al cargar la información",
+        JSON.stringify(profileError)
+      );
       return;
     }
     if (!profileLoading && profileDate && result.data) {
-      dispatch(setUser({
-        email: result.data.email,
-        localId: result.data.localId,
-        idToken: result.data.idToken,
-        name: profileDate.name,
-        lastName: profileDate.lastName
-      }));
-      navigation.navigate("HomePrincipal");
+      dispatch(
+        setUser({
+          email: result.data.email,
+          localId: result.data.localId,
+          idToken: result.data.idToken,
+          name: profileDate.name,
+          lastName: profileDate.lastName,
+        })
+      );
+      
     }
-  }, [profileDate, profileLoading, profileError, dispatch, result.data, navigation]);
+  }, [
+    profileDate,
+    profileLoading,
+    profileError,
+    dispatch,
+    result.data,
+    navigation,
+  ]);
 
   const onSubmit = () => {
     triggerSignIn({ email, password });
@@ -94,7 +112,6 @@ const Login = ({ navigation }) => {
 };
 
 export default Login;
-
 
 const styles = StyleSheet.create({
   container: {

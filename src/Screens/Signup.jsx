@@ -12,9 +12,10 @@ import SubmitButton from "../components/SubmitButton";
 import { useDispatch } from "react-redux";
 import { useSignUpMutation } from "../services/authService";
 import { setUser } from "../features/user/UserSlice";
-import { useDBContext } from "../context/DBContext"; 
+import { useDBContext } from "../context/DBContext";
 import { sendEmailFromClient } from "../services/emailService";
 import { useUpdateUserProfileMutation } from "../services/userService";
+import { HomeStackNavigator } from "../navigation/HomeStackNavigator";
 
 const Signup = ({ navigation }) => {
   const [name, setName] = useState("");
@@ -28,12 +29,9 @@ const Signup = ({ navigation }) => {
   const dispatch = useDispatch();
 
   const [triggerSignUp, result] = useSignUpMutation();
-  const [
-    triggerUpdateProfile,
-    { isLoading: profileLoading }
-  ] = useUpdateUserProfileMutation();
+  const [triggerUpdateProfile, { isLoading: profileLoading }] =
+    useUpdateUserProfileMutation();
 
-  
   useEffect(() => {
     if (result.isSuccess && result.data) {
       const { localId, email, idToken } = result.data;
@@ -41,15 +39,21 @@ const Signup = ({ navigation }) => {
       (async () => {
         try {
           if (!dbInitialized) {
-            Alert.alert("Error de DB", "La base de datos no está lista para guardar la sesión. Por favor, inténtelo de nuevo.");
-            return; 
+            Alert.alert(
+              "Error de DB",
+              "La base de datos no está lista para guardar la sesión. Por favor, inténtelo de nuevo."
+            );
+            return;
           }
 
           await insertSession({ email, localId, token: idToken });
-          await triggerUpdateProfile({ localId, name, lastName, email }).unwrap();
-          dispatch(
-            setUser({ email, idToken, localId, name, lastName })
-          );
+          await triggerUpdateProfile({
+            localId,
+            name,
+            lastName,
+            email,
+          }).unwrap();
+          dispatch(setUser({ email, idToken, localId, name, lastName }));
           await sendEmailFromClient({
             to: [{ email, name: name || "Nuevo Usuario" }],
             subject: "Bienvenido a la Red Perinatal Digital",
@@ -60,7 +64,7 @@ const Signup = ({ navigation }) => {
               <p>Saludos cordiales,<br>El equipo de Red Perinatal Digital</p>
             `,
           });
-          navigation.navigate("HomePrincipal");
+         
         } catch (error) {
           Alert.alert(
             "Error en el registro",
@@ -88,18 +92,26 @@ const Signup = ({ navigation }) => {
       ) {
         setErrorPassword(
           errorData.message ||
-          "Contraseña débil o inválida (mínimo 6 caracteres)."
+            "Contraseña débil o inválida (mínimo 6 caracteres)."
         );
       } else {
         setErrorMail(
-          errorData.message ||
-          "Error inesperado. Por favor, intenta de nuevo."
+          errorData.message || "Error inesperado. Por favor, intenta de nuevo."
         );
       }
 
       setPassword("");
     }
-  }, [result, insertSession, dispatch, triggerUpdateProfile, navigation, name, lastName, dbInitialized]); // Agrega dbInitialized
+  }, [
+    result,
+    insertSession,
+    dispatch,
+    triggerUpdateProfile,
+    navigation,
+    name,
+    lastName,
+    dbInitialized,
+  ]); // Agrega dbInitialized
 
   const onSubmit = () => {
     setErrorMail("");
@@ -119,8 +131,17 @@ const Signup = ({ navigation }) => {
       <View style={styles.form}>
         <Text style={styles.title}>Registro</Text>
         <InputForm label="Nombre" value={name} onChangeText={setName} />
-        <InputForm label="Apellido" value={lastName} onChangeText={setLastName} />
-        <InputForm label="Email" value={email} onChangeText={setEmail} error={errorMail} />
+        <InputForm
+          label="Apellido"
+          value={lastName}
+          onChangeText={setLastName}
+        />
+        <InputForm
+          label="Email"
+          value={email}
+          onChangeText={setEmail}
+          error={errorMail}
+        />
         <InputForm
           label="Contraseña"
           placeholder="Mínimo 6 caracteres"
@@ -134,7 +155,7 @@ const Signup = ({ navigation }) => {
           title={result.isLoading || profileLoading ? "" : "Enviar"}
           disabled={result.isLoading || profileLoading || !dbInitialized} // Deshabilita si la DB no está lista
         >
-          {(result.isLoading || profileLoading) ? (
+          {result.isLoading || profileLoading ? (
             <ActivityIndicator size="small" color="#fff" />
           ) : (
             <Text style={{ color: "#fff", fontSize: 18 }}>Enviar</Text>
@@ -150,8 +171,6 @@ const Signup = ({ navigation }) => {
 };
 
 export default Signup;
-
-
 
 const styles = StyleSheet.create({
   container: {
