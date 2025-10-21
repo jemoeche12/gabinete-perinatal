@@ -81,9 +81,7 @@ app.post("/webhook", async (request, response) => {
 
     case "payment_method.attached": {
       const paymentMethod = event.data.object;
-      console.log(
-        `💳 PaymentMethod ${paymentMethod.id} attached to customer ${paymentMethod.customer}`
-      );
+     
       break;
     }
 
@@ -210,10 +208,7 @@ const sendEmailFunction = onCall(async (request) => {
       .post("send", { version: "v3.1" })
       .request(messagePayload);
 
-    console.log(
-      "Respuesta de Mailjet:",
-      JSON.stringify(response.body, null, 2)
-    );
+  
 
     if (
       response.body &&

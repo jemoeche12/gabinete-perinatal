@@ -65,7 +65,6 @@ const Cart = ({ navigation }) => {
         currency: "eur",
       };
 
-      console.log("Enviando datos al servidor:", requestData);
 
       const response = await fetch(
         `https://api-yela3b24ha-uc.a.run.app/create-payment-intent`,
@@ -85,7 +84,6 @@ const Cart = ({ navigation }) => {
       }
 
       const data = await response.json();
-      console.log("Respuesta del servidor:", data);
 
       if (data.error) {
         throw new Error(data.error);

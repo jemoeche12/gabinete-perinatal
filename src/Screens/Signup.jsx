@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import {
   Pressable,
   StyleSheet,
@@ -6,8 +7,10 @@ import {
   Alert,
   ActivityIndicator,
   ImageBackground,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
-import { useEffect, useState } from "react";
 import InputForm from "../components/InputForm";
 import SubmitButton from "../components/SubmitButton";
 import { useDispatch } from "react-redux";
@@ -17,6 +20,7 @@ import { useDBContext } from "../context/DBContext";
 import { sendEmailFromClient } from "../services/emailService";
 import { useUpdateUserProfileMutation } from "../services/userService";
 import fondoSignUp from "../../assets/fondos/CONTACTO.jpg";
+import Membresias from "./Membresias";
 
 const Signup = ({ navigation }) => {
   const [name, setName] = useState("");
@@ -25,6 +29,7 @@ const Signup = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [errorMail, setErrorMail] = useState("");
   const [errorPassword, setErrorPassword] = useState("");
+  const [selectedPlan, setSelectedPlan] = useState("basico");
 
   const { insertSession, dbInitialized } = useDBContext();
   const dispatch = useDispatch();
@@ -35,41 +40,39 @@ const Signup = ({ navigation }) => {
 
   useEffect(() => {
     if (result.isSuccess && result.data) {
-      const { localId, email, idToken } = result.data;
-
+      const { localId, email: userEmail, idToken } = result.data;
       (async () => {
         try {
           if (!dbInitialized) {
-            Alert.alert(
-              "Error de DB",
-              "La base de datos no está lista para guardar la sesión. Por favor, inténtelo de nuevo."
-            );
+            Alert.alert("Error de DB", "Base de datos no lista.");
             return;
           }
 
-          await insertSession({ email, localId, token: idToken });
+          await insertSession({ email: userEmail, localId, token: idToken, });
+
           await triggerUpdateProfile({
             localId,
             name,
             lastName,
-            email,
+            email: userEmail,
+            membresia: selectedPlan,
           }).unwrap();
-          dispatch(setUser({ email, idToken, localId, name, lastName }));
+
+          dispatch(
+            setUser({ email: userEmail, idToken, localId, name, lastName, role: "user", membresia: selectedPlan })
+          );
+
           await sendEmailFromClient({
-            to: [{ email, name: name || "Nuevo Usuario" }],
+            to: [{ email: userEmail, name: name || "Nuevo Usuario" }],
             subject: "Bienvenido a la Red Perinatal Digital",
-            htmlContent: `
-              <p>Hola ${name || "bienvenido"},</p>
-              <p>¡Gracias por registrarte en la Red Perinatal Digital! Estamos encantados de tenerte con nosotros.</p>
-              <p>Esperamos que disfrutes de tu experiencia.</p>
-              <p>Saludos cordiales,<br>El equipo de Red Perinatal Digital</p>
-            `,
+            htmlContent: `<p>Hola ${name || "bienvenido"},</p>
+              <p>Gracias por registrarte en la Red Perinatal Digital.</p>
+              <p>Tu plan seleccionado es <b>${selectedPlan}</b>.</p>`,
           });
-         
-        } catch (error) {
+        } catch (err) {
           Alert.alert(
             "Error en el registro",
-            error.message || "Error inesperado en el registro."
+            err.message || "Error inesperado."
           );
         }
       })();
@@ -77,30 +80,11 @@ const Signup = ({ navigation }) => {
 
     if (result.isError) {
       const errorData = result.error?.data?.error || result.error;
-      Alert.alert(
-        "Error en el registro",
-        errorData.message || "Ocurrió un error. Intenta de nuevo."
-      );
-
-      if (
-        errorData.path === "email" ||
-        errorData.message?.includes("EMAIL_EXISTS")
-      ) {
-        setErrorMail(errorData.message || "Email inválido o ya en uso.");
-      } else if (
-        errorData.path === "password" ||
-        errorData.message?.includes("WEAK_PASSWORD")
-      ) {
-        setErrorPassword(
-          errorData.message ||
-            "Contraseña débil o inválida (mínimo 6 caracteres)."
-        );
-      } else {
-        setErrorMail(
-          errorData.message || "Error inesperado. Por favor, intenta de nuevo."
-        );
-      }
-
+      Alert.alert("Error", errorData.message || "Ocurrió un error.");
+      if (errorData.message?.includes("EMAIL_EXISTS"))
+        setErrorMail("Email ya en uso");
+      if (errorData.message?.includes("WEAK_PASSWORD"))
+        setErrorPassword("Contraseña débil");
       setPassword("");
     }
   }, [
@@ -108,11 +92,11 @@ const Signup = ({ navigation }) => {
     insertSession,
     dispatch,
     triggerUpdateProfile,
-    navigation,
     name,
     lastName,
     dbInitialized,
-  ]); 
+    selectedPlan,
+  ]);
 
   const onSubmit = () => {
     setErrorMail("");
@@ -127,85 +111,114 @@ const Signup = ({ navigation }) => {
     triggerSignUp({ email, password, returnSecureToken: true });
   };
 
+  const handlePlanSelect = (planId) => setSelectedPlan(planId);
+
   return (
-    <ImageBackground source={fondoSignUp} style={styles.container}>
-      <View style={styles.form}>
-        <Text style={styles.title}>Registro</Text>
-        <InputForm label="Nombre" value={name} onChangeText={setName} />
-        <InputForm
-          label="Apellido"
-          value={lastName}
-          onChangeText={setLastName}
-        />
-        <InputForm
-          label="Email"
-          value={email}
-          onChangeText={setEmail}
-          error={errorMail}
-        />
-        <InputForm
-          label="Contraseña"
-          placeholder="Mínimo 6 caracteres"
-          value={password}
-          onChangeText={setPassword}
-          error={errorPassword}
-          isSecure={true}
-        />
-        <SubmitButton
-          onPress={onSubmit}
-          title={result.isLoading || profileLoading ? "" : "Enviar"}
-          disabled={result.isLoading || profileLoading || !dbInitialized} 
-        >
-          {result.isLoading || profileLoading ? (
-            <ActivityIndicator size="small" color="#fff" />
-          ) : (
-            <Text style={{ color: "#fff", fontSize: 18 }}>Enviar</Text>
-          )}
-        </SubmitButton>
-        <Text style={styles.sub}>¿Ya tienes una cuenta?</Text>
-        <Pressable onPress={() => navigation.navigate("Login")}>
-          <Text style={styles.subLink}>Iniciar Sesión</Text>
-        </Pressable>
-      </View>
-    </ImageBackground>
+    <ScrollView
+      contentContainerStyle={styles.scrollContainer}
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
+    >
+      <ImageBackground
+        source={fondoSignUp}
+        style={styles.background}
+        resizeMode="cover"
+      >
+        
+          <Membresias onSelectPlan={handlePlanSelect} />
+          <Text style={styles.header}>Crea tu cuenta</Text>
+          <View style={styles.form}>
+            <Text style={styles.title}>Registro</Text>
+
+            <InputForm label="Nombre" value={name} onChangeText={setName} />
+            <InputForm
+              label="Apellido"
+              value={lastName}
+              onChangeText={setLastName}
+            />
+            <InputForm
+              label="Email"
+              value={email}
+              onChangeText={setEmail}
+              error={errorMail}
+            />
+            <InputForm
+              label="Contraseña"
+              placeholder="Mínimo 6 caracteres"
+              value={password}
+              onChangeText={setPassword}
+              error={errorPassword}
+              isSecure
+            />
+
+            <SubmitButton
+              onPress={onSubmit}
+              disabled={result.isLoading || profileLoading || !dbInitialized}
+            >
+              {result.isLoading || profileLoading ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Text style={{ color: "#fff", fontSize: 18 }}>Registrarme</Text>
+              )}
+            </SubmitButton>
+
+            <Text style={styles.sub}>¿Ya tienes una cuenta?</Text>
+            <Pressable onPress={() => navigation.navigate("Login")}>
+              <Text style={styles.subLink}>Iniciar Sesión</Text>
+            </Pressable>
+          </View>
+      </ImageBackground>
+    </ScrollView>
   );
 };
 
 export default Signup;
 
 const styles = StyleSheet.create({
-  container: {
+  background: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+  },
+  scrollContainer: {
+    flexGrow: 1,
+  },
+ 
+  header: {
+    fontSize: 26,
+    fontWeight: "700",
+    color: "#B78270",
+    marginTop: 40,
+    marginBottom: 10,
+    textAlign: "center",
   },
   form: {
-    width: "80%",
-    padding: 20,
-    borderRadius: 10,
-    backgroundColor: "#f9f9f9",
+    width: "92%",
+    backgroundColor: "rgba(255,255,255,0.95)",
+    borderRadius: 12,
+    marginHorizontal: "4%",
+    marginVertical: 40,
+    padding: 18,
     shadowColor: "#000",
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
+    shadowRadius: 6,
     elevation: 3,
   },
   title: {
     color: "#B78270",
-    fontSize: 30,
-    marginBottom: 20,
+    fontSize: 22,
+    fontWeight: "700",
+    marginBottom: 16,
+    textAlign: "center",
   },
   sub: {
     color: "#555",
-    fontSize: 16,
-    marginTop: 10,
     textAlign: "center",
+    marginTop: 10,
   },
   subLink: {
     color: "#B78270",
-    fontSize: 16,
-    marginTop: 5,
     textAlign: "center",
+    marginTop: 4,
     textDecorationLine: "underline",
   },
 });

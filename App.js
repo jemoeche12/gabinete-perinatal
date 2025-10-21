@@ -20,7 +20,6 @@ export default function App() {
   useEffect(() => {
     const initializeStripe = async () => {
       try {
-        console.log("Initializing Stripe with key:", publishableKey?.substring(0, 20) + "...");
         
         if (!publishableKey) {
           throw new Error("Stripe publishable key is missing");
@@ -29,7 +28,6 @@ export default function App() {
         await initStripe({
           publishableKey: publishableKey,
         });
-        console.log("Stripe initialized successfully");
       } catch (error) {
         console.error("Stripe initialization error:", error);
         Alert.alert("❌ Error al inicializar Stripe:", error.message);

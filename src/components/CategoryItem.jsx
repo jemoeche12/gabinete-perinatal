@@ -1,22 +1,39 @@
-import { Pressable, StyleSheet, Text } from 'react-native';
-import React from 'react';
-import Card from './Card';
-import { useDispatch } from 'react-redux';
-import { setCategorySelected } from '../features/recursos/InformacionSlice';
+import { Pressable, StyleSheet, Text } from "react-native";
+import React from "react";
+import Card from "./Card";
+import { useDispatch } from "react-redux";
+import { setCategorySelected } from "../features/recursos/InformacionSlice";
 
-const CategoryItem = ({ category, navigation}) => {
+const CategoryItem = ({ category, navigation, canAccess, onPressLocked }) => {
   const dispatch = useDispatch();
 
-  const handleNavigate = () =>{
-    dispatch(setCategorySelected(category))
-    navigation.navigate('ItemListCategory', {category})
-  }
-
-
+  const handleNavigate = () => {
+    dispatch(setCategorySelected(category));
+    if (canAccess) {
+      navigation.navigate("ItemListCategory", { category });
+    } else {
+      if (onPressLocked) onPressLocked(category.requiredLevel);
+      return;
+    }
+  };
   return (
     <Card>
-      <Pressable style={styles.productItem} onPress={handleNavigate}>
-        <Text style={styles.productText}>{category}</Text>
+      <Pressable
+        style={[styles.productItem, !canAccess && styles.lockedItem]}
+        onPress={handleNavigate}
+      >
+        <Text
+          numberOfLines={1}
+          ellipsizeMode="tail"
+          style={[
+            styles.productText,
+            !canAccess && styles.lockedText,
+            !canAccess && styles.textWithIcon,
+          ]}
+        >
+          {category.name}
+        </Text>
+        {!canAccess && <Text style={styles.alignedLockedIcon}>🔒</Text>}
       </Pressable>
     </Card>
   );
@@ -52,13 +69,30 @@ const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOpacity: 0.2,
     shadowOffset: { width: 2, height: 2 },
-    elevation: 3,
+    elevation: 3, // Estilos Flexbox:
+    flexDirection: "row",
+    justifyContent: "flex-start",
     alignItems: "center",
-
   },
   productText: {
     fontSize: 18,
     color: "black",
-    fontFamily:'Roboto400',
+    fontFamily: "Roboto400",
+  },
+  textWithIcon: {
+    flexShrink: 1,
+    marginRight: 10,
+  },
+  lockedItem: {
+    backgroundColor: "#EAEAEA",
+    borderColor: "#999",
+    opacity: 0.7,
+  },
+  lockedText: {
+    color: "#666",
+  },
+  alignedLockedIcon: {
+    marginLeft: "auto", // Empuja el candado a la derecha
+    fontSize: 20,
   },
 });

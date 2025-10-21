@@ -1,51 +1,104 @@
 const membresiaLevels = {
-    free: 1,
-    premium: 2,
-    superPremium: 3,
-}
+    basico: 1,      
+    intermedio: 2,  
+    premium: 3      
+};
+
 
 const permisosConfig = {
-    recursos: {
-        free: 3,
-        premium: null,
-        superPremium: null
+    biblioteca: {
+        basico: 5,          
+        intermedio: null,  
+        premium: null       
     },
-    test: {
-        free: 3,
-        premium: null,
-        superPremium: null
+    guias: {
+        basico: 3,         
+        intermedio: null,   
+        premium: null       
     },
     podcast: {
-        free: 3,
-        premium: null,
-        superPremium: null
+        basico: 3,          
+        intermedio: null,  
+        premium: null      
+    },
+    
+    test: {
+        basico: 2,          
+        intermedio: 5,      
+        premium: null     
+    },
+    categories: {
+        basico: 3,          
+        intermedio: null,   
+        premium: null       
     }
+};
 
-
-}
 
 const serviciosPagos = {
     talleres: {
-        visibleAll: true,
-        membresiaRequired: ['superPremium']
+        visibleAll: true,              
+        membresiaRequired: ['premium'],
+        requierePago: ['basico', 'intermedio'],
+        beneficioPremium: '1 taller gratis incluido'
     },
-    asesorias: {
+    orientaciones: {
         visibleAll: true,
-        membresiaRequired: ['superPremium']
+        membresiaRequired: ['premium'], 
+        requierePago: ['basico', 'intermedio'],
+        beneficioPremium: '1 orientación gratis incluida'
     },
-    guias: {
+    citas: {
         visibleAll: true,
-        membresiaRequired: ['superPremium']
+        membresiaRequired: [],         
+        requierePago: ['basico', 'intermedio', 'premium'],
+        beneficioPremium: null
     }
-}
+};
 
 const requisitoMembresia = (userLevel, requiredLevel) => {
-    return membresiaLevels[userLevel] >= membresiaLevels[requiredLevel];
-}
+    const userLevelNum = membresiaLevels[userLevel] || 0;
+    const requiredLevelNum = membresiaLevels[requiredLevel] || 0;
+    return userLevelNum >= requiredLevelNum;
+};
 
-exports = {
+const getSiguienteNivel = (currentLevel) => {
+    const currentNum = membresiaLevels[currentLevel] || 0;
+    const siguienteNivel = Object.entries(membresiaLevels)
+        .filter(([_, value]) => value > currentNum)
+        .sort(([_, a], [__, b]) => a - b);
+    
+    return siguienteNivel.length > 0 ? siguienteNivel[0][0] : null;
+};
+
+const getInfoPlan = (tipoPlan) => {
+    const planes = {
+        basico: {
+            nombre: 'basico',
+            precio: 'Gratis',
+            descripcion: 'Acceso limitado a contenido básico'
+        },
+        intermedio: {
+            nombre: 'intermedio',
+            precio: '18€/mes',
+            precioSemestral: '70€ (11.67€/mes)',
+            precioAnual: '100€ (8.33€/mes)',
+            descripcion: 'Mayor parte del contenido desbloqueado'
+        },
+        premium: {
+            nombre: 'premium',
+            precio: '150€/año (12.50€/mes)',
+            descripcion: 'Acceso completo + 1 taller y 1 orientación gratis'
+        }
+    };
+    return planes[tipoPlan] || null;
+};
+
+module.exports = {
     membresiaLevels,
     permisosConfig,
     serviciosPagos,
-    requisitoMembresia
+    requisitoMembresia,
+    getSiguienteNivel,
+    getInfoPlan
 };

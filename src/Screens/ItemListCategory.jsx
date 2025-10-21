@@ -14,7 +14,7 @@ const ItemListCategory = ({ navigation, route, visible }) => {
     const [isMenuVisible, setIsMenuVisible] = useState(visible)
 
     const { category: categorySelected } = route.params;
-    const { data: productsFetched = [], error: errorFetched, isLoading } = useGetProductsByCategoryQuery(categorySelected);
+    const { data: productsFetched = [], error: errorFetched, isLoading } = useGetProductsByCategoryQuery(categorySelected.name);
 
 
 
