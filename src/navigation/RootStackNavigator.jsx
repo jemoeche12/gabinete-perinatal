@@ -10,6 +10,7 @@ import TerminosYCondiciones from "../Screens/TerminosYCondiciones";
 import MisCitas from "../Screens/MisCitas";
 import InstructivoScreen from "../Screens/InstructivoScreen";
 import PodcastScreen from "../Screens/PodcastScreen";
+import ComunidadScreen from "../Screens/ComunidadScreen";
 
 const RootStackNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -28,6 +29,7 @@ const RootStackNavigator = () => {
       <Stack.Screen name="SobreNosotros" component={SobreNosotros} />
       <Stack.Screen name="ContactoScreen" component={ContactoScreen} />
       <Stack.Screen name="Cart" component={Cart} />
+      <Stack.Screen name="ComunidadScreen" component={ComunidadScreen} />
       <Stack.Screen
         name="TerminosYCondiciones"
         component={TerminosYCondiciones}

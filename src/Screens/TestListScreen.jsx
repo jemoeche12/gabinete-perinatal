@@ -4,13 +4,28 @@ import MenuDesplegable from "../components/MenuDesplegable";
 import React, { useState } from "react";
 import { useGetTestTituloQuery } from "../services/testService";
 import TestComponent from "../components/TestComponent";
-import iconImageLoading from '../../assets/Red.png';
-
+import iconImageLoading from "../../assets/Red.png";
+import { usePermisses } from "../hooks/usePermisses";
+import BannerMembresia from "../components/BannerMembresia";
+import { Modal } from "react-native";
 
 const TestListScreen = ({ navigation, visible }) => {
   const { data, error, isLoading } = useGetTestTituloQuery();
   const [isMenuVisible, setMenuVisible] = useState(visible);
   const toggleMenu = () => setMenuVisible(!isMenuVisible);
+  const [requiredLevel, setRequiredLevel] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const { canAccessByLevel } = usePermisses();
+
+  const handleLockedPress = (requiredLevel) => {
+    setRequiredLevel(requiredLevel);
+    setModalVisible(true);
+  };
+
+  const handlePlanNavigation = () => {
+    navigation.navigate("Membresias");
+  };
 
   if (isLoading)
     return (
@@ -26,19 +41,38 @@ const TestListScreen = ({ navigation, visible }) => {
       {isMenuVisible && (
         <MenuDesplegable onClose={toggleMenu} visible={isMenuVisible} />
       )}
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.centeredView}>
+          <BannerMembresia
+            requiredLevel={requiredLevel}
+            onClose={() => setModalVisible(false)}
+            onNavigateToPlans={handlePlanNavigation}
+          />
+        </View>
+      </Modal>
 
       <FlatList
         style={styles.container}
         data={data}
-        keyExtractor={(_, index) => index.toString()}
+        keyExtractor={(item) => item.id.toString()}
         showsVerticalScrollIndicator={false}
-        renderItem={({ item, index }) => (
-          <TestComponent
-            categoryTest={item.title}
-            navigation={navigation}
-            id={item.id}
-          />
-        )}
+        renderItem={({ item }) => {
+          const canAccess = canAccessByLevel(item.requiredLevel);
+          return (
+            <TestComponent
+              categoryTest={item.title}
+              navigation={navigation}
+              id={item.id}
+              canAccess={canAccess}
+              onPressLocked={handleLockedPress}
+            />
+          );
+        }}
         ListHeaderComponent={
           <View style={styles.view}>
             <Text style={styles.text}>
@@ -74,27 +108,33 @@ const styles = StyleSheet.create({
     backgroundColor: "#F8EDE3",
     flex: 1,
   },
-   containImageLoading: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'white',
-        height: '100%',
-        width: '100%',
-    },
-    iconImageLoading: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: 250,
-        height: 250,
-        resizeMode: 'contain',
-    },
+  containImageLoading: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "white",
+    height: "100%",
+    width: "100%",
+  },
+  iconImageLoading: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    width: 250,
+    height: 250,
+    resizeMode: "contain",
+  },
   view: {
     marginTop: 40,
   },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
   text: {
-    fontFamily: 'Roboto400',
+    fontFamily: "Roboto400",
     width: "90%",
     marginHorizontal: "5%",
     fontSize: 24,

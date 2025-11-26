@@ -16,7 +16,7 @@ export const recursosApi = createApi({
             id: Number(value.id ?? key), 
             name: value.name,
             requiredLevel:
-              value.requiredLevel || value.suscriptionPlan || "free",
+              value.requiredLevel || value.suscriptionPlan || "basico",
           })
         );
 

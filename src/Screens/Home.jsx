@@ -10,7 +10,7 @@ import AddButton from "../components/AddButton";
 import { colors } from "../utils/customerStyle";
 import podcast from "../../assets/icon/microphone.png";
 import app from "../../assets/icon/instApp.png";
-import asesoria from "../../assets/icon/asesoria.png";
+import comunidad from "../../assets/icon/group.png";
 import cita from "../../assets/icon/citaApp.png";
 import talleres from "../../assets/icon/talleres.png";
 import ModalAsesoriaForm from "../components/ModalFormAsesoria";
@@ -27,10 +27,7 @@ const Home = ({ visible }) => {
     navigation.navigate("Talleres");
   };
 
-  const manejoTurnos = () => {
-    setModalVisible(!modalVisible);
-  };
-
+  
   return (
     <ImageBackground source={fondoInicio} style={styles.background}>
       <View style={{ flex: 1 }}>
@@ -54,10 +51,10 @@ const Home = ({ visible }) => {
             <View>
               <AddButton
                 style={styles.btnAsesorias}
-                title="ASESORIA"
-                onPress={manejoTurnos}
+                title="COMUNIDAD"
+                onPress={() => navigation.navigate("ComunidadScreen")}
                 iconSize={42}
-                iconSource={asesoria}
+                iconSource={comunidad}
               />
             </View>
             <AddButton
@@ -105,7 +102,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 10,
-    marginHorizontal: 20,
+    marginHorizontal: 10,
+    marginTop: 20
   },
   logoContainer: {
     flexDirection: "column",
@@ -118,12 +116,12 @@ const styles = StyleSheet.create({
     width: 225,
     height: 225,
     marginBottom: 70,
-    marginTop: -20,
+    marginTop: -30,
   },
   btnInst: {
     backgroundColor: colors.btnGuia,
-    marginLeft: 50
-    
+    marginLeft: 50,
+    marginTop: 40
   },
   buttonContainer: {
     flexDirection: "column",

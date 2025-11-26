@@ -42,11 +42,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   button: {
-    width: 95,
-    height: 95,
+    width: 105,
+    height: 105,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 45,
+    borderRadius: 50,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,

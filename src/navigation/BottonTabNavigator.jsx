@@ -1,15 +1,14 @@
-import { StyleSheet, View } from 'react-native'
-import React from 'react'
+import { StyleSheet, View } from 'react-native';
 import Home from '../Screens/Home'
-import RecursoStackNavigator from './RecursosStackNavigator'
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import RecursoStackNavigator from './RecursosStackNavigator';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import MyProfileStackNavigator from './MyProfileStackNavigator'
-import TalleresStackNavigator from './TalleresStackNavigator'
-import TestStackNavigator from './TestStackNavigator'
-import HomeStackNavigator from './HomeStackNavigator'
+import MyProfileStackNavigator from './MyProfileStackNavigator';
+import TalleresStackNavigator from './TalleresStackNavigator';
+import TestStackNavigator from './TestStackNavigator';
+import HomeStackNavigator from './HomeStackNavigator';
 
 
 
@@ -43,12 +42,12 @@ const BottonTabNavigator = () => {
     }}
   />
   <Tab.Screen
-    name="Recursos"
+    name="Biblioteca"
     component={RecursoStackNavigator}
     options={{
       headerShown: false,
       tabBarIcon: () => (
-        <AntDesign name="folderopen" size={28} color="black" />
+        <Ionicons name="library-outline" size={28} color="black" />
       ),
     }}
   />

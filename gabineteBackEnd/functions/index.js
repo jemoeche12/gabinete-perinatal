@@ -2,12 +2,18 @@ const express = require("express");
 const cors = require("cors");
 const Stripe = require("stripe");
 const Mailjet = require("node-mailjet");
-const { onRequest, onCall, HttpsError } = require("firebase-functions/v2/https");
+const {
+  onRequest,
+  onCall,
+  HttpsError,
+} = require("firebase-functions/v2/https");
 
-const stripeSecretKey = "sk_test_51RgMQYFJ1XWiS5lgSH6lIeJxFIuVj6eLvn2oLRRYCFLpGG6dmNs7qC08eZB54J130KR6H8XcKRaL9SRfH27FkP0O009PZXRiqN";
-const stripeWebhookSecret = "whsec_OPmKusDitS57VinkAcZOj0rduFu2Ocr9";
-const mailjetApiKey = "3326de0752c681ca2eda3da28b76ecfd";
-const mailjetApiSecret = "a49d76568733421067b6ebb48844059b";
+
+
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+const mailjetApiKey = process.env.MAILJET_API_KEY;
+const mailjetApiSecret = process.env.MAILJET_API_SECRET;
 
 const app = express();
 app.use(cors({ origin: true }));
@@ -16,7 +22,6 @@ const admin = require("firebase-admin");
 if (!admin.apps.length) admin.initializeApp();
 
 const sendEmailFromClient = async ({ email, subject, body }) => {
- 
   return Promise.resolve();
 };
 
@@ -60,13 +65,13 @@ app.post("/webhook", async (request, response) => {
           estado: "pagado",
           fecha_pago: Date.now(),
         });
-        
+
         await sendEmailFromClient({
           email: customerEmail,
           subject: "Pago exitoso",
           body: `Hola ${customerName}, tu pago de $${totalAmount} ha sido recibido con éxito. Gracias por tu compra!`,
         });
-        
+
         await sendEmailFromClient({
           email: "florenciavelascopsi@hotmail.com",
           subject: "Nueva orden",
@@ -81,7 +86,7 @@ app.post("/webhook", async (request, response) => {
 
     case "payment_method.attached": {
       const paymentMethod = event.data.object;
-     
+
       break;
     }
 
@@ -90,8 +95,6 @@ app.post("/webhook", async (request, response) => {
 
   response.json({ received: true });
 });
-
-
 
 app.post("/create-payment-intent", async (req, res) => {
   if (!stripeSecretKey) {
@@ -104,7 +107,8 @@ app.post("/create-payment-intent", async (req, res) => {
   });
 
   try {
-    const { amount, currency, cartItems, customerEmail, customerName } = req.body;
+    const { amount, currency, cartItems, customerEmail, customerName } =
+      req.body;
 
     if (!amount || amount <= 0) {
       return res.status(400).json({ error: "El monto debe ser mayor a 0" });
@@ -115,8 +119,6 @@ app.post("/create-payment-intent", async (req, res) => {
     }
 
     const amountInCents = Math.round(amount * 100);
-
-    
 
     const orderId = `order_${Date.now()}`;
     const productNames = cartItems
@@ -143,10 +145,11 @@ app.post("/create-payment-intent", async (req, res) => {
     });
   } catch (error) {
     console.error("Error en /create-payment-intent:", error);
-    res.status(500).json({ error: error.message || "Error interno del servidor" });
+    res
+      .status(500)
+      .json({ error: error.message || "Error interno del servidor" });
   }
 });
-
 
 app.get("/health", (req, res) => {
   res.json({ status: "OK", timestamp: new Date().toISOString() });
@@ -207,8 +210,6 @@ const sendEmailFunction = onCall(async (request) => {
     const response = await mailer
       .post("send", { version: "v3.1" })
       .request(messagePayload);
-
-  
 
     if (
       response.body &&

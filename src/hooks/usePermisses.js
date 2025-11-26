@@ -9,7 +9,7 @@ import {
 } from "../config/permisosConfig";
 
 export const usePermisses = () => {
-  const { membresia, role, isAdmin, isMembresiaActive } = useAuth(); 
+  const { membresia, role, isAdmin, isMembresiaActive } = useAuth();
   const tipoMembresia = membresia?.tipo || "basico";
   const nivelActual = membresiaLevels[tipoMembresia] || 1;
 
@@ -24,7 +24,7 @@ export const usePermisses = () => {
       mostrarActualizacionMembresia: () => false,
       getLevelRequiredForContent: () => null,
       getSiguienteNivelDisponible: () => null,
-      
+
       tipoMembresia: "admin",
       nivelActual: 99,
       membresiaActiva: true,
@@ -113,6 +113,26 @@ export const usePermisses = () => {
     return nombres[tipoMembresia] || "Desconocido";
   };
 
+  const readPosts = () => {
+    return permisosConfig.blog[tipoMembresia]?.readPosts || false;
+  };
+
+  const canReadComments = () => {
+    return permisosConfig.blog.readComments[tipoMembresia] || false;
+  };
+
+  const canWriteComments = () => {
+    return permisosConfig.blog.writeComments[tipoMembresia] || false;
+  };
+
+  const canDeleteOwnComments = () => {
+    return permisosConfig.blog.deleteOwnComments[tipoMembresia] || false;
+  };
+
+  const sendPrivateMessages = () => {
+    return permisosConfig.blog.sendPrivateMessages[tipoMembresia] || false;
+  };
+
   const membresiaActiva = isMembresiaActive();
 
   return {
@@ -130,5 +150,11 @@ export const usePermisses = () => {
     tipoMembresia,
     nivelActual,
     membresiaActiva,
+
+    readPosts,
+    canReadComments,
+    canWriteComments,
+    canDeleteOwnComments,
+    sendPrivateMessages,
   };
 };

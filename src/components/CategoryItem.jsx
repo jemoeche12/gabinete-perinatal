@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOpacity: 0.2,
     shadowOffset: { width: 2, height: 2 },
-    elevation: 3, // Estilos Flexbox:
+    elevation: 3,
     flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "center",
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     color: "#666",
   },
   alignedLockedIcon: {
-    marginLeft: "auto", // Empuja el candado a la derecha
+    marginLeft: "auto",
     fontSize: 20,
   },
 });

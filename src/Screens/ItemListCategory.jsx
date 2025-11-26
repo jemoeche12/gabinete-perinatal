@@ -38,10 +38,7 @@ const ItemListCategory = ({ navigation, route, visible }) => {
             <CustomHeader onMenuPress={toggleMenu} />
             {isMenuVisible && <MenuDesplegable onClose={toggleMenu} visible={isMenuVisible} />}
             <View style={styles.container}>
-                <View style={styles.searchContainer}>
-                    <Search onSearch={setBusqueda} goBack={() => navigation.goBack()} />
-                    {error ? <Text style={styles.errorText}>{error}</Text> : null}
-                </View>
+                
                 <FlatList
                     data={productsFiltered}
                     renderItem={({ item }) => (
