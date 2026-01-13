@@ -27,25 +27,30 @@ const PLAN_CONFIG = {
     name: "Básico",
     color: "#E8D5C4",
     options: [
-      { id: "basico_free", price: 0, period: "gratis", currency: "eur" }
-    ]
+      { id: "basico_free", price: 0, period: "gratis", currency: "eur" },
+    ],
   },
   intermedio: {
     name: "Intermedio",
     color: "#C9A690",
     options: [
       { id: "intermedio_month", price: 18, period: "mes", currency: "eur" },
-      { id: "intermedio_6months", price: 70, period: "6 meses", currency: "eur" },
-      { id: "intermedio_year", price: 100, period: "año", currency: "eur" }
-    ]
+      {
+        id: "intermedio_6months",
+        price: 70,
+        period: "6 meses",
+        currency: "eur",
+      },
+      { id: "intermedio_year", price: 100, period: "año", currency: "eur" },
+    ],
   },
   premium: {
     name: "Premium",
     color: "#B78270",
     options: [
-      { id: "premium_year", price: 130, period: "año", currency: "eur" }
-    ]
-  }
+      { id: "premium_year", price: 130, period: "año", currency: "eur" },
+    ],
+  },
 };
 
 const Signup = ({ navigation }) => {
@@ -60,7 +65,7 @@ const Signup = ({ navigation }) => {
     id: "basico_free",
     price: 0,
     period: "gratis",
-    currency: "eur"
+    currency: "eur",
   });
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
@@ -115,8 +120,11 @@ const Signup = ({ navigation }) => {
         name,
         lastName,
         email: userEmail,
-        membresia: selectedPlan,
-        subscriptionType: selectedOption?.id || "basico_free",
+        membresia: {
+          tipo: selectedPlan,
+          subscriptionType: selectedOption?.id || "basico_free",
+          fechaInicio: Date.now(),
+        },
       }).unwrap();
 
       dispatch(
@@ -127,7 +135,11 @@ const Signup = ({ navigation }) => {
           name,
           lastName,
           role: "user",
-          membresia: selectedPlan,
+          membresia: {
+            tipo: selectedPlan,
+            subscriptionType: selectedOption?.id || "basico_free",
+            fechaInicio: Date.now(),
+          },
         })
       );
 
@@ -142,9 +154,11 @@ const Signup = ({ navigation }) => {
             <h2 style="color: #B78270;">¡Hola ${name || ""}!</h2>
             <p>Gracias por registrarte en la Red Perinatal Digital.</p>
             <p>Tu plan seleccionado es: <strong>${planName}</strong></p>
-            ${selectedOption?.price > 0 
-              ? `<p>Tu pago de ${currencySymbol}${selectedOption.price} (${selectedOption.period}) ha sido procesado exitosamente.</p>` 
-              : ''}
+            ${
+              selectedOption?.price > 0
+                ? `<p>Tu pago de ${currencySymbol}${selectedOption.price} (${selectedOption.period}) ha sido procesado exitosamente.</p>`
+                : ""
+            }
             <p>¡Esperamos que disfrutes de todos nuestros recursos!</p>
             <br>
             <p>Saludos,<br>El equipo de Red Perinatal Digital</p>
@@ -161,7 +175,10 @@ const Signup = ({ navigation }) => {
           {
             text: "OK",
             onPress: () => {
-              navigation.navigate("HomePrincipal");
+              navigation.reset({
+                index: 0,
+                routes: [{ name: "Main" }],
+              });
             },
           },
         ]
@@ -285,7 +302,7 @@ const Signup = ({ navigation }) => {
         );
         return false;
       }
-      
+
       return true;
     } catch (error) {
       console.error("Error inesperado en initializePaymentSheet:", error);
@@ -351,7 +368,7 @@ const Signup = ({ navigation }) => {
         id: option.id || `${selectedPlan}_${option.period}`,
         price: option.amount,
         period: option.period,
-        currency: option.currency
+        currency: option.currency,
       });
     }
   };
@@ -370,7 +387,7 @@ const Signup = ({ navigation }) => {
         style={styles.background}
         resizeMode="cover"
       >
-        <Membresias 
+        <Membresias
           onSelectPlan={handlePlanSelect}
           onSelectDuration={handleDurationSelect}
         />
@@ -407,31 +424,47 @@ const Signup = ({ navigation }) => {
                   key={option.id}
                   style={[
                     styles.optionButton,
-                    selectedOption?.id === option.id && styles.optionButtonSelected,
-                    { borderColor: currentPlan.color }
+                    selectedOption?.id === option.id &&
+                      styles.optionButtonSelected,
+                    { borderColor: currentPlan.color },
                   ]}
                   onPress={() => setSelectedOption(option)}
                   activeOpacity={0.7}
                 >
                   <View style={styles.optionContent}>
                     <View style={styles.optionLeft}>
-                      <Text style={[
-                        styles.optionPeriod,
-                        selectedOption?.id === option.id && styles.optionTextSelected
-                      ]}>
+                      <Text
+                        style={[
+                          styles.optionPeriod,
+                          selectedOption?.id === option.id &&
+                            styles.optionTextSelected,
+                        ]}
+                      >
                         {option.period}
                       </Text>
                       {selectedOption?.id === option.id && (
-                        <View style={[styles.selectedBadge, { backgroundColor: currentPlan.color }]}>
-                          <Text style={styles.selectedBadgeText}>✓ Seleccionado</Text>
+                        <View
+                          style={[
+                            styles.selectedBadge,
+                            { backgroundColor: currentPlan.color },
+                          ]}
+                        >
+                          <Text style={styles.selectedBadgeText}>
+                            ✓ Seleccionado
+                          </Text>
                         </View>
                       )}
                     </View>
-                    <Text style={[
-                      styles.optionPrice,
-                      selectedOption?.id === option.id && { color: currentPlan.color }
-                    ]}>
-                      {option.currency === "eur" ? "€" : "$"}{option.price}
+                    <Text
+                      style={[
+                        styles.optionPrice,
+                        selectedOption?.id === option.id && {
+                          color: currentPlan.color,
+                        },
+                      ]}
+                    >
+                      {option.currency === "eur" ? "€" : "$"}
+                      {option.price}
                     </Text>
                   </View>
                 </TouchableOpacity>
@@ -462,10 +495,9 @@ const Signup = ({ navigation }) => {
               )}
             </View>
             <Text style={styles.priceText}>
-              {selectedOption?.price === 0 
-                ? "Gratis" 
-                : `${currencySymbol}${selectedOption?.price}`
-              }
+              {selectedOption?.price === 0
+                ? "Gratis"
+                : `${currencySymbol}${selectedOption?.price}`}
             </Text>
           </View>
 
@@ -482,7 +514,9 @@ const Signup = ({ navigation }) => {
               <View style={styles.loadingContainer}>
                 <ActivityIndicator size="small" color="#fff" />
                 <Text style={styles.loadingText}>
-                  {isProcessingPayment ? "Procesando pago..." : "Registrando..."}
+                  {isProcessingPayment
+                    ? "Procesando pago..."
+                    : "Registrando..."}
                 </Text>
               </View>
             ) : (

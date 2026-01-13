@@ -24,7 +24,7 @@ import home from "../../assets/icon/home.png";
 const Cart = ({ navigation }) => {
   const cartItems = useSelector((state) => state.cart.value.itemCart);
   const total = useSelector((state) => state.cart.value.totalPrecioCarrito);
-  const { user, localId } = useSelector((state) => state.auth.value);
+  const { email, localId } = useSelector((state) => state.auth.value);
   const dispatch = useDispatch();
   const [triggerOrderConfirm] = useOrderConfirmMutation();
 
@@ -34,7 +34,6 @@ const Cart = ({ navigation }) => {
 
   const [loading, setLoading] = useState(false);
 
-  const email = user || "";
   const emailEquipo = "florenciavelascopsi@hotmail.com";
   const name = profileData?.name;
   const lastName = profileData?.lastName;
@@ -186,7 +185,7 @@ const Cart = ({ navigation }) => {
       const result = await triggerOrderConfirm({
         cartItems,
         amount: parseFloat(total),
-        user,
+        email: email,
       }).unwrap();
 
       dispatch(clearCart());

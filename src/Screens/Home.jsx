@@ -23,8 +23,8 @@ const Home = ({ visible }) => {
     setIsMenuVisible(!isMenuVisible);
   };
 
-  const manejoTaller = () => {
-    navigation.navigate("Talleres");
+  const manejoGuia = () => {
+    navigation.navigate("Guias");
   };
 
   
@@ -40,8 +40,8 @@ const Home = ({ visible }) => {
             <Image source={logo} style={styles.imgLog} resizeMode="contain" />
             <AddButton
               style={styles.btnInst}
-              title="APP"
-              onPress={() => navigation.navigate("InstructivoScreen")}
+              title="DUELO"
+              onPress={() => navigation.navigate("Duelo")}
               iconSource={app}
               iconSize={42}
               color="black"
@@ -59,8 +59,8 @@ const Home = ({ visible }) => {
             </View>
             <AddButton
               style={styles.btnTalleres}
-              title="TALLERES"
-              onPress={manejoTaller}
+              title="GUIAS"
+              onPress={manejoGuia}
               iconSource={talleres}
             />
             <AddButton

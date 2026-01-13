@@ -4,7 +4,7 @@ export const useAuth = () => {
   const authState = useSelector((state) => state.auth.value);
 
   const {
-    user,
+    email,
     idToken,
     localId,
     imageCamera,
@@ -15,7 +15,7 @@ export const useAuth = () => {
   } = authState;
 
   const isAuthenticated = () => {
-    return !!user && !!idToken;
+    return !!email && !!idToken;
   };
   const isAdmin = () => {
     return role === "admin";
@@ -48,7 +48,7 @@ export const useAuth = () => {
 
 
   return {
-    user,
+    email,
     idToken,
     localId,
     imageCamera,

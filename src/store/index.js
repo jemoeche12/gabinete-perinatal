@@ -6,6 +6,7 @@ import CartReducer from "../features/cart/CartSlice";
 import TestReducer from "../features/test/TestSlice";
 import PostReducer from "../features/post/PostSlice";  
 import CommentReducer from "../features/comments/CommentSlice";
+import dueloReducer from "../features/duelo/DueloSlice";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import { recursosApi } from "../services/recursosService";
 import { authApi } from "../services/authService";
@@ -17,6 +18,7 @@ import { consultasApi } from "../services/consultasService";
 import { orderApi } from "../services/orderService";
 import { asesoriasApi } from "../services/asesoriasService";
 import { podcastApi } from "../services/podcastService";
+import { dueloApi } from "../services/DueloService";
 
 const store = configureStore({
     reducer: {
@@ -27,6 +29,7 @@ const store = configureStore({
         cart: CartReducer,
         posts: PostReducer,
         comments: CommentReducer,
+        duelo: dueloReducer,
         [recursosApi.reducerPath]: recursosApi.reducer,
         [authApi.reducerPath]: authApi.reducer,
         [talleresApi.reducerPath]: talleresApi.reducer,
@@ -37,6 +40,7 @@ const store = configureStore({
         [consultasApi.reducerPath]: consultasApi.reducer,
         [orderApi.reducerPath]: orderApi.reducer,
         [podcastApi.reducerPath]: podcastApi.reducer,
+        [dueloApi.reducerPath]: dueloApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware()
@@ -49,7 +53,8 @@ const store = configureStore({
             .concat(asesoriasApi.middleware)
             .concat(consultasApi.middleware)
             .concat(orderApi.middleware)
-            .concat(podcastApi.middleware),
+            .concat(podcastApi.middleware)
+            .concat(dueloApi.middleware),
 });
 
 setupListeners(store.dispatch);

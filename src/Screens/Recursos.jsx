@@ -28,7 +28,7 @@ const Recursos = ({ navigation, visible }) => {
 
   const handleNavigateToPlans = () => {
     setModalVisible(false);
-    navigation.navigate("Membresias"); 
+    navigation.navigate("UpdateMembresias"); 
   };
 
   return (

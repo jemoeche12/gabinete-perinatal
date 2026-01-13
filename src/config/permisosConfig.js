@@ -10,6 +10,11 @@ const permisosConfig = {
     intermedio: null,
     premium: null,
   },
+  duelo: {
+    basico: 3,
+    intermedio: null,
+    premium: null,
+  },
   guias: {
     basico: 3,
     intermedio: null,

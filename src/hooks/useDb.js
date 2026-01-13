@@ -3,24 +3,23 @@ import * as SQLite from "expo-sqlite";
 import { Alert } from "react-native";
 
 export const useDB = () => {
- 
   const dbRef = useRef(null);
   const [dbInitialized, setDbInitialized] = useState(false);
-  const [dbError, setDbError] = useState(null); 
+  const [dbError, setDbError] = useState(null);
 
   const getDatabaseInstance = useCallback(() => {
     if (dbRef.current) {
-      return dbRef.current; 
+      return dbRef.current;
     }
     try {
       const db = SQLite.openDatabaseSync("sessions.db");
-      dbRef.current = db; 
+      dbRef.current = db;
       return db;
     } catch (error) {
       setDbError(new Error("Failed to open database."));
-      throw error; 
+      throw error;
     }
-  }, []); 
+  }, []);
   const initDB = useCallback(async () => {
     if (dbInitialized) {
       return;
@@ -38,23 +37,21 @@ export const useDB = () => {
           token TEXT NOT NULL
         );`;
 
-      await db.execAsync(sql); 
-      setDbInitialized(true); 
-      setDbError(null); 
+      await db.execAsync(sql);
+      setDbInitialized(true);
+      setDbError(null);
     } catch (error) {
       setDbInitialized(false);
       setDbError(new Error("Failed to initialize database table."));
-      throw error; 
+      throw error;
     }
   }, [dbInitialized, getDatabaseInstance]);
 
   useEffect(() => {
-    initDB().catch(e => {
+    initDB().catch((e) => {
       Alert.alert("[useDB] useEffect: Error during initial DB setup:", e);
     });
-  }, [initDB]); 
-
-  
+  }, [initDB]);
 
   const insertSession = useCallback(
     async ({ email, localId, token }) => {
@@ -64,15 +61,17 @@ export const useDB = () => {
       const sql = `INSERT OR REPLACE INTO sessions(localId, email, token) VALUES(?, ?, ?)`;
       return await dbRef.current.runAsync(sql, [localId, email, token]);
     },
-    [dbInitialized] 
+    [dbInitialized]
   );
 
   const getSession = useCallback(async () => {
-    if (!dbRef.current || !dbInitialized) {
-     
-      return null;
+    while (!dbInitialized) {
+      await new Promise((res) => setTimeout(res, 50));
     }
-    const sql = `SELECT * FROM sessions`;
+
+    if (!dbRef.current) return null;
+
+    const sql = `SELECT * FROM sessions LIMIT 1`;
     return await dbRef.current.getFirstAsync(sql);
   }, [dbInitialized]);
 
@@ -86,7 +85,7 @@ export const useDB = () => {
 
   return {
     dbInitialized,
-    dbError, 
+    dbError,
     initDB,
     insertSession,
     getSession,

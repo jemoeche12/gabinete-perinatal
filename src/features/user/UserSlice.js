@@ -1,4 +1,4 @@
-const { createSlice } = require("@reduxjs/toolkit");
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialMembresia = {
   tipo: "basico",
@@ -14,7 +14,7 @@ export const AuthSlice = createSlice({
   name: "auth",
   initialState: {
     value: {
-      user: null,
+      email: null,
       idToken: null,
       localId: null,
       imageCamera: null,
@@ -26,35 +26,42 @@ export const AuthSlice = createSlice({
   },
   reducers: {
     setUser: (state, { payload }) => {
-      state.value.user = payload.email || null;
-      state.value.idToken = payload.idToken || null;
-      state.value.localId = payload.localId || null;
-      state.value.name = payload.name || null;
-      state.value.lastName = payload.lastName || null;
-      state.value.role = payload.role || null;
-      let normalizedMembresia;
+      state.value.email = payload.email ?? state.value.email;
+      state.value.idToken = payload.idToken ?? state.value.idToken;
+      state.value.localId = payload.localId ?? state.value.localId;
+      state.value.name = payload.name ?? state.value.name;
+      state.value.lastName = payload.lastName ?? state.value.lastName;
+      state.value.role = payload.role ?? state.value.role;
 
-      if(typeof payload.membresia === "string"){
-        normalizedMembresia = {
-          ...initialMembresia,
-          tipo: payload.membresia.toLowerCase(),
-        };
-      } else if(typeof payload.membresia === "object" && payload.membresia !== null){
-        normalizedMembresia = {
-          ...initialMembresia,
-          ...payload.membresia,
-          tipo: payload.membresia.tipo
-            ? payload.membresia.tipo.toLowerCase()
-            : "basico",
+      if (payload.membresia !== undefined) {
+        let normalizedMembresia;
 
-        };
-      } else{
-        normalizedMembresia = initialMembresia;
+        if (typeof payload.membresia === "string") {
+          normalizedMembresia = {
+            ...initialMembresia,
+            tipo: payload.membresia.toLowerCase(),
+          };
+        } else if (
+          typeof payload.membresia === "object" &&
+          payload.membresia !== null
+        ) {
+          normalizedMembresia = {
+            ...initialMembresia,
+            ...payload.membresia,
+            tipo: payload.membresia.tipo
+              ? payload.membresia.tipo.toLowerCase()
+              : initialMembresia.tipo,
+          };
+        } else {
+          normalizedMembresia = initialMembresia;
+        }
+
+        state.value.membresia = normalizedMembresia;
       }
-      state.value.membresia = normalizedMembresia;
     },
+
     clearUser: (state) => {
-      state.value.user = null;
+      state.value.email = null;
       state.value.idToken = null;
       state.value.localId = null;
       state.value.imageCamera = null;

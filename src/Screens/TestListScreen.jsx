@@ -24,7 +24,7 @@ const TestListScreen = ({ navigation, visible }) => {
   };
 
   const handlePlanNavigation = () => {
-    navigation.navigate("Membresias");
+    navigation.navigate("UpdateMembresias");
   };
 
   if (isLoading)

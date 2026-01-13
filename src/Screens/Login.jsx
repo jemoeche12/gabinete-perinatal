@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
-import { View, Text, Pressable, StyleSheet, Alert, ImageBackground } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  Alert,
+  ImageBackground,
+} from "react-native";
 import InputForm from "../components/InputForm";
 import { useDispatch } from "react-redux";
 import { useSignInMutation } from "../services/authService";
@@ -63,16 +70,17 @@ const Login = ({ navigation }) => {
       return;
     }
     if (!profileLoading && profileDate && result.data) {
-      dispatch(
-        setUser({
-          email: result.data.email,
-          localId: result.data.localId,
-          idToken: result.data.idToken,
-          name: profileDate.name,
-          lastName: profileDate.lastName,
-        })
-      );
-      
+      const mergedUser = {
+        email: result.data.email,
+        localId: result.data.localId,
+        idToken: result.data.idToken,
+        name: profileDate.name || "",
+        lastName: profileDate.lastName || "",
+        role: profileDate.role || "user",
+        membresia: profileDate.membresia || undefined,
+      };
+
+      dispatch(setUser(mergedUser));
     }
   }, [
     profileDate,
@@ -133,7 +141,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 30,
-    fontFamily: 'Roboto400',
+    fontFamily: "Roboto400",
     color: "#B78270",
     marginBottom: 20,
     textAlign: "center",
@@ -150,11 +158,11 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontSize: 18,
-    fontFamily: 'Roboto400',
+    fontFamily: "Roboto400",
   },
   placeholder: {
     color: "black",
     fontSize: 18,
-    fontFamily: 'Roboto400',
+    fontFamily: "Roboto400",
   },
 });

@@ -2,7 +2,7 @@ import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import TestListScreen from "../Screens/TestListScreen";
 import TestDetailScreen from "../Screens/TestDetailScreen";
-import Membresias from "../Screens/Membresias";
+import UpdateMembresias from "../Screens/UpdateMembresias";
 
 const TestStackNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -23,8 +23,8 @@ const TestStackNavigator = () => {
         options={{ headerBackVisible: false }}
       />
       <Stack.Screen
-        name="Membresias"
-        component={Membresias}
+        name="UpdateMembresias"
+        component={UpdateMembresias}
         options={{ headerBackVisible: false }}
       />
     </Stack.Navigator>

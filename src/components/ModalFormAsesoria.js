@@ -34,7 +34,7 @@ const horariosDisponibles = [
 const ModalAsesoriaForm = ({ modalVisible, setModalVisible }) => {
   let today = new Date();
   const [selectedDate, setSelectedDate] = useState(dayjs(today));
-  const { user, localId } = useSelector((state) => state.auth.value);
+  const { email, localId } = useSelector((state) => state.auth.value);
   const { data: profileData, isLoading: profileLoading } =
     useGetProfileQuery(localId);
   const [telefono, setTelefono] = useState("");
@@ -45,7 +45,6 @@ const ModalAsesoriaForm = ({ modalVisible, setModalVisible }) => {
 
   const name = profileData?.name || "";
   const lastName = profileData?.lastName || "";
-  const email = user || "";
 
   const [crearAsesoria, { isLoading: isCrearAsesoria }] =
     useCrearAsesoriaMutation();

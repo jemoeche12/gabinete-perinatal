@@ -12,7 +12,7 @@ import closeSession from "../../assets/icon/closeSession.png";
 import { colors } from "../utils/customerStyle";
 
 const MyProfil = ({ navigation }) => {
-  const { imageCamera, localId, user } = useSelector(
+  const { imageCamera, localId, email } = useSelector(
     (state) => state.auth.value
   );
 
@@ -22,7 +22,6 @@ const MyProfil = ({ navigation }) => {
   const dispatch = useDispatch();
   const name = profileDate?.name || "";
   const lastName = profileDate?.lastName || "";
-  const email = user || "";
 
   const tomarImagen = () => {
     navigation.navigate("ImagenSeleccionada");

@@ -11,6 +11,9 @@ import MisCitas from "../Screens/MisCitas";
 import InstructivoScreen from "../Screens/InstructivoScreen";
 import PodcastScreen from "../Screens/PodcastScreen";
 import ComunidadScreen from "../Screens/ComunidadScreen";
+import Duelo from "../Screens/Duelo";
+import Guias from "../Screens/Guias";
+import DueloStackNavigator from "./DueloStackNavigator";
 
 const RootStackNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -30,6 +33,8 @@ const RootStackNavigator = () => {
       <Stack.Screen name="ContactoScreen" component={ContactoScreen} />
       <Stack.Screen name="Cart" component={Cart} />
       <Stack.Screen name="ComunidadScreen" component={ComunidadScreen} />
+      <Stack.Screen name="Duelo" component={DueloStackNavigator} />
+      <Stack.Screen name="Guias" component={Guias} />
       <Stack.Screen
         name="TerminosYCondiciones"
         component={TerminosYCondiciones}

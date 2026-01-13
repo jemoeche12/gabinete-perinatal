@@ -21,7 +21,7 @@ const diasDisponibles = ["LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES"];
 const ModalForm = ({ modalVisible, setModalVisible }) => {
   let today = new Date();
   const [selectedDate, setSelectedDate] = useState(dayjs(today));
-  const { user, localId } = useSelector((state) => state.auth.value);
+  const { email, localId } = useSelector((state) => state.auth.value);
   const { data: profileData, isLoading: profileLoading } =
     useGetProfileQuery(localId);
 
@@ -31,7 +31,6 @@ const ModalForm = ({ modalVisible, setModalVisible }) => {
 
   const name = profileData?.name || "";
   const lastName = profileData?.lastName || "";
-  const email = user || "";
 
   const [crearCita, { isLoading: isCrearCita }] = useCrearCitaMutation();
 

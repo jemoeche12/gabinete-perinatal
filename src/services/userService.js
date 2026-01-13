@@ -17,7 +17,7 @@ export const userApi = createApi({
         updateUserProfile: builder.mutation({
             query: ({localId, ...profileDate}) => ({
                 url: `user/${localId}.json`,
-                method: "PUT",
+                method: "PATCH",
                 body: profileDate,
             })
         })

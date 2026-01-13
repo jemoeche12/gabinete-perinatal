@@ -22,7 +22,7 @@ const FormComponent = () => {
   const [modalVisible, setModalVisible] = useState(false);
 
   const authState = useSelector((state) => state.auth.value);
-  const { user, localId } = authState;
+  const { email, localId } = authState;
 
   const { data: profileDate } = useGetProfileQuery(localId);
 
@@ -35,13 +35,13 @@ const FormComponent = () => {
     try {
       const dataForm = {
         nombre: name || nombre,
-        correo: user || correo,
+        correo: email || correo,
         motivo,
         mensaje,
         quiereContacto,
       };
 
-      let receptor = user || correo;
+      let receptor = email || correo;
 
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!receptor || !emailRegex.test(receptor)) {
@@ -117,7 +117,7 @@ const FormComponent = () => {
         style={styles.input}
         placeholder="example@mail.com"
         placeholderTextColor="#999"
-        value={user}
+        value={email || correo}
         keyboardType="email-address"
       />
       <Text style={styles.label}>Motivo de contacto:</Text>
