@@ -5,12 +5,13 @@ import {
   StyleSheet,
   ScrollView,
   Image,
-  TouchableOpacity,
+  Pressable,
 } from "react-native";
 import CustomHeader from "../components/CustomHeader";
 import MenuDesplegable from "../components/MenuDesplegable";
 import FormComponent from "../components/FormComponent";
 import CardPsicologos from "../components/CardPsicologos";
+import back from "../../assets/icon/back.png";
 
 const ContactoScreen = ({ visible, navigation }) => {
   const [isMenuVisible, setIsMenuVisible] = useState(visible);
@@ -22,6 +23,7 @@ const ContactoScreen = ({ visible, navigation }) => {
   return (
     <>
       <CustomHeader onMenuPress={toggleMenu} />
+
       {isMenuVisible && (
         <MenuDesplegable visible={isMenuVisible} onClose={toggleMenu} />
       )}
@@ -29,6 +31,14 @@ const ContactoScreen = ({ visible, navigation }) => {
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
       >
+        <View>
+          <Pressable
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Image source={back} style={styles.backIcon} />
+          </Pressable>
+        </View>
         <CardPsicologos
           psicologo={{
             nombre: "Florencia",
@@ -39,9 +49,6 @@ const ContactoScreen = ({ visible, navigation }) => {
           uri="https://example.com/imagen.jpg"
         />
         <FormComponent />
-        <TouchableOpacity style={styles.button} onPress={() => {navigation.navigate("Main")}}>
-          <Text style={styles.buttonText}>Volver al Inicio</Text>
-        </TouchableOpacity>
       </ScrollView>
     </>
   );
@@ -51,24 +58,20 @@ export default ContactoScreen;
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    flex: 1,
     backgroundColor: "#F8EDE3",
     paddingVertical: 30,
   },
-   button: {
-    backgroundColor: "#B78270",
-    padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
+  backButton: {
+    left: 15,
+    marginBottom: 10,
+    width: 40,
+    height: 40,
     justifyContent: "center",
-    marginTop: 25,
-    marginBottom: 20,
   },
-  buttonText: {
-    color: "#fff",
-    fontSize: 18,
-    fontFamily: "Roboto400",
+  backIcon: {
+    width: 40,
+    height: 40,
+    resizeMode: "contain",
   },
 });

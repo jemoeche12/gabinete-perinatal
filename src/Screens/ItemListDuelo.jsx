@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { FlatList, StyleSheet, View } from "react-native";
+import { FlatList, StyleSheet, View, Pressable, Image } from "react-native";
 import { useGetDueloByCategoryQuery } from "../services/DueloService";
 import CustomHeader from "../components/CustomHeader";
 import MenuDesplegable from "../components/MenuDesplegable";
 import DueloItem from "../components/DueloItem";
+import back from "../../assets/icon/back.png";
 
 const ItemListDuelo = ({ navigation, route }) => {
   const [busqueda, setBusqueda] = useState("");
@@ -22,20 +23,28 @@ const ItemListDuelo = ({ navigation, route }) => {
   return (
     <>
       <CustomHeader onMenuPress={toggleMenu} />
-      {isMenuVisible && (
-        <MenuDesplegable onClose={toggleMenu} visible={isMenuVisible} />
-      )}
-      <FlatList
-        style={styles.container}
-        data={data}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.productItem}>
-            <DueloItem duelo={item} navigation={navigation} />
-          </View>
+      <View style={styles.container}>
+        <Pressable
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Image source={back} style={styles.backIcon} />
+        </Pressable>
+        {isMenuVisible && (
+          <MenuDesplegable onClose={toggleMenu} visible={isMenuVisible} />
         )}
-        contentContainerStyle={styles.list}
-      />
+        <FlatList
+          style={styles.container}
+          data={data}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <View style={styles.productItem}>
+              <DueloItem duelo={item} navigation={navigation} />
+            </View>
+          )}
+          contentContainerStyle={styles.list}
+        />
+      </View>
     </>
   );
 };
@@ -60,5 +69,17 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowOffset: { width: 2, height: 2 },
     elevation: 3,
+  },
+  backButton: {
+    left: 15,
+    marginVertical: 10,
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+  },
+  backIcon: {
+    width: 40,
+    height: 40,
+    resizeMode: "contain",
   },
 });

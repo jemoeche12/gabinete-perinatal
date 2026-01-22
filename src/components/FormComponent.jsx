@@ -181,6 +181,7 @@ export default FormComponent;
 const styles = StyleSheet.create({
   form: {
     width: "90%",
+    marginHorizontal: "5%",
     padding: 20,
     borderRadius: 10,
     backgroundColor: "#f9f9f9",

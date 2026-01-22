@@ -11,6 +11,7 @@ import {
 import React, { useState } from "react";
 import { useGetTestByIdQuery } from "../services/testService";
 import iconImageLoading from "../../assets/Red.png";
+import back from "../../assets/icon/back.png";
 
 const TestDetailScreen = ({ route, navigation }) => {
   const { id } = route.params;
@@ -43,7 +44,7 @@ const TestDetailScreen = ({ route, navigation }) => {
   const obtenerMensaje = (puntaje) => {
     const mensajePorPuntaje = data.resultadosPorPuntaje || [];
     const resultadoMensaje = mensajePorPuntaje.find(
-      (r) => puntaje >= r.min && puntaje <= r.max
+      (r) => puntaje >= r.min && puntaje <= r.max,
     );
     return (
       resultadoMensaje?.mensaje ||
@@ -55,7 +56,7 @@ const TestDetailScreen = ({ route, navigation }) => {
     const puntaje = Object.values(selectedRespuesta);
     const totalPuntaje = puntaje.reduce(
       (sum, valor) => sum + parseInt(valor || 0),
-      0
+      0,
     );
     return totalPuntaje;
   };
@@ -69,85 +70,88 @@ const TestDetailScreen = ({ route, navigation }) => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.title}>{data.title}</Text>
-        <Text style={styles.description}>{data.objetivo}</Text>
-      </View>
-
-      <Text style={styles.subtitulo}>Preguntas:</Text>
-
-      <FlatList
-        data={arrayPreguntas}
-        keyExtractor={(_, index) => `q-${index}`}
-        renderItem={({ item: preguntaItem, index }) => {
-          const questionId = `q-${index}`;
-
-          const arrayRespuestas = Array.isArray(preguntaItem.respuestas)
-            ? preguntaItem.respuestas
-            : Object.values(preguntaItem.respuestas || {});
-
-          const isCurrentQuestionAnswered = selectedRespuesta[questionId];
-
-          return (
-            <View style={styles.preguntaBox}>
-              <Text style={styles.pregunta}>{preguntaItem.pregunta}</Text>
-              {arrayRespuestas.map((respuestaItem, idx) => {
-                const isSelected =
-                  isCurrentQuestionAnswered === respuestaItem.valor;
-
-                return (
-                  <Pressable
-                    key={`${questionId}-${respuestaItem.valor}-${idx}`}
-                    style={[
-                      styles.respuestaButton,
-                      isSelected && styles.respuestaButtonSelected,
-                    ]}
-                    onPress={() =>
-                      handleAnswerPress(respuestaItem.valor, questionId)
-                    }
-                  >
-                    <Text
-                      style={[
-                        styles.respuestaButtonText,
-                        isSelected && styles.respuestaButtonTextSelected,
-                      ]}
-                    >
-                      {respuestaItem.text || respuestaItem.texto}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-          );
-        }}
-        scrollEnabled={false}
-      />
-
-      <Pressable style={styles.button} onPress={handleMostrarResultado}>
-        <Text style={styles.buttonText}>Mostrar Resultado del Test</Text>
+      <ScrollView contentContainerStyle={styles.container}>
+      <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Image source={back} style={styles.backIcon} />
       </Pressable>
+        <View style={styles.headerContainer}>
+          <Text style={styles.title}>{data.title}</Text>
+          <Text style={styles.description}>{data.objetivo}</Text>
+        </View>
 
-      <Modal
-        visible={modalVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setModalVisible(!modalVisible)}
-      >
-        <ScrollView style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Text style={styles.modalText}>{data.interpretaciones}</Text>
-            <Text style={styles.scoreText}>{mensajeResultado}</Text>
-            <Pressable
-              style={[styles.button, styles.buttonClose]}
-              onPress={() => setModalVisible(!modalVisible)}
-            >
-              <Text style={styles.buttonText}>Cerrar</Text>
-            </Pressable>
-          </View>
-        </ScrollView>
-      </Modal>
-    </ScrollView>
+        <Text style={styles.subtitulo}>Preguntas:</Text>
+
+        <FlatList
+          data={arrayPreguntas}
+          keyExtractor={(_, index) => `q-${index}`}
+          renderItem={({ item: preguntaItem, index }) => {
+            const questionId = `q-${index}`;
+
+            const arrayRespuestas = Array.isArray(preguntaItem.respuestas)
+              ? preguntaItem.respuestas
+              : Object.values(preguntaItem.respuestas || {});
+
+            const isCurrentQuestionAnswered = selectedRespuesta[questionId];
+
+            return (
+              <View style={styles.preguntaBox}>
+                <Text style={styles.pregunta}>{preguntaItem.pregunta}</Text>
+                {arrayRespuestas.map((respuestaItem, idx) => {
+                  const isSelected =
+                    isCurrentQuestionAnswered === respuestaItem.valor;
+
+                  return (
+                    <Pressable
+                      key={`${questionId}-${respuestaItem.valor}-${idx}`}
+                      style={[
+                        styles.respuestaButton,
+                        isSelected && styles.respuestaButtonSelected,
+                      ]}
+                      onPress={() =>
+                        handleAnswerPress(respuestaItem.valor, questionId)
+                      }
+                    >
+                      <Text
+                        style={[
+                          styles.respuestaButtonText,
+                          isSelected && styles.respuestaButtonTextSelected,
+                        ]}
+                      >
+                        {respuestaItem.text || respuestaItem.texto}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            );
+          }}
+          scrollEnabled={false}
+        />
+
+        <Pressable style={styles.button} onPress={handleMostrarResultado}>
+          <Text style={styles.buttonText}>Mostrar Resultado del Test</Text>
+        </Pressable>
+
+        <Modal
+          visible={modalVisible}
+          animationType="slide"
+          transparent={true}
+          onRequestClose={() => setModalVisible(!modalVisible)}
+        >
+          <ScrollView style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>{data.interpretaciones}</Text>
+              <Text style={styles.scoreText}>{mensajeResultado}</Text>
+              <Pressable
+                style={[styles.button, styles.buttonClose]}
+                onPress={() => setModalVisible(!modalVisible)}
+              >
+                <Text style={styles.buttonText}>Cerrar</Text>
+              </Pressable>
+            </View>
+          </ScrollView>
+        </Modal>
+      </ScrollView>
   );
 };
 
@@ -159,8 +163,20 @@ const styles = StyleSheet.create({
     padding: 20,
     flexGrow: 1,
   },
+  backButton: {
+    left: 15,
+    marginBottom: 10,
+    width: 40, 
+    height: 40,
+    justifyContent: "center",
+  },
+  backIcon: {
+    width: 40,
+    height: 40,
+    resizeMode: "contain",
+  },
   loading: {
-    marginTop: 50,
+    marginTop: 40,
     fontSize: 18,
     textAlign: "center",
   },
@@ -187,14 +203,14 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   headerContainer: {
-    marginVertical: 20,
+    marginVertical: 5,
     alignItems: "center",
   },
   title: {
     fontSize: 28,
-    fontFamily: 'Roboto400',
+    fontFamily: "Roboto400",
     textAlign: "center",
-    marginVertical: 25,
+    marginVertical: 15,
   },
   description: {
     fontSize: 18,
@@ -259,7 +275,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontSize: 18,
-    fontFamily: 'Roboto400',
+    fontFamily: "Roboto400",
   },
   centeredView: {
     flex: 1,
@@ -295,7 +311,7 @@ const styles = StyleSheet.create({
   },
   scoreText: {
     fontSize: 26,
-    fontFamily: 'Roboto400',
+    fontFamily: "Roboto400",
     color: "#B78270",
     marginBottom: 25,
   },

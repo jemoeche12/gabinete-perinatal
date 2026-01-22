@@ -1,4 +1,10 @@
-import { StyleSheet, View, Modal, TextInput, ImageBackground } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Modal,
+  TextInput,
+  ImageBackground,
+} from "react-native";
 import { useEffect, useState } from "react";
 import {
   FlatList,
@@ -7,6 +13,7 @@ import {
   Alert,
   RefreshControl,
   ActivityIndicator,
+  Image,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -25,9 +32,13 @@ import CommentList from "../components/CommentList";
 import CommentInput from "../components/CommentInput";
 import { useGetProfileQuery } from "../services/userService";
 import fondo from "../../assets/fondos/fondo_APP.jpg";
+import { useNavigation } from "@react-navigation/native";
+import back from "../../assets/icon/back.png";
 
 const ComunidadScreen = () => {
   const dispatch = useDispatch();
+
+  const navigation = useNavigation();
 
   const { posts, loading, error } = useSelector((state) => state.posts);
   const { comments } = useSelector((state) => state.comments);
@@ -86,7 +97,7 @@ const ComunidadScreen = () => {
           onPress: () => dispatch(deletePostThunks(postId, userData)),
           style: "destructive",
         },
-      ]
+      ],
     );
   };
 
@@ -169,21 +180,29 @@ const ComunidadScreen = () => {
           <ActivityIndicator size="large" />
         ) : (
           <>
+            <Pressable
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}
+            >
+              <Image source={back} style={styles.backIcon} />
+            </Pressable>
             <View style={styles.containerIntro}>
-              <Text style={styles.introTitle}>Un lugar para respirar, compartir y no sentirte sola/o</Text>
-              <Text style={styles.introText}>
-                Bienvenida/o a este espacio creado para acompañarte en cada etapa:
-                el deseo de gestar, el embarazo, el posparto, la crianza, los
-                miedos, los duelos y todo aquello que a veces cuesta decir en voz
-                alta.
+              <Text style={styles.introTitle}>
+                Un lugar para respirar, compartir y no sentirte sola/o
               </Text>
               <Text style={styles.introText}>
-                Aquí puedes: Ser vos misma/o, sin exigencias. Compartir lo que te
-                pasa y encontrar a otras personas que sienten como vos. Recibir
-                sostén profesional cuando lo necesites. Este es un rincón seguro.
-                Un lugar donde tus emociones tienen espacio, donde tu historia
-                importa y donde podés descansar un momento. No estás sola/o. La
-                comunidad te abraza.
+                Bienvenida/o a este espacio creado para acompañarte en cada
+                etapa: el deseo de gestar, el embarazo, el posparto, la crianza,
+                los miedos, los duelos y todo aquello que a veces cuesta decir
+                en voz alta.
+              </Text>
+              <Text style={styles.introText}>
+                Aquí puedes: Ser vos misma/o, sin exigencias. Compartir lo que
+                te pasa y encontrar a otras personas que sienten como vos.
+                Recibir sostén profesional cuando lo necesites. Este es un
+                rincón seguro. Un lugar donde tus emociones tienen espacio,
+                donde tu historia importa y donde podés descansar un momento. No
+                estás sola/o. La comunidad te abraza.
               </Text>
             </View>
 
@@ -203,7 +222,10 @@ const ComunidadScreen = () => {
           </>
         )}
 
-        <Pressable style={styles.addButton} onPress={() => setModalVisible(true)}>
+        <Pressable
+          style={styles.addButton}
+          onPress={() => setModalVisible(true)}
+        >
           <Text style={styles.addButtonText}>+</Text>
         </Pressable>
 
@@ -263,13 +285,26 @@ const styles = StyleSheet.create({
   containerIntro: {
     marginHorizontal: 20,
     marginVertical: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
     padding: 15,
     borderRadius: 10,
+    marginTop: 40,
+  },
+  backButton: {
+    left: 15,
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    top: 15,
+  },
+  backIcon: {
+    width: 40,
+    height: 40,
+    resizeMode: "contain",
   },
   introTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
   },
   introText: {

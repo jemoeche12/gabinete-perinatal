@@ -1,10 +1,18 @@
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import {
+  FlatList,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  Pressable,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import ProductItem from "../components/ProductItem";
 import Search from "../components/Search";
 import { useGetProductsByCategoryQuery } from "../services/recursosService";
 import CustomHeader from "../components/CustomHeader";
 import MenuDesplegable from "../components/MenuDesplegable";
+import back from "../../assets/icon/back.png";
 
 const ItemListCategory = ({ navigation, route, visible }) => {
   const [busqueda, setBusqueda] = useState("");
@@ -22,7 +30,7 @@ const ItemListCategory = ({ navigation, route, visible }) => {
   useEffect(() => {
     if (!isLoading) {
       const productFilter = productsFetched.filter((product) =>
-        product.title.toLowerCase().includes(busqueda.toLowerCase())
+        product.title.toLowerCase().includes(busqueda.toLowerCase()),
       );
       setProductFiltered(productFilter);
       setError("");
@@ -36,10 +44,16 @@ const ItemListCategory = ({ navigation, route, visible }) => {
   return (
     <>
       <CustomHeader onMenuPress={toggleMenu} />
-      {isMenuVisible && (
-        <MenuDesplegable onClose={toggleMenu} visible={isMenuVisible} />
-      )}
       <View style={styles.container}>
+        <Pressable
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Image source={back} style={styles.backIcon} />
+        </Pressable>
+        {isMenuVisible && (
+          <MenuDesplegable onClose={toggleMenu} visible={isMenuVisible} />
+        )}
         <FlatList
           data={productsFiltered}
           renderItem={({ item }) => (
@@ -94,5 +108,17 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "black",
     fontFamily: "Roboto",
+  },
+  backButton: {
+    left: 15,
+    marginVertical: 10,
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+  },
+  backIcon: {
+    width: 40,
+    height: 40,
+    resizeMode: "contain",
   },
 });

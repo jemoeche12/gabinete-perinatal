@@ -6,6 +6,7 @@ import {
   Pressable,
   Alert,
   ActivityIndicator,
+  Image,
 } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,6 +21,7 @@ import { useState } from "react";
 import { colors } from "../utils/customerStyle";
 import payment from "../../assets/icon/pagoConfirm.png";
 import home from "../../assets/icon/home.png";
+import back from "../../assets/icon/back.png";
 
 const Cart = ({ navigation }) => {
   const cartItems = useSelector((state) => state.cart.value.itemCart);
@@ -64,7 +66,6 @@ const Cart = ({ navigation }) => {
         currency: "eur",
       };
 
-
       const response = await fetch(
         `https://api-yela3b24ha-uc.a.run.app/create-payment-intent`,
         {
@@ -73,7 +74,7 @@ const Cart = ({ navigation }) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(requestData),
-        }
+        },
       );
 
       if (!response.ok) {
@@ -97,7 +98,7 @@ const Cart = ({ navigation }) => {
       console.error("Error en fetchPaymentIntent:", error);
       Alert.alert(
         "Error de Conexión",
-        `No se pudo conectar con el servidor de pagos: ${error.message}.`
+        `No se pudo conectar con el servidor de pagos: ${error.message}.`,
       );
       return null;
     }
@@ -126,7 +127,7 @@ const Cart = ({ navigation }) => {
         Alert.alert(
           "Error de Configuración",
           `Error al configurar el pago: ${error.message}
-           Código de error: ${error.code}`
+           Código de error: ${error.code}`,
         );
         return false;
       } else {
@@ -146,12 +147,18 @@ const Cart = ({ navigation }) => {
     }
 
     if (!validateTotal()) {
-      Alert.alert("Error", "El total del carrito no es válido. Por favor, verifica los productos.");
+      Alert.alert(
+        "Error",
+        "El total del carrito no es válido. Por favor, verifica los productos.",
+      );
       return;
     }
 
     if (!name || !lastName || !email) {
-      Alert.alert("Error", "Faltan datos del perfil. Por favor, completa tu información.");
+      Alert.alert(
+        "Error",
+        "Faltan datos del perfil. Por favor, completa tu información.",
+      );
       return;
     }
 
@@ -175,7 +182,7 @@ const Cart = ({ navigation }) => {
           Alert.alert(
             "Error de Pago",
             `El pago no se pudo completar: ${error.message}
-             Código: ${error.code}`
+             Código: ${error.code}`,
           );
         }
         setLoading(false);
@@ -204,14 +211,14 @@ const Cart = ({ navigation }) => {
 
       Alert.alert(
         "¡Éxito!",
-        "Tu orden ha sido confirmada y el pago procesado con éxito. Recibirás un email de confirmación."
+        "Tu orden ha sido confirmada y el pago procesado con éxito. Recibirás un email de confirmación.",
       );
     } catch (orderError) {
       console.error("Error en la confirmación de la orden:", orderError);
       Alert.alert(
         "Error",
         orderError.message ||
-          "Ocurrió un error al confirmar la orden después del pago."
+          "Ocurrió un error al confirmar la orden después del pago.",
       );
     } finally {
       setLoading(false);
@@ -223,17 +230,31 @@ const Cart = ({ navigation }) => {
       <Text style={styles.header}>Tu Carrito</Text>
       {cartItems.length === 0 ? (
         <View>
+          <Pressable
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Image source={back} style={styles.backIcon} />
+          </Pressable>
           <Text style={styles.emptyCartText}>El carrito está vacío.</Text>
         </View>
       ) : (
-        <FlatList
-          showsVerticalScrollIndicator={false}
-          data={cartItems}
-          keyExtractor={(item, index) =>
-            item && item.id ? item.id.toString() : index.toString()
-          }
-          renderItem={({ item }) => <CartItem item={item} />}
-        />
+        <View style={{ flex: 1 }}>
+          <Pressable
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Image source={back} style={styles.backIcon} />
+          </Pressable>
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            data={cartItems}
+            keyExtractor={(item, index) =>
+              item && item.id ? item.id.toString() : index.toString()
+            }
+            renderItem={({ item }) => <CartItem item={item} />}
+          />
+        </View>
       )}
 
       {cartItems.length > 0 && (
@@ -248,13 +269,15 @@ const Cart = ({ navigation }) => {
               <View style={{ alignItems: "center" }}>
                 <AddButton
                   onPress={handlerOrderConfirm}
-                  disabled={loading || cartItems.length === 0 || !validateTotal()}
+                  disabled={
+                    loading || cartItems.length === 0 || !validateTotal()
+                  }
                   iconSource={payment}
                   iconSize={42}
                   color="black"
                   style={styles.addButton}
                 />
-                <Text style={{ textAlign: "center", marginTop: 10 }}>
+                <Text style={{ textAlign: "center", marginTop: 5 }}>
                   PAGAR Y CONFIRMAR
                 </Text>
               </View>
@@ -270,7 +293,7 @@ const Cart = ({ navigation }) => {
           )}
         </View>
       )}
- 
+
       <View style={styles.totalContainer}>
         <Pressable style={styles.clearCart} onPress={handleClearCart}>
           <FontAwesome name="trash-o" size={24} color="black" />
@@ -279,7 +302,6 @@ const Cart = ({ navigation }) => {
           Total: €{validateTotal() ? parseFloat(total).toFixed(2) : "0.00"}
         </Text>
       </View>
-     
     </View>
   );
 };
@@ -314,7 +336,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 16,
-    paddingVertical: 20,
+    paddingVertical: 16,
     borderTopWidth: 1,
     borderTopColor: "#eee",
     backgroundColor: "#f9f9f9",
@@ -347,5 +369,17 @@ const styles = StyleSheet.create({
     backgroundColor: colors.btnAsesorias,
     right: 100,
     top: 450,
+  },
+  backButton: {
+    left: 15,
+    marginBottom: 20,
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+  },
+  backIcon: {
+    width: 40,
+    height: 40,
+    resizeMode: "contain",
   },
 });

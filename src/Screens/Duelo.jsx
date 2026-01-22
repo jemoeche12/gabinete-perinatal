@@ -1,4 +1,11 @@
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import {
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+} from "react-native";
 import React from "react";
 import { useState } from "react";
 import { useGetDueloQuery } from "../services/DueloService";
@@ -9,6 +16,7 @@ import BannerMembresia from "../components/BannerMembresia";
 import DueloComponent from "../components/DueloComponent";
 import { Modal } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import back from "../../assets/icon/back.png";
 
 const Duelo = () => {
   const [requiredLevel, setRequiredLevel] = useState(null);
@@ -36,19 +44,19 @@ const Duelo = () => {
 
   const listFooterComponent = () => {
     return (
-      <View style={{marginVertical: 20, marginHorizontal: 10}}>
+      <View style={{ marginVertical: 20, marginHorizontal: 10 }}>
         <Text style={styles.textFooter}>
           {" "}
-          Lo más importante hoy: Queremos recordarte algo,{" "} no estás
-          sola, no estás solo, y no hay una forma “correcta” de vivir este
-          momento. {" "}El duelo por un bebé es una experiencia profunda, única y
-          legítima. {" "}Cada emoción —la tristeza, el enojo, el miedo o el silencio—
-          tiene su razón de ser. {" "}En la Red de Apoyo PERINATAL queremos ofrecerte
-          un espacio de escucha y acompañamiento respetuoso.{" "} Podés escribirnos
-          si necesitás hablar, recibir orientación o simplemente ser escuchada
-          con sensibilidad. {" "}¿Quieres acompañamiento emocional? Pulsa aquí para
+          Lo más importante hoy: Queremos recordarte algo, no estás sola, no
+          estás solo, y no hay una forma “correcta” de vivir este momento. El
+          duelo por un bebé es una experiencia profunda, única y legítima. Cada
+          emoción —la tristeza, el enojo, el miedo o el silencio— tiene su razón
+          de ser. En la Red de Apoyo PERINATAL queremos ofrecerte un espacio de
+          escucha y acompañamiento respetuoso. Podés escribirnos si necesitás
+          hablar, recibir orientación o simplemente ser escuchada con
+          sensibilidad. ¿Quieres acompañamiento emocional? Pulsa aquí para
           conectarte con una profesional de nuestra red. Atención personalizada
-          y confidencial. {" "}Espacio de escucha activa, sin juicios, desde la
+          y confidencial. Espacio de escucha activa, sin juicios, desde la
           psicología perinatal. “Tu historia importa. Tu bebé importa. Tu dolor
           merece cuidado.”{" "}
         </Text>
@@ -59,6 +67,7 @@ const Duelo = () => {
   return (
     <>
       <CustomHeader onMenuPress={toggleMenu} />
+    
       {isMenuVisible && (
         <MenuDesplegable onClose={toggleMenu} visible={isMenuVisible} />
       )}
@@ -94,6 +103,12 @@ const Duelo = () => {
         }}
         ListHeaderComponent={
           <View style={styles.view}>
+            <Pressable
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}
+            >
+              <Image source={back} style={styles.backIcon} />
+            </Pressable>
             <Text style={styles.text}>
               En este espacio de la Red de Apoyo Perinatal encontrarás compañía,
               palabras que abrazan y recursos pensados para transitar el duelo
@@ -124,7 +139,19 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   view: {
-    marginTop: 40,
+    marginTop: 20,
+  },
+  backButton: {
+    left: 15,
+    marginBottom: 10,
+    width: 40, 
+    height: 40,
+    justifyContent: "center",
+  },
+  backIcon: {
+    width: 40,
+    height: 40,
+    resizeMode: "contain",
   },
   text: {
     fontFamily: "Roboto400",
@@ -134,14 +161,14 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   textFooter: {
-    fontFamily: "Roboto400", 
+    fontFamily: "Roboto400",
     width: "90%",
     marginHorizontal: "5%",
-    fontSize: 20, 
+    fontSize: 20,
     paddingBottom: 20,
-    marginTop: 20, 
-    textAlign: 'center', 
-    fontWeight: 'bold' 
+    marginTop: 20,
+    textAlign: "center",
+    fontWeight: "bold",
   },
   list: {
     paddingBottom: 40,

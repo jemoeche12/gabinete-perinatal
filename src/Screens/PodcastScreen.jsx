@@ -1,4 +1,11 @@
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import {
+  FlatList,
+  StyleSheet,
+  Text,
+  View,
+  Pressable,
+  Image,
+} from "react-native";
 import React, { useState } from "react";
 import {
   useGetCategoriesQuery,
@@ -6,9 +13,13 @@ import {
 } from "../services/podcastService";
 import { Picker } from "@react-native-picker/picker";
 import PodcastComponent from "../components/PodcastComponent";
+import { useNavigation } from "@react-navigation/native";
+import back from "../../assets/icon/back.png";
 
 const PodcastScreen = () => {
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("todos");
+
+  const navigation = useNavigation();
 
   const {
     data: categoriesPodcast = [],
@@ -53,30 +64,42 @@ const PodcastScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Podcast</Text>
+    <>
+      <View style={styles.container}>
+        <View style={styles.viewTitle}>
+          <Pressable
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Image source={back} style={styles.backIcon} />
+          </Pressable>
+          <Text style={styles.title}>Podcast</Text>
+        </View>
+        <Picker
+          selectedValue={categoriaSeleccionada}
+          onValueChange={(value) => setCategoriaSeleccionada(value)}
+          style={styles.picker}
+          dropdownIconColor="white"
+        >
+          <Picker.Item label="Todos" value="todos" />
+          {categoriesPodcast.map((cat, index) => (
+            <Picker.Item key={index} label={cat} value={cat} />
+          ))}
+        </Picker>
 
-      <Picker
-        selectedValue={categoriaSeleccionada}
-        onValueChange={(value) => setCategoriaSeleccionada(value)}
-        style={styles.picker}
-      >
-        <Picker.Item label="Todos" value="todos" />
-        {categoriesPodcast.map((cat, index) => (
-          <Picker.Item key={index} label={cat} value={cat} />
-        ))}
-      </Picker>
-
-      <FlatList
-        data={podcastCategory}
-        renderItem={({ item }) => <PodcastComponent item={item} />}
-        keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
-        horizontal={true}
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.listContainer}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
-      />
-    </View>
+        <FlatList
+          data={podcastCategory}
+          renderItem={({ item }) => <PodcastComponent item={item} />}
+          keyExtractor={(item) =>
+            item.id?.toString() || Math.random().toString()
+          }
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.listContainer}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+        />
+      </View>
+    </>
   );
 };
 
@@ -92,6 +115,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
+  },
+  viewTitle: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginVertical: 20,
   },
   title: {
     fontSize: 24,
@@ -115,6 +144,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
     color: "#ff4444",
+  },
+  backButton: {
+    position: "absolute",
+    left: 15,
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 10,
+  },
+  backIcon: {
+    width: 40,
+    height: 40,
+    resizeMode: "contain",
+    tintColor: "white",
   },
   picker: {
     color: "white",
