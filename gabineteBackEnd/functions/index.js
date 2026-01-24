@@ -15,6 +15,7 @@ const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 const mailjetApiKey = process.env.MAILJET_API_KEY;
 const mailjetApiSecret = process.env.MAILJET_API_SECRET;
 
+
 const app = express();
 app.use(cors({ origin: true }));
 

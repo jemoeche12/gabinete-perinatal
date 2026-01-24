@@ -23,32 +23,31 @@ const ContactoScreen = ({ visible, navigation }) => {
   return (
     <>
       <CustomHeader onMenuPress={toggleMenu} />
-
-      {isMenuVisible && (
-        <MenuDesplegable visible={isMenuVisible} onClose={toggleMenu} />
-      )}
-      <ScrollView
-        contentContainerStyle={styles.container}
-        showsVerticalScrollIndicator={false}
-      >
-        <View>
-          <Pressable
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Image source={back} style={styles.backIcon} />
-          </Pressable>
+      <ScrollView>
+        <Pressable
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Image source={back} style={styles.backIcon} />
+        </Pressable>
+        {isMenuVisible && (
+          <MenuDesplegable visible={isMenuVisible} onClose={toggleMenu} />
+        )}
+        <View
+          contentContainerStyle={styles.container}
+          showsVerticalScrollIndicator={false}
+        >
+          <CardPsicologos
+            psicologo={{
+              nombre: "Florencia",
+              apellido: "Velasco",
+              telefono: "+33 777989701",
+              email: "florencia.velasco@example.com",
+            }}
+            uri="https://example.com/imagen.jpg"
+          />
+          <FormComponent />
         </View>
-        <CardPsicologos
-          psicologo={{
-            nombre: "Florencia",
-            apellido: "Velasco",
-            telefono: "+33 777989701",
-            email: "florencia.velasco@example.com",
-          }}
-          uri="https://example.com/imagen.jpg"
-        />
-        <FormComponent />
       </ScrollView>
     </>
   );
@@ -64,7 +63,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     left: 15,
-    marginBottom: 10,
+    marginVertical: 20,
     width: 40,
     height: 40,
     justifyContent: "center",

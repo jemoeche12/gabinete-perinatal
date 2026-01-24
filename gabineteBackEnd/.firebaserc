@@ -2,7 +2,8 @@
   "projects": {
     "default": "gabinete-perinatal",
     "redPerinatal": "gabinete-perinatal",
-    "redPerintal": "gabinete-perinatal"
+    "redPerintal": "gabinete-perinatal",
+    "gabinete-perinatal": "gabinete-perinatal"
   },
   "targets": {},
   "etags": {}
