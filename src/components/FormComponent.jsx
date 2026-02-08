@@ -180,7 +180,7 @@ export default FormComponent;
 
 const styles = StyleSheet.create({
   form: {
-    width: "90%",
+    width: "100%",
     marginHorizontal: "5%",
     padding: 20,
     borderRadius: 10,

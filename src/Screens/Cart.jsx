@@ -7,6 +7,7 @@ import {
   Alert,
   ActivityIndicator,
   Image,
+  ImageBackground,
 } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,9 +20,10 @@ import { useGetProfileQuery } from "../services/userService";
 import { useStripe } from "@stripe/stripe-react-native";
 import { useState } from "react";
 import { colors } from "../utils/customerStyle";
-import payment from "../../assets/icon/pagoConfirm.png";
+import payment from "../../assets/icon/credit-card.png";
 import home from "../../assets/icon/home.png";
 import back from "../../assets/icon/back.png";
+import fondo from "../../assets/fondos/fondo_APP.jpg";
 
 const Cart = ({ navigation }) => {
   const cartItems = useSelector((state) => state.cart.value.itemCart);
@@ -127,7 +129,7 @@ const Cart = ({ navigation }) => {
         Alert.alert(
           "Error de Configuración",
           `Error al configurar el pago: ${error.message}
-           Código de error: ${error.code}`,
+            Código de error: ${error.code}`,
         );
         return false;
       } else {
@@ -182,7 +184,7 @@ const Cart = ({ navigation }) => {
           Alert.alert(
             "Error de Pago",
             `El pago no se pudo completar: ${error.message}
-             Código: ${error.code}`,
+              Código: ${error.code}`,
           );
         }
         setLoading(false);
@@ -226,82 +228,63 @@ const Cart = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Tu Carrito</Text>
-      {cartItems.length === 0 ? (
-        <View>
-          <Pressable
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Image source={back} style={styles.backIcon} />
-          </Pressable>
-          <Text style={styles.emptyCartText}>El carrito está vacío.</Text>
-        </View>
-      ) : (
-        <View style={{ flex: 1 }}>
-          <Pressable
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Image source={back} style={styles.backIcon} />
-          </Pressable>
-          <FlatList
-            showsVerticalScrollIndicator={false}
-            data={cartItems}
-            keyExtractor={(item, index) =>
-              item && item.id ? item.id.toString() : index.toString()
-            }
-            renderItem={({ item }) => <CartItem item={item} />}
-          />
-        </View>
-      )}
+    <ImageBackground source={fondo} style={styles.container}>
+      <View style={styles.headerContainer}>
+        <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Image source={back} style={styles.backIcon} />
+        </Pressable>
+        <Text style={styles.header}>Tu Carrito</Text>
+        <View style={{ width: 40 }} />
+      </View>
+
+      <FlatList
+        showsVerticalScrollIndicator={false}
+        data={cartItems}
+        keyExtractor={(item, index) =>
+          item && item.id ? item.id.toString() : index.toString()
+        }
+        renderItem={({ item }) => <CartItem item={item} />}
+        contentContainerStyle={styles.listContent}
+        ListEmptyComponent={<Text style={styles.emptyCartText}>El carrito está vacío.</Text>}
+      />
 
       {cartItems.length > 0 && (
-        <View style={styles.button}>
-          {loading ? (
-            <View style={{ alignItems: "center" }}>
+        <View style={styles.footerContainer}>
+          <View style={styles.buttonWrapper}>
+            {loading ? (
               <ActivityIndicator size="large" color="#0000ff" />
-              <Text style={{ marginTop: 10 }}>Procesando pago...</Text>
-            </View>
-          ) : (
-            <View style={styles.containerButtons}>
-              <View style={{ alignItems: "center" }}>
+            ) : (
+              <View style={styles.containerButtons}>
                 <AddButton
                   onPress={handlerOrderConfirm}
-                  disabled={
-                    loading || cartItems.length === 0 || !validateTotal()
-                  }
+                  disabled={loading || cartItems.length === 0 || !validateTotal()}
                   iconSource={payment}
-                  iconSize={42}
-                  color="black"
+                  iconSize={30}
                   style={styles.addButton}
                   title="Pagar"
                 />
-               
+                <AddButton
+                  title="Inicio"
+                  onPress={() => navigation.navigate("Main")}
+                  iconSource={home}
+                  iconSize={30}
+                  style={styles.addButtonHome}
+                />
               </View>
-              <AddButton
-                title="Inicio"
-                onPress={() => {
-                  navigation.navigate("Main");
-                }}
-                style={styles.addButtonHome}
-                iconSource={home}
-              />
-            </View>
-          )}
+            )}
+          </View>
+
+          <View style={styles.totalContainer}>
+            <Pressable style={styles.clearCart} onPress={handleClearCart}>
+              <FontAwesome name="trash-o" size={24} color="black" />
+            </Pressable>
+            <Text style={styles.totalText}>
+              Total: €{validateTotal() ? parseFloat(total).toFixed(2) : "0.00"}
+            </Text>
+          </View>
         </View>
       )}
-
-      <View style={styles.totalContainer}>
-        <Pressable style={styles.clearCart} onPress={handleClearCart}>
-          <FontAwesome name="trash-o" size={24} color="black" />
-        </Pressable>
-        <Text style={styles.totalText}>
-          Total: €{validateTotal() ? parseFloat(total).toFixed(2) : "0.00"}
-        </Text>
-      </View>
-    </View>
+    </ImageBackground>
   );
 };
 
@@ -310,15 +293,24 @@ export default Cart;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    padding: 16,
+    backgroundColor: "#E6C6B7",
+  },
+  headerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingTop: 50,
+    paddingHorizontal: 16,
+    backgroundColor: "transparent",
   },
   header: {
     fontSize: 24,
     fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 20,
-    color: "#333",
+    color: "black",
+  },
+  listContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 20,
   },
   emptyCartText: {
     fontSize: 18,
@@ -326,59 +318,73 @@ const styles = StyleSheet.create({
     color: "#666",
     marginTop: 50,
   },
-  button: {
-    marginVertical: 20,
-    paddingHorizontal: 16,
+  footerContainer: {
+    backgroundColor: "transparent",
+    borderTopWidth: 1,
+    borderTopColor: "transparent",
+  },
+  buttonWrapper: {
+    paddingVertical: 15,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  containerButtons: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 15,
+    width: "100%",
+  },
+  addButton: {
+    backgroundColor: colors.btnGuia,
+    width: 90,
+    height: 90, 
+    borderRadius: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingTop: 0,
+    paddingBottom: 5,
+    marginVertical: 0,
+    overflow: "hidden", 
+  },
+  addButtonHome: {
+    backgroundColor: colors.btnAsesorias,
+    width: 90,
+    height: 90,
+    borderRadius: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingTop: 0,
+    paddingBottom: 5,
+    marginVertical: 0,
+    overflow: "hidden",
   },
   totalContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderTopWidth: 1,
-    borderTopColor: "#eee",
+    paddingHorizontal: 20,
+    paddingVertical: 15,
     backgroundColor: "#f9f9f9",
   },
   clearCart: {
-    padding: 10,
+    padding: 5,
   },
   totalText: {
     fontSize: 18,
     fontWeight: "bold",
     color: "#333",
   },
-  containerButtons: {
-    flexDirection: "row",
-    gap: 15,
-    justifyContent: "center",
-  },
-  addButton: {
-    backgroundColor: colors.btnGuia,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: 20,
-    paddingBottom: 0,
-    marginBottom: 20,
-  },
-  addButtonHome: {
-    backgroundColor: colors.btnAsesorias,
-  },
-  addButtonIncio: {
-    backgroundColor: colors.btnAsesorias,
-    right: 100,
-    top: 450,
-  },
   backButton: {
-    left: 15,
-    marginBottom: 20,
     width: 40,
     height: 40,
     justifyContent: "center",
+    alignItems: "center",
   },
   backIcon: {
-    width: 40,
-    height: 40,
+    width: 35,
+    height: 35,
     resizeMode: "contain",
+    tintColor: "black",
   },
 });

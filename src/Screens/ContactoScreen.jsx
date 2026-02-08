@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
   View,
-  Text,
   StyleSheet,
   ScrollView,
   Image,
@@ -21,48 +20,64 @@ const ContactoScreen = ({ visible, navigation }) => {
   };
 
   return (
-    <>
+    <View style={styles.mainWrapper}>
       <CustomHeader onMenuPress={toggleMenu} />
-      <ScrollView>
+      
+      {isMenuVisible && (
+        <MenuDesplegable visible={isMenuVisible} onClose={toggleMenu} />
+      )}
+
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent} 
+        showsVerticalScrollIndicator={false}
+      >
         <Pressable
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
           <Image source={back} style={styles.backIcon} />
         </Pressable>
-        {isMenuVisible && (
-          <MenuDesplegable visible={isMenuVisible} onClose={toggleMenu} />
-        )}
-        <View
-          contentContainerStyle={styles.container}
-          showsVerticalScrollIndicator={false}
-        >
-          <CardPsicologos
-            psicologo={{
-              nombre: "Florencia",
-              apellido: "Velasco",
-              telefono: "+33 777989701",
-              email: "florencia.velasco@example.com",
-            }}
-            uri="https://example.com/imagen.jpg"
-          />
-          <FormComponent />
-        </View>
+
+        <CardPsicologos
+          style={styles.cardPsicologos}
+          psicologo={{
+            nombre: "Florencia",
+            apellido: "Velasco",
+            telefono: "+33 777989701",
+            email: "florencia.velasco@example.com",
+          }}
+          uri="https://example.com/imagen.jpg"
+        />
+        
+        <FormComponent style={styles.formComponent} />
+        
+        <View style={{ height: 50 }} />
       </ScrollView>
-    </>
+    </View>
   );
 };
 
 export default ContactoScreen;
 
 const styles = StyleSheet.create({
-  container: {
+  mainWrapper: {
     flex: 1,
-    backgroundColor: "#F8EDE3",
-    paddingVertical: 30,
+    backgroundColor: "#F8EDE3", 
   },
+  scrollView: {
+    flex: 1,
+  },
+  
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 40, 
+    alignItems: "center", 
+  },
+ 
   backButton: {
-    left: 15,
+    alignSelf: 'flex-start', 
+    marginLeft: 15,
     marginVertical: 20,
     width: 40,
     height: 40,
