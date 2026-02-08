@@ -276,10 +276,9 @@ const Cart = ({ navigation }) => {
                   iconSize={42}
                   color="black"
                   style={styles.addButton}
+                  title="Pagar"
                 />
-                <Text style={{ textAlign: "center", marginTop: 5 }}>
-                  PAGAR Y CONFIRMAR
-                </Text>
+               
               </View>
               <AddButton
                 title="Inicio"

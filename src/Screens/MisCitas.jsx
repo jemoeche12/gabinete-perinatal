@@ -22,7 +22,7 @@ dayjs.locale("es");
 const MisCitas = ({ navigation }) => {
   const localId = useSelector((state) => state.auth.value.localId);
   const [modalVisible, setModalVisible] = useState(false);
-
+  const [diaSeleccionado, setDiaSeleccionado] = useState("");
   const [fechaElegida, setFechaElegida] = useState(
     dayjs().format("YYYY-MM-DD")
   );
@@ -91,6 +91,7 @@ const MisCitas = ({ navigation }) => {
         <ModalForm
           modalVisible={modalVisible}
           setModalVisible={setModalVisible}
+          diaSeleccionado={diaSeleccionado}
         />
       </View>
     );
@@ -108,9 +109,9 @@ const MisCitas = ({ navigation }) => {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.citaCard}>
-            <Text style={styles.citaText}>Fecha: {item.fechaElegida}</Text>
+            <Text style={styles.citaText}>Fecha de solicitud de cita: {fechaElegida}</Text>
             <Text style={styles.citaText}>
-              Horario de llamada: {item.horarioELegido}
+              Dia elegido para la llamada: {item.diaSeleccionado}
             </Text>
             <Text style={styles.citaText}>Consulta: {item.consulta}</Text>
           </View>

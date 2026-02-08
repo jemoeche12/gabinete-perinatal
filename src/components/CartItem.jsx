@@ -24,7 +24,7 @@ const CartItem = ({ item }) => {
   return (
     <View style={styles.card}>
       <Text style={styles.title}>{titulo}</Text>
-      <Text style={styles.text}>{beneficios}</Text>
+      <Text numberOfLines={3} ellipsizeMode="tail" style={styles.text}>{beneficios}</Text>
       <View style={styles.totalContainer}>
         <Pressable style={styles.clearItem} onPress={handleClearItem}>
           <FontAwesome name="trash-o" size={24} color="black" />
@@ -60,6 +60,7 @@ const styles = StyleSheet.create({
     color: "#555",
     marginBottom: 3,
     fontFamily: 'Roboto400',
+    
   },
   totalContainer: {
     justifyContent: "space-between",

@@ -8,7 +8,6 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import ProductItem from "../components/ProductItem";
-import Search from "../components/Search";
 import { useGetProductsByCategoryQuery } from "../services/recursosService";
 import CustomHeader from "../components/CustomHeader";
 import MenuDesplegable from "../components/MenuDesplegable";

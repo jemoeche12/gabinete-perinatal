@@ -34,7 +34,7 @@ const Talleres = ({ navigation, visible }) => {
         </ScrollView>
         <AddButton
           style={styles.btnTalleres}
-          title="ir a Talleres"
+          title="Talleres"
           onPress={() => navigation.navigate("ListTalleres")}
           iconSource={iconTalleres}
         />

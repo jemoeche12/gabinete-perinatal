@@ -8,12 +8,10 @@ import SobreNosotros from "../Screens/SobreNosotros";
 import Cart from "../Screens/Cart";
 import TerminosYCondiciones from "../Screens/TerminosYCondiciones";
 import MisCitas from "../Screens/MisCitas";
-import InstructivoScreen from "../Screens/InstructivoScreen";
 import PodcastScreen from "../Screens/PodcastScreen";
 import ComunidadScreen from "../Screens/ComunidadScreen";
-import Duelo from "../Screens/Duelo";
-import Guias from "../Screens/Guias";
 import DueloStackNavigator from "./DueloStackNavigator";
+import guidesStackNavigator from "./GuidesStackNavigator";
 
 const RootStackNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -34,18 +32,12 @@ const RootStackNavigator = () => {
       <Stack.Screen name="Cart" component={Cart} />
       <Stack.Screen name="ComunidadScreen" component={ComunidadScreen} />
       <Stack.Screen name="Duelo" component={DueloStackNavigator} />
-      <Stack.Screen name="Guias" component={Guias} />
+      <Stack.Screen name="Guias" component={guidesStackNavigator} />
       <Stack.Screen
         name="TerminosYCondiciones"
         component={TerminosYCondiciones}
       />
       <Stack.Screen name="PodcastScreen" component={PodcastScreen} />
-      <Stack.Screen
-        name="InstructivoScreen"
-        component={InstructivoScreen}
-        options={{ headerShown: false, presentation: "modal" }}
-      />
-      
     </Stack.Navigator>
   );
 };

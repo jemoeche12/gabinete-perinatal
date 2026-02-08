@@ -5,15 +5,14 @@ import { useGetProfileImageQuery } from "../services/recursosService";
 import { useDBContext } from "../context/DBContext";
 import { clearUser } from "../features/user/UserSlice";
 import Card from "../components/Card";
-import Fontisto from "@expo/vector-icons/Fontisto";
 import { useGetProfileQuery } from "../services/userService";
-import  addImg  from "../../assets/icon/addImg.png";
+import addImg from "../../assets/icon/addImg.png";
 import closeSession from "../../assets/icon/closeSession.png";
 import { colors } from "../utils/customerStyle";
 
 const MyProfil = ({ navigation }) => {
   const { imageCamera, localId, email } = useSelector(
-    (state) => state.auth.value
+    (state) => state.auth.value,
   );
 
   const { data: imageFromBase } = useGetProfileImageQuery(localId);
@@ -32,7 +31,7 @@ const MyProfil = ({ navigation }) => {
       if (!dbInitialized) {
         Alert.alert(
           "Error de DB",
-          "La base de datos no está lista. Intente de nuevo."
+          "La base de datos no está lista. Intente de nuevo.",
         );
         return;
       }
@@ -43,7 +42,7 @@ const MyProfil = ({ navigation }) => {
     } catch (error) {
       Alert.alert(
         "Error al cerrar sesión",
-        error.message || "Error desconocido al cerrar sesión."
+        error.message || "Error desconocido al cerrar sesión.",
       );
     }
   };
@@ -85,11 +84,7 @@ const MyProfil = ({ navigation }) => {
             </View>
             <Text style={styles.Nombre}>Nombre: {name}</Text>
             <Text style={styles.Nombre}>Apellido: {lastName}</Text>
-          </View>
-
-          <View style={styles.cardContent}>
-            <Fontisto name="email" size={24} color="black" />
-            <Text style={styles.textCard}>Email: {email}</Text>
+            <Text style={styles.Nombre}>Email: {email}</Text>
           </View>
         </Card>
       </View>
@@ -99,14 +94,12 @@ const MyProfil = ({ navigation }) => {
           onPress={tomarImagen}
           title="Subir Imagen"
           iconSource={addImg}
-
         />
         <AddButton
           style={[styles.addButton, { backgroundColor: colors.btnAsesorias }]}
           onPress={cerrarSesion}
           title="Cerrar Sesion"
           iconSource={closeSession}
-
         />
       </View>
       <Image
@@ -186,13 +179,8 @@ const styles = StyleSheet.create({
     color: "black",
     margin: 10,
   },
-  textCard: {
-    fontSize: 18,
-    fontFamily: "Roboto400",
-    color: "black",
-  },
   imagen: {
-    marginVertical: 20,
+    marginTop: 8,
     marginHorizontal: "auto",
     height: 200,
     width: 200,

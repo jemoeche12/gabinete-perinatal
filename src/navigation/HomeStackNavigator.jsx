@@ -1,10 +1,7 @@
-import { StyleSheet, Text, View } from "react-native";
-import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Home from "../Screens/Home";
 import TalleresStackNavigator from "./TalleresStackNavigator";
 import Cart from "../Screens/Cart";
-import InstructivoScreen from "../Screens/InstructivoScreen";
 
 const HomeStackNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -31,4 +28,3 @@ const HomeStackNavigator = () => {
 
 export default HomeStackNavigator;
 
-const styles = StyleSheet.create({});

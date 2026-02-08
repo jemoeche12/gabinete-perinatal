@@ -74,7 +74,6 @@ const TestListScreen = ({ navigation, visible }) => {
           );
         }}
         ListHeaderComponent={
-          
           <View style={styles.view}>
             <Text style={styles.text}>
               La gestación, el parto y la crianza son etapas llenas de desafíos

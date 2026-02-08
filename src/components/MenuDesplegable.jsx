@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 10,
     paddingTop: 80,
-    zIndex: 2,
+    zIndex: 999,
     width: "70%",
     height: "100%",
   },

@@ -86,7 +86,6 @@ const PodcastScreen = () => {
             <Picker.Item key={index} label={cat} value={cat} />
           ))}
         </Picker>
-
         <FlatList
           data={podcastCategory}
           renderItem={({ item }) => <PodcastComponent item={item} />}

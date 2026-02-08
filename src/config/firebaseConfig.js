@@ -1,6 +1,8 @@
 import { initializeApp } from "firebase/app";
 import { getFunctions } from 'firebase/functions';
 import { httpsCallable } from "firebase/functions";
+import { getStorage } from "firebase/storage";
+
 
 
 const firebaseConfig = {
@@ -16,5 +18,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const functions = getFunctions(app); 
+const storage = getStorage();
 
-export { app, functions, httpsCallable }; 
+export { app, functions, httpsCallable, storage }; 
