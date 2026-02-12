@@ -5,6 +5,7 @@ import Recursos from '../Screens/Recursos';
 import ItemListCategory from '../Screens/ItemListCategory';
 import Detail from '../Screens/Detail';
 import UpdateMembresias from '../Screens/UpdateMembresias';
+import LibraryScreen from '../Screens/Library';
 
 
 const Stack = createNativeStackNavigator();
@@ -17,6 +18,7 @@ const RecursoStackNavigator = () => {
       headerStyle: { backgroundColor: '#F8EDE3' },
       headerTintColor: '#FFF',
     }}>
+      <Stack.Screen name="Recursos" component={LibraryScreen} />
       <Stack.Screen name="RecursosLista" component={Recursos} />
       <Stack.Screen name="ItemListCategory" component={ItemListCategory} options={{ headerBackVisible: false }} />
       <Stack.Screen name="Detail" component={Detail} options={{ headerBackVisible: false }} />

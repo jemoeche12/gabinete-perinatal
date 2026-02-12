@@ -1,93 +1,60 @@
-import { FlatList, StyleSheet, View, Text } from "react-native";
+import {
+  FlatList,
+  StyleSheet,
+  Image,
+  Pressable,
+  View,
+  Text,
+} from "react-native";
 import React, { useState } from "react";
 import CategoryItem from "../components/CategoryItem";
 import { useGetCategoriesQuery } from "../services/recursosService";
 import CustomHeader from "../components/CustomHeader";
 import MenuDesplegable from "../components/MenuDesplegable";
-import { usePermisses } from "../hooks/usePermisses";
-import BannerMembresia from "../components/BannerMembresia";
-import { Modal } from "react-native";
+import back from "../../assets/icon/back.png";
 
-const Recursos = ({ navigation, visible }) => {
+const Recursos = ({ navigation, visible, route }) => {
   const [isMenuVisible, setIsMenuVisible] = useState(visible);
-  const [requiredLevel, setRequiredLevel] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
-  const { canAccessByLevel } = usePermisses();
+  const { category } = route.params;
 
-  const { data: categories = [] } = useGetCategoriesQuery();
+  const { data: categories = [] } = useGetCategoriesQuery(category.id);
 
   const toggleMenu = () => {
     setIsMenuVisible(!isMenuVisible);
   };
 
-  const handleLockedPress = (requiredLevel) => {
-    setRequiredLevel(requiredLevel);
-    setModalVisible(true);
-  };
-
-  const handleNavigateToPlans = () => {
-    setModalVisible(false);
-    navigation.navigate("UpdateMembresias"); 
-  };
-
   return (
     <>
       <CustomHeader onMenuPress={toggleMenu} />
+
       {isMenuVisible && (
         <MenuDesplegable onClose={toggleMenu} visible={isMenuVisible} />
       )}
-      <Modal
-        visible={modalVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.centeredView}>
-          <BannerMembresia
-            requiredLevel={requiredLevel}
-            onClose={() => setModalVisible(false)}
-            onNavigateToPlans={handleNavigateToPlans}
-          />
-        </View>
-      </Modal>
+
       <FlatList
         style={styles.container}
         showsVerticalScrollIndicator={false}
         data={categories}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => {
-          const canAccess = canAccessByLevel(item.requiredLevel);
           return (
             <CategoryItem
               category={item}
               navigation={navigation}
-              canAccess={canAccess}
-              onPressLocked={handleLockedPress}
+              canAccess={true}
             />
           );
         }}
         ListHeaderComponent={
           <View style={styles.view}>
-            <Text style={styles.text}>
-              Hemos organizado el contenido en diferentes botones
-              temáticos, para que puedas acceder fácilmente a la
-              información que más te interesa:{'\n\n'}
-
-              - Encuentra información sobre cambios físicos y emocionales,
-               preparación para el parto y autocuidado.{'\n\n'}
-
-              - Consejos y herramientas para acompañar activamente en todo
-              el proceso.{'\n\n'}
-              - Guía sobre cómo brindar apoyo desde la empatía y el amor.{'\n\n'}
-              - Recursos para fortalecer el lazo con tu bebé desde
-              el nacimiento.{'\n\n'}
-              - Respuestas a preguntas comunes sobre la gestación y el posparto.{'\n\n'}
-               Cada botón te llevará a contenido especializado, elaborado por profesionales de la
-              psicología perinatal.{'\n\n'}Explora, aprende y vive
-              esta etapa con toda la información.{'\n\n'}Recuerda que estamos aquí
-              para acompañarte.
-            </Text>
+            <Pressable
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}
+            >
+              <Image source={back} style={styles.backIcon} />
+            </Pressable>
           </View>
         }
         contentContainerStyle={styles.list}
@@ -104,7 +71,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   view: {
-    marginTop: 40,
+    paddingVertical: 20,
   },
   text: {
     fontFamily: "Roboto400",
@@ -113,8 +80,20 @@ const styles = StyleSheet.create({
     fontSize: 24,
     paddingBottom: 20,
   },
+  backButton: {
+    left: 15,
+    marginVertical: 7,
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+  },
+  backIcon: {
+    width: 40,
+    height: 40,
+    resizeMode: "contain",
+  },
   list: {
-    paddingBottom: 40,
+    paddingVertical: 20,
   },
   centeredView: {
     flex: 1,

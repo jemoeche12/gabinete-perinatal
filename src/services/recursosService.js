@@ -6,21 +6,37 @@ export const recursosApi = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: baseUrl }),
   tagTypes: ["profileImageGet"],
   endpoints: (builder) => ({
-    getCategories: builder.query({
-      query: () => "categories.json",
+    getLibraryByCategory: builder.query({
+      query: () => `categoriesLibrary.json`,
       transformResponse: (response) => {
+        if (!response) return [];
+        const categoriesArray = Object.entries(response).map(
+          ([key, value]) => ({
+            id: Number(value.id ?? key),
+            name: value.name,
+            description: value.description,
+            requiredLevel:
+              value.requiredLevel || value.suscriptionPlan || "basico",
+          }),
+        );
+        return categoriesArray;
+      },
+    }),
+
+    getCategories: builder.query({
+      query: (categoryId) => "categories.json",
+      transformResponse: (response, meta, categoryId) => {
         if (!response) return [];
 
         const categoriesArray = Object.entries(response).map(
           ([key, value]) => ({
-            id: Number(value.id ?? key), 
-            name: value.name,
-            requiredLevel:
-              value.requiredLevel || value.suscriptionPlan || "basico",
-          })
+            ...value,
+            id: Number(key),
+          }),
         );
 
-        return categoriesArray;
+
+        return categoriesArray.filter(category => category.categoryId === categoryId);
       },
     }),
 
@@ -63,6 +79,7 @@ export const recursosApi = createApi({
 });
 
 export const {
+  useGetLibraryByCategoryQuery,
   useGetCategoriesQuery,
   useGetProductsByCategoryQuery,
   useGetProductByIdQuery,
