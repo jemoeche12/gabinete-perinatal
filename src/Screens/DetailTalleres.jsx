@@ -45,6 +45,9 @@ const DetailTalleres = ({ route, navigation, visible }) => {
     setIsMenuVisible(!isMenuVisible);
   };
 
+  const formatText = (text) =>
+  text?.replace(/\n+/g, " ").trim();
+
   return (
     <>
       <CustomHeader onMenuPress={toggleMenu} />
@@ -60,7 +63,7 @@ const DetailTalleres = ({ route, navigation, visible }) => {
         </Pressable>
         <Text style={styles.title}>{taller.titulo}</Text>
         <Text style={styles.description}>{taller.objetivo}</Text>
-        <Text style={styles.contenidos}>{taller.contenidos}</Text>
+        <Text style={styles.contenidos}>{formatText(taller.contenidos)}</Text>
         <View style={styles.modalidad}>
           <Text style={styles.modalidadText}>Dia: {taller.modalidad.dia}</Text>
           <Text style={styles.modalidadText}>

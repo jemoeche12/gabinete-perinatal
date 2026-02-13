@@ -1,9 +1,10 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Image } from "react-native";
 import React, { useState } from "react";
 import { useGetDueloByIdQuery } from "../services/DueloService";
 import CustomHeader from "../components/CustomHeader";
 import MenuDesplegable from "../components/MenuDesplegable";
 import { ScrollView, Pressable } from "react-native";
+import iconImageLoading from "../../assets/Red.png";
 
 
 const DueloDetail = ({route, navigation}) => {
@@ -18,6 +19,15 @@ const DueloDetail = ({route, navigation}) => {
   const toggleMenu = () => {
     setIsMenuVisible(!isMenuVisible);
   };
+
+  if (isLoading) {
+    return (
+      <View style={styles.containImageLoading}>
+        <Image source={iconImageLoading} style={styles.iconImageLoading} />
+      </View>
+    );
+  }
+  
 
   return (
     <View style={styles.container}>
@@ -49,10 +59,27 @@ const styles = StyleSheet.create({
     justifyContent: "center",
 
   },
+   containImageLoading: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "white",
+      height: "100%",
+      width: "100%",
+    },
+    iconImageLoading: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      width: 250,
+      height: 250,
+      resizeMode: "contain",
+    },
   title: {
     fontSize: 24,
     color: "white",
-    marginTop: -20,
+    marginTop: 30,
+    marginBottom: 20,
     textAlign: "center",
     fontWeight: "bold",
 
@@ -62,8 +89,9 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "white",
     fontWeight: "300",
-    marginBottom: 40,
+    marginVertical: 30,
     fontFamily: 'Roboto400',
+    lineHeight: 28,
   },
   scrollContainer: {
     flexGrow: 1,
@@ -72,15 +100,17 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "rgba(0,0,0,0.7)",
 
-  }, content: {
-    padding: 20,
+  }, 
+  content: {
+    flex: 1,
+    width: "100%",
   },
   btn: {
     borderRadius: 10,
     backgroundColor: "#B78270",
     paddingVertical: 10,
     paddingHorizontal: 20,
-    marginTop: -10,
+    marginTop: 10,
   },
   btnText: {
     color: "#fff",

@@ -47,7 +47,7 @@ const ListTalleres = ({ navigation, visible }) => {
           <Image source={back} style={styles.backIcon} />
         </Pressable>
         <FlatList
-          contentContainerStyle={{ paddingBottom: 150 }}
+          contentContainerStyle={{ paddingBottom: 200 }}
           data={data}
           keyExtractor={(item) => item.id.toString()}
           showsVerticalScrollIndicator={false}

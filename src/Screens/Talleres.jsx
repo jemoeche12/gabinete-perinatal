@@ -11,7 +11,6 @@ import fondo from "../../assets/fondos/fondoTalleres.jpg";
 import AddButton from "../components/AddButton";
 import CustomHeader from "../components/CustomHeader";
 import MenuDesplegable from "../components/MenuDesplegable";
-import { colors } from "../utils/customerStyle";
 import iconTalleres from "../../assets/icon/talleres.png";
 
 const Talleres = ({ navigation, visible }) => {

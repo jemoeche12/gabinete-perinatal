@@ -54,7 +54,7 @@ const Duelo = () => {
           de ser. En la Red de Apoyo PERINATAL queremos ofrecerte un espacio de
           escucha y acompañamiento respetuoso. Podés escribirnos si necesitás
           hablar, recibir orientación o simplemente ser escuchada con
-          sensibilidad. ¿Quieres acompañamiento emocional? Pulsa aquí para
+          sensibilidad. ¿Quieres acompañamiento emocional? Solicita una cita para
           conectarte con una profesional de nuestra red. Atención personalizada
           y confidencial. Espacio de escucha activa, sin juicios, desde la
           psicología perinatal. “Tu historia importa. Tu bebé importa. Tu dolor
@@ -169,6 +169,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     textAlign: "center",
     fontWeight: "bold",
+    lineHeight: 30,
   },
   list: {
     paddingBottom: 40,

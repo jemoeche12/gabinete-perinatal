@@ -13,7 +13,6 @@ const FaqItem = ({ item }) => {
   return (
     <Pressable onPress={() => setOpen(!open)} style={styles.faqItem}>
       <Text style={styles.question}>{item.pregunta}</Text>
-
       {open && <Text style={styles.answer}>{item.respuesta}</Text>}
     </Pressable>
   );
@@ -26,9 +25,10 @@ const FaqScreen = () => {
   return (
     <>
       <CustomHeader onMenuPress={() => setIsMenuVisible(!isMenuVisible)} />
-
-      <MenuDesplegable onClose={() => setIsMenuVisible(false)} visible={isMenuVisible} />
-
+      <MenuDesplegable
+        onClose={() => setIsMenuVisible(false)}
+        visible={isMenuVisible}
+      />
       <FlatList
         data={preguntasFrecuentes}
         keyExtractor={(_, index) => index.toString()}
