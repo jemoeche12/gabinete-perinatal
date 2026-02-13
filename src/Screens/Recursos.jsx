@@ -15,7 +15,6 @@ import back from "../../assets/icon/back.png";
 
 const Recursos = ({ navigation, visible, route }) => {
   const [isMenuVisible, setIsMenuVisible] = useState(visible);
-  const [modalVisible, setModalVisible] = useState(false);
 
   const { category } = route.params;
 

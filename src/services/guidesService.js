@@ -15,6 +15,7 @@ export const guidesApi = createApi({
             id: Number(value.id ?? key),
             name: value.name,
             description: value.description,
+            color: value.color,
             requiredLevel:
               value.requiredLevel || value.suscriptionPlan || "basico",
           }),

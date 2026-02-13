@@ -180,38 +180,42 @@ const ComunidadScreen = () => {
           <ActivityIndicator size="large" />
         ) : (
           <>
-            <Pressable
-              style={styles.backButton}
-              onPress={() => navigation.goBack()}
-            >
-              <Image source={back} style={styles.backIcon} />
-            </Pressable>
-            <View style={styles.containerIntro}>
-              <Text style={styles.introTitle}>
-                Un lugar para respirar, compartir y no sentirte sola/o
-              </Text>
-              <Text style={styles.introText}>
-                Bienvenida/o a este espacio creado para acompañarte en cada
-                etapa: el deseo de gestar, el embarazo, el posparto, la crianza,
-                los miedos, los duelos y todo aquello que a veces cuesta decir
-                en voz alta.
-              </Text>
-              <Text style={styles.introText}>
-                Aquí puedes: Ser vos misma/o, sin exigencias. Compartir lo que
-                te pasa y encontrar a otras personas que sienten como vos.
-                Recibir sostén profesional cuando lo necesites. Este es un
-                rincón seguro. Un lugar donde tus emociones tienen espacio,
-                donde tu historia importa y donde podés descansar un momento. No
-                estás sola/o. La comunidad te abraza.
-              </Text>
-            </View>
-
             <FlatList
               data={posts}
               keyExtractor={(item) => item.id}
               renderItem={renderPost}
               refreshControl={
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              }
+              ListHeaderComponent={
+                <>
+                  <Pressable
+                    style={styles.backButton}
+                    onPress={() => navigation.goBack()}
+                  >
+                    <Image source={back} style={styles.backIcon} />
+                  </Pressable>
+
+                  <View style={styles.containerIntro}>
+                    <Text style={styles.introTitle}>
+                      Un lugar para respirar, compartir y no sentirte sola/o
+                    </Text>
+                    <Text style={styles.introText}>
+                      Bienvenida/o a este espacio creado para acompañarte en
+                      cada etapa: el deseo de gestar, el embarazo, el posparto,
+                      la crianza, los miedos, los duelos y todo aquello que a
+                      veces cuesta decir en voz alta.
+                    </Text>
+                    <Text style={styles.introText}>
+                      Aquí puedes: Ser vos misma/o, sin exigencias. Compartir lo
+                      que te pasa y encontrar a otras personas que sienten como
+                      vos. Recibir sostén profesional cuando lo necesites. Este
+                      es un rincón seguro. Un lugar donde tus emociones tienen
+                      espacio, donde tu historia importa y donde podés descansar
+                      un momento. No estás sola/o. La comunidad te abraza.
+                    </Text>
+                  </View>
+                </>
               }
               ListEmptyComponent={
                 <Text style={styles.emptyText}>

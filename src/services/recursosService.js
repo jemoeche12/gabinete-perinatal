@@ -15,6 +15,7 @@ export const recursosApi = createApi({
             id: Number(value.id ?? key),
             name: value.name,
             description: value.description,
+            color: value.color,
             requiredLevel:
               value.requiredLevel || value.suscriptionPlan || "basico",
           }),
@@ -35,8 +36,9 @@ export const recursosApi = createApi({
           }),
         );
 
-
-        return categoriesArray.filter(category => category.categoryId === categoryId);
+        return categoriesArray.filter(
+          (category) => category.categoryId === categoryId,
+        );
       },
     }),
 

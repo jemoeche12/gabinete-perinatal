@@ -11,6 +11,7 @@ import { useGetProductByIdQuery } from "../services/recursosService";
 import { useState } from "react";
 import CustomHeader from "../components/CustomHeader";
 import MenuDesplegable from "../components/MenuDesplegable";
+import fondo from "../../assets/fondos/fondoTalleres.jpg";
 
 
 const Detail = ({ navigation, route, visible }) => {
@@ -25,7 +26,7 @@ const Detail = ({ navigation, route, visible }) => {
 
   return (
     <ImageBackground
-      source={require("../../assets/img/fondoRecurso.png")}
+      source={fondo}
       style={styles.background}
     >
       <CustomHeader onMenuPress={toggleMenu} />

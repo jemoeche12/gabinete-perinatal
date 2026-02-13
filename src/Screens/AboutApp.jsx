@@ -74,6 +74,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "#F8EDE3",
     flex: 1,
+    paddingBottom: 40,
   },
   backButton: {
     top: 20,
@@ -101,6 +102,7 @@ const styles = StyleSheet.create({
     width: "90%",
     marginHorizontal: "5%",
     marginVertical: 30,
+    paddingBottom: 30,
   },
   subtitleTaller: {
     fontFamily: "Roboto400",

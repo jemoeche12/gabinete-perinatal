@@ -16,10 +16,11 @@ const CategoryItem = ({ category, navigation, canAccess, onPressLocked }) => {
       return;
     }
   };
+
   return (
     <Card>
       <Pressable
-        style={[styles.productItem, !canAccess && styles.lockedItem]}
+        style={[styles.productItem,!canAccess && styles.lockedItem]}
         onPress={handleNavigate}
       >
         <Text

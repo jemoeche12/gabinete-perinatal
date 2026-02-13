@@ -26,7 +26,7 @@ const GuidesComponent = ({
     <Card>
       <Pressable
         onPress={handleNavigate}
-        style={[styles.card, !canAccess && styles.lockedCard]}
+        style={[styles.card, { backgroundColor: category.color }, !canAccess && styles.lockedCard]}
       >
         <View style={styles.header}>
           <Text

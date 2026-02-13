@@ -121,13 +121,14 @@ const styles = StyleSheet.create({
   btnInst: {
     backgroundColor: colors.btnGuia,
     marginLeft: 50,
-    marginTop: 40
+    marginTop: 45
   },
   buttonContainer: {
     flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "flex-end",
     width: "50%",
+    top: 5,
     marginBottom: 100,
     gap: 30,
   },

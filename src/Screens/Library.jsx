@@ -71,7 +71,6 @@ const LibraryScreen = () => {
           const canAccess = canAccessByLevel(item.requiredLevel);
           return (
             <LibraryComponent
-              style={styles.categoryName}
               category={item}
               navigation={navigation}
               onPressLocked={handleLockedPress}

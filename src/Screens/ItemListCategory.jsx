@@ -44,7 +44,6 @@ const ItemListCategory = ({ navigation, route, visible }) => {
     <>
       <CustomHeader onMenuPress={toggleMenu} />
       <View style={styles.container}>
- 
         {isMenuVisible && (
           <MenuDesplegable onClose={toggleMenu} visible={isMenuVisible} />
         )}
@@ -57,16 +56,16 @@ const ItemListCategory = ({ navigation, route, visible }) => {
           )}
           keyExtractor={(product) => product.id}
           contentContainerStyle={styles.list}
-           ListHeaderComponent={
-                    <View style={styles.view}>
-                      <Pressable
-                        style={styles.backButton}
-                        onPress={() => navigation.goBack()}
-                      >
-                        <Image source={back} style={styles.backIcon} />
-                      </Pressable>
-                    </View>
-                  }
+          ListHeaderComponent={
+            <View style={styles.view}>
+              <Pressable
+                style={styles.backButton}
+                onPress={() => navigation.goBack()}
+              >
+                <Image source={back} style={styles.backIcon} />
+              </Pressable>
+            </View>
+          }
         />
       </View>
     </>
@@ -80,7 +79,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F8EDE3",
   },
-    view: {
+  view: {
     paddingVertical: 20,
   },
 

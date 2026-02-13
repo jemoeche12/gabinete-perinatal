@@ -5,6 +5,7 @@ import {
   View,
   Pressable,
   Image,
+  ImageBackground,
 } from "react-native";
 import React, { useState } from "react";
 import {
@@ -15,6 +16,7 @@ import { Picker } from "@react-native-picker/picker";
 import PodcastComponent from "../components/PodcastComponent";
 import { useNavigation } from "@react-navigation/native";
 import back from "../../assets/icon/back.png";
+import fondo from '../../assets/fondos/PODCAST.jpg';
 
 const PodcastScreen = () => {
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("todos");
@@ -66,6 +68,7 @@ const PodcastScreen = () => {
   return (
     <>
       <View style={styles.container}>
+        <ImageBackground source={fondo} style={styles.backgroundImage}>
         <View style={styles.viewTitle}>
           <Pressable
             style={styles.backButton}
@@ -79,11 +82,12 @@ const PodcastScreen = () => {
           selectedValue={categoriaSeleccionada}
           onValueChange={(value) => setCategoriaSeleccionada(value)}
           style={styles.picker}
-          dropdownIconColor="white"
+          dropdownIconColor="black"
+
         >
-          <Picker.Item label="Todos" value="todos" />
+          <Picker.Item label="Todos" value="todos" style={styles.pickerItem} />
           {categoriesPodcast.map((cat, index) => (
-            <Picker.Item key={index} label={cat} value={cat} />
+            <Picker.Item key={index} label={cat} value={cat} style={{fontWeight: "bold", color: "black"}} />
           ))}
         </Picker>
         <FlatList
@@ -97,6 +101,7 @@ const PodcastScreen = () => {
           contentContainerStyle={styles.listContainer}
           ItemSeparatorComponent={() => <View style={styles.separator} />}
         />
+        </ImageBackground>
       </View>
     </>
   );
@@ -115,6 +120,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
   },
+  backgroundImage: {
+    flex: 1,
+    resizeMode: "cover",
+  },
   viewTitle: {
     flexDirection: "row",
     alignItems: "center",
@@ -126,7 +135,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginVertical: 25,
     textAlign: "center",
-    color: "white",
+    color: "black",
   },
   listContainer: {
     padding: 10,
@@ -157,10 +166,14 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     resizeMode: "contain",
-    tintColor: "white",
+    tintColor: "black",
   },
   picker: {
-    color: "white",
-    borderColor: "white",
-  },
+    color: "black",
+    borderColor: "black",
+    fontWeight: "bold",
+    borderRadius: 8,
+    
+  },  
+  
 });

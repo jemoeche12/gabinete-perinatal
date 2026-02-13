@@ -23,10 +23,14 @@ const LibraryComponent = ({
   };
 
   return (
-     <Card>
+    <Card>
       <Pressable
         onPress={handleNavigate}
-        style={[styles.card, !canAccess && styles.lockedCard]}
+        style={[
+          styles.card,
+          { backgroundColor: category.color },
+          !canAccess && styles.lockedCard,
+        ]}
       >
         <View style={styles.header}>
           <Text
@@ -39,9 +43,7 @@ const LibraryComponent = ({
           {!canAccess && <Text style={styles.lockIcon}>🔒</Text>}
         </View>
 
-        <Text style={styles.description}>
-{description}
-        </Text>
+        <Text style={styles.description}>{description}</Text>
       </Pressable>
     </Card>
   );
@@ -78,11 +80,13 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto400",
     color: "#222",
     flex: 1,
-    marginVertical: 4,
+    marginVertical: 12,
+    textAlign: "center",
   },
 
   description: {
-    fontSize: 14,
+    marginVertical: 8,
+    fontSize: 16,
     color: "#444",
     lineHeight: 18,
     fontFamily: "Roboto400",

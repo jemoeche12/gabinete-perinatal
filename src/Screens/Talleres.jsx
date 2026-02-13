@@ -1,4 +1,10 @@
-import { ImageBackground, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  ImageBackground,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import React, { useState } from "react";
 import FuncionTalleres from "../components/FuncionTalleres";
 import fondo from "../../assets/fondos/fondoTalleres.jpg";
@@ -30,14 +36,13 @@ const Talleres = ({ navigation, visible }) => {
             espacio de escucha profesional.
           </Text>
           <FuncionTalleres />
-          <View style={{ height: 120 }} />
         </ScrollView>
-        <AddButton
-          style={styles.btnTalleres}
-          title="Talleres"
-          onPress={() => navigation.navigate("ListTalleres")}
-          iconSource={iconTalleres}
-        />
+          <AddButton
+            style={styles.btnTalleres}
+            title="Talleres"
+            onPress={() => navigation.navigate("ListTalleres")}
+            iconSource={iconTalleres}
+          />
       </ImageBackground>
     </View>
   );
@@ -58,6 +63,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     alignItems: "center",
     justifyContent: "center",
+    paddingBottom: 80,
   },
   title: {
     fontSize: 24,
@@ -66,14 +72,18 @@ const styles = StyleSheet.create({
     textAlign: "center",
     padding: 20,
     fontFamily: "Roboto400",
+    
   },
-  btnTalleres: {
-    left: 100,
-    bottom: 50,
-    backgroundColor: "#E6C6B7",
-    width: 100,
-    height: 100,
-    zIndex: 4, 
-    elevation: 5
-  },
+btnTalleres: {
+  position: "absolute",   
+  right: 20,
+  bottom: 40,
+  
+  backgroundColor: "#E6C6B7",
+  width: 100,
+  height: 100,
+  zIndex: 10,
+  elevation: 10,
+}
+
 });

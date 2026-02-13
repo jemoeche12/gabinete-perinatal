@@ -1,7 +1,8 @@
-import { StyleSheet, Text, View, Image, Pressable } from "react-native";
+import { StyleSheet, Text, View, Image, Pressable, ImageBackground } from "react-native";
 import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import { useGetPodcastByIdQuery } from "../services/podcastService";
 import { useEffect } from "react";
+import fondo from '../../assets/fondos/PODCAST.jpg';
 
 const ModalAudioPodcast = ({ id, onClose, item }) => {
   const audioSource = useGetPodcastByIdQuery(id);
@@ -51,7 +52,7 @@ const ModalAudioPodcast = ({ id, onClose, item }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <ImageBackground  source={fondo} style={styles.container}>
       {item?.urlImagen ? (
         <Image style={styles.image} source={{ uri: item.urlImagen }} />
       ) : (
@@ -76,7 +77,7 @@ const ModalAudioPodcast = ({ id, onClose, item }) => {
       <Pressable style={styles.button} onPress={onClose}>
         <Text style={styles.buttonText}>Cerrar</Text>
       </Pressable>
-    </View>
+    </ImageBackground>
   );
 };
 
@@ -107,21 +108,22 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    color:"white",
+    color:"black",
     fontWeight: "bold",
     marginTop: 8,
     textAlign: "center",
+
   },
   description: {
-    color: "white",
-    fontSize: 14,
+    color: "black",
+    fontSize: 16,
     textAlign: "center",
     marginVertical: 8,
   },
 
   debug: {
     fontSize: 10,
-    color: "#999",
+    color: "black",
     marginBottom: 10,
     textAlign: "center",
   },
