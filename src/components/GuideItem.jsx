@@ -13,7 +13,7 @@ const GuideItem = ({ guide, navigation }) => {
   };
   return (
     <Card style={styles.container}>
-      <Pressable style={styles.productItem} onPress={handleNavigate}>
+      <Pressable style={[styles.productItem, { backgroundColor: guide.color }]} onPress={handleNavigate}>
         <Text style={styles.productTextCategorie}>
           Categoria: {guide.categories}
         </Text>

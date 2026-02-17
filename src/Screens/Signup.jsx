@@ -9,6 +9,7 @@ import {
   ImageBackground,
   ScrollView,
   TouchableOpacity,
+  KeyboardAvoidingView,
 } from "react-native";
 import { useStripe } from "@stripe/stripe-react-native";
 import InputForm from "../components/InputForm";
@@ -140,7 +141,7 @@ const Signup = ({ navigation }) => {
             subscriptionType: selectedOption?.id || "basico_free",
             fechaInicio: Date.now(),
           },
-        })
+        }),
       );
 
       const planName = PLAN_CONFIG[selectedPlan]?.name || selectedPlan;
@@ -181,7 +182,7 @@ const Signup = ({ navigation }) => {
               });
             },
           },
-        ]
+        ],
       );
     } catch (err) {
       setIsProcessingPayment(false);
@@ -246,7 +247,7 @@ const Signup = ({ navigation }) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(requestData),
-        }
+        },
       );
 
       if (!response.ok) {
@@ -270,7 +271,7 @@ const Signup = ({ navigation }) => {
       console.error("Error en fetchPaymentIntent:", error);
       Alert.alert(
         "Error de Conexión",
-        `No se pudo conectar con el servidor de pagos: ${error.message}.`
+        `No se pudo conectar con el servidor de pagos: ${error.message}.`,
       );
       return null;
     }
@@ -298,7 +299,7 @@ const Signup = ({ navigation }) => {
         console.error("Error al inicializar PaymentSheet:", error);
         Alert.alert(
           "Error de Configuración",
-          `Error al configurar el pago: ${error.message}`
+          `Error al configurar el pago: ${error.message}`,
         );
         return false;
       }
@@ -340,7 +341,7 @@ const Signup = ({ navigation }) => {
           console.error("Error en presentPaymentSheet:", error);
           Alert.alert(
             "Error de Pago",
-            `El pago no se pudo completar: ${error.message}`
+            `El pago no se pudo completar: ${error.message}`,
           );
         }
         setIsProcessingPayment(false);
@@ -352,7 +353,7 @@ const Signup = ({ navigation }) => {
       console.error("Error en el proceso de pago:", error);
       Alert.alert(
         "Error",
-        error.message || "Ocurrió un error al procesar el pago"
+        error.message || "Ocurrió un error al procesar el pago",
       );
       setIsProcessingPayment(false);
     }
@@ -377,164 +378,167 @@ const Signup = ({ navigation }) => {
   const currencySymbol = selectedOption?.currency === "eur" ? "€" : "$";
 
   return (
-    <ScrollView
-      contentContainerStyle={styles.scrollContainer}
-      showsVerticalScrollIndicator={false}
-      keyboardShouldPersistTaps="handled"
+    <ImageBackground
+      source={fondoSignUp}
+      style={styles.background}
+      resizeMode="cover"
     >
-      <ImageBackground
-        source={fondoSignUp}
-        style={styles.background}
-        resizeMode="cover"
-      >
-        <Membresias
-          onSelectPlan={handlePlanSelect}
-          onSelectDuration={handleDurationSelect}
-        />
-        <Text style={styles.header}>Crea tu cuenta</Text>
-        <View style={styles.form}>
-          <Text style={styles.title}>Registro</Text>
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          <Membresias
+            onSelectPlan={handlePlanSelect}
+            onSelectDuration={handleDurationSelect}
+          />
+          <Text style={styles.header}>Crea tu cuenta</Text>
+          <View style={styles.form}>
+            <Text style={styles.title}>Registro</Text>
 
-          <InputForm label="Nombre" value={name} onChangeText={setName} />
-          <InputForm
-            label="Apellido"
-            value={lastName}
-            onChangeText={setLastName}
-          />
-          <InputForm
-            label="Email"
-            value={email}
-            onChangeText={setEmail}
-            error={errorMail}
-          />
-          <InputForm
-            label="Contraseña"
-            placeholder="Mínimo 6 caracteres"
-            value={password}
-            onChangeText={setPassword}
-            error={errorPassword}
-            isSecure
-          />
-
-          {currentPlan?.options && currentPlan.options.length > 1 && (
-            <View style={styles.optionsContainer}>
-              <Text style={styles.optionsLabel}>Selecciona el período:</Text>
-              {currentPlan.options.map((option) => (
-                <TouchableOpacity
-                  key={option.id}
-                  style={[
-                    styles.optionButton,
-                    selectedOption?.id === option.id &&
-                      styles.optionButtonSelected,
-                    { borderColor: currentPlan.color },
-                  ]}
-                  onPress={() => setSelectedOption(option)}
-                  activeOpacity={0.7}
-                >
-                  <View style={styles.optionContent}>
-                    <View style={styles.optionLeft}>
-                      <Text
-                        style={[
-                          styles.optionPeriod,
-                          selectedOption?.id === option.id &&
-                            styles.optionTextSelected,
-                        ]}
-                      >
-                        {option.period}
-                      </Text>
-                      {selectedOption?.id === option.id && (
-                        <View
+            <InputForm label="Nombre" value={name} onChangeText={setName} />
+            <InputForm
+              label="Apellido"
+              value={lastName}
+              onChangeText={setLastName}
+            />
+            <InputForm
+              label="Email"
+              value={email}
+              onChangeText={setEmail}
+              error={errorMail}
+            />
+            <InputForm
+              label="Contraseña"
+              placeholder="Mínimo 6 caracteres"
+              value={password}
+              onChangeText={setPassword}
+              error={errorPassword}
+              isSecure
+            />
+            {currentPlan?.options && currentPlan.options.length > 1 && (
+              <View style={styles.optionsContainer}>
+                <Text style={styles.optionsLabel}>Selecciona el período:</Text>
+                {currentPlan.options.map((option) => (
+                  <TouchableOpacity
+                    key={option.id}
+                    style={[
+                      styles.optionButton,
+                      selectedOption?.id === option.id &&
+                        styles.optionButtonSelected,
+                      { borderColor: currentPlan.color },
+                    ]}
+                    onPress={() => setSelectedOption(option)}
+                    activeOpacity={0.7}
+                  >
+                    <View style={styles.optionContent}>
+                      <View style={styles.optionLeft}>
+                        <Text
                           style={[
-                            styles.selectedBadge,
-                            { backgroundColor: currentPlan.color },
+                            styles.optionPeriod,
+                            selectedOption?.id === option.id &&
+                              styles.optionTextSelected,
                           ]}
                         >
-                          <Text style={styles.selectedBadgeText}>
-                            ✓ Seleccionado
-                          </Text>
-                        </View>
-                      )}
+                          {option.period}
+                        </Text>
+                        {selectedOption?.id === option.id && (
+                          <View
+                            style={[
+                              styles.selectedBadge,
+                              { backgroundColor: currentPlan.color },
+                            ]}
+                          >
+                            <Text style={styles.selectedBadgeText}>
+                              ✓ Seleccionado
+                            </Text>
+                          </View>
+                        )}
+                      </View>
+                      <Text
+                        style={[
+                          styles.optionPrice,
+                          selectedOption?.id === option.id && {
+                            color: currentPlan.color,
+                          },
+                        ]}
+                      >
+                        {option.currency === "eur" ? "€" : "$"}
+                        {option.price}
+                      </Text>
                     </View>
-                    <Text
-                      style={[
-                        styles.optionPrice,
-                        selectedOption?.id === option.id && {
-                          color: currentPlan.color,
-                        },
-                      ]}
-                    >
-                      {option.currency === "eur" ? "€" : "$"}
-                      {option.price}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
 
-          <View
-            style={[
-              styles.planInfo,
-              { borderLeftColor: currentPlan?.color || "#B78270" },
-            ]}
-          >
-            <View style={styles.planDetails}>
-              <Text style={styles.planLabel}>Plan seleccionado:</Text>
-              <Text
-                style={[
-                  styles.planName,
-                  { color: currentPlan?.color || "#B78270" },
-                ]}
-              >
-                {currentPlan?.name || "Básico"}
+            <View
+              style={[
+                styles.planInfo,
+                { borderLeftColor: currentPlan?.color || "#B78270" },
+              ]}
+            >
+              <View style={styles.planDetails}>
+                <Text style={styles.planLabel}>Plan seleccionado:</Text>
+                <Text
+                  style={[
+                    styles.planName,
+                    { color: currentPlan?.color || "#B78270" },
+                  ]}
+                >
+                  {currentPlan?.name || "Básico"}
+                </Text>
+                {selectedOption && selectedOption.price > 0 && (
+                  <Text style={styles.planPeriod}>
+                    por {selectedOption.period}
+                  </Text>
+                )}
+              </View>
+              <Text style={styles.priceText}>
+                {selectedOption?.price === 0
+                  ? "Gratis"
+                  : `${currencySymbol}${selectedOption?.price}`}
               </Text>
-              {selectedOption && selectedOption.price > 0 && (
-                <Text style={styles.planPeriod}>
-                  por {selectedOption.period}
+            </View>
+
+            <SubmitButton
+              onPress={onSubmit}
+              disabled={
+                result.isLoading ||
+                profileLoading ||
+                !dbInitialized ||
+                isProcessingPayment
+              }
+            >
+              {result.isLoading || profileLoading || isProcessingPayment ? (
+                <View style={styles.loadingContainer}>
+                  <ActivityIndicator size="small" color="#fff" />
+                  <Text style={styles.loadingText}>
+                    {isProcessingPayment ? "Procesando..." : "Registrando..."}
+                  </Text>
+                </View>
+              ) : (
+                <Text
+                  style={{
+                    color: "#fff",
+                    fontSize: 18,
+                    fontWeight: "600",
+                    textAlign: "center",
+                  }}
+                >
+                  {selectedOption?.price === 0
+                    ? "Registrarme"
+                    : "Pagar y Registrarme"}
                 </Text>
               )}
-            </View>
-            <Text style={styles.priceText}>
-              {selectedOption?.price === 0
-                ? "Gratis"
-                : `${currencySymbol}${selectedOption?.price}`}
-            </Text>
+            </SubmitButton>
+            <Text style={styles.sub}>¿Ya tienes una cuenta?</Text>
+            <Pressable onPress={() => navigation.navigate("Login")}>
+              <Text style={styles.subLink}>Iniciar Sesión</Text>
+            </Pressable>
           </View>
-
-          <SubmitButton
-            onPress={onSubmit}
-            disabled={
-              result.isLoading ||
-              profileLoading ||
-              !dbInitialized ||
-              isProcessingPayment
-            }
-          >
-            {result.isLoading || profileLoading || isProcessingPayment ? (
-              <View style={styles.loadingContainer}>
-                <ActivityIndicator size="small" color="#fff" />
-                <Text style={styles.loadingText}>
-                  {isProcessingPayment
-                    ? "Procesando pago..."
-                    : "Registrando..."}
-                </Text>
-              </View>
-            ) : (
-              <Text style={{ color: "#fff", fontSize: 18, fontWeight: "600" }}>
-                {selectedOption?.price === 0
-                  ? "Registrarme Gratis"
-                  : `Pagar ${currencySymbol}${selectedOption?.price} y Registrarme`}
-              </Text>
-            )}
-          </SubmitButton>
-
-          <Text style={styles.sub}>¿Ya tienes una cuenta?</Text>
-          <Pressable onPress={() => navigation.navigate("Login")}>
-            <Text style={styles.subLink}>Iniciar Sesión</Text>
-          </Pressable>
-        </View>
-      </ImageBackground>
-    </ScrollView>
+        </ScrollView>
+    </ImageBackground>
   );
 };
 

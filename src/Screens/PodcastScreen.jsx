@@ -16,7 +16,8 @@ import { Picker } from "@react-native-picker/picker";
 import PodcastComponent from "../components/PodcastComponent";
 import { useNavigation } from "@react-navigation/native";
 import back from "../../assets/icon/back.png";
-import fondo from '../../assets/fondos/PODCAST.jpg';
+import fondo from "../../assets/fondos/PODCAST.jpg";
+import logo from "../../assets/Red.png";
 
 const PodcastScreen = () => {
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("todos");
@@ -38,6 +39,7 @@ const PodcastScreen = () => {
   if (loadingCategories || loadingPodcasts) {
     return (
       <View style={styles.centerContainer}>
+        <Image source={logo} style={styles.logo}/>
         <Text style={styles.messageText}>Cargando, espere por favor...</Text>
       </View>
     );
@@ -58,6 +60,13 @@ const PodcastScreen = () => {
   if (podcastCategory.length === 0) {
     return (
       <View style={styles.centerContainer}>
+        <Pressable
+          style={{top: 40, left: 20, position: "absolute"}}
+          onPress={() => navigation.goBack()}
+        >
+          <Image source={back} style={styles.backIcon} />
+        </Pressable>
+        <Image source={logo} style={styles.logo} />
         <Text style={styles.messageText}>
           Disculpe, no hay ningún podcast en esta categoría.
         </Text>
@@ -69,38 +78,46 @@ const PodcastScreen = () => {
     <>
       <View style={styles.container}>
         <ImageBackground source={fondo} style={styles.backgroundImage}>
-        <View style={styles.viewTitle}>
-          <Pressable
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
+          <View style={styles.viewTitle}>
+            <Pressable
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}
+            >
+              <Image source={back} style={styles.backIcon} />
+            </Pressable>
+            <Text style={styles.title}>Podcast</Text>
+          </View>
+          <Picker
+            selectedValue={categoriaSeleccionada}
+            onValueChange={(value) => setCategoriaSeleccionada(value)}
+            style={styles.picker}
+            dropdownIconColor="black"
           >
-            <Image source={back} style={styles.backIcon} />
-          </Pressable>
-          <Text style={styles.title}>Podcast</Text>
-        </View>
-        <Picker
-          selectedValue={categoriaSeleccionada}
-          onValueChange={(value) => setCategoriaSeleccionada(value)}
-          style={styles.picker}
-          dropdownIconColor="black"
-
-        >
-          <Picker.Item label="Todos" value="todos" style={styles.pickerItem} />
-          {categoriesPodcast.map((cat, index) => (
-            <Picker.Item key={index} label={cat} value={cat} style={{fontWeight: "bold", color: "black"}} />
-          ))}
-        </Picker>
-        <FlatList
-          data={podcastCategory}
-          renderItem={({ item }) => <PodcastComponent item={item} />}
-          keyExtractor={(item) =>
-            item.id?.toString() || Math.random().toString()
-          }
-          horizontal={true}
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.listContainer}
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
-        />
+            <Picker.Item
+              label="Todos"
+              value="todos"
+              style={styles.pickerItem}
+            />
+            {categoriesPodcast.map((cat, index) => (
+              <Picker.Item
+                key={index}
+                label={cat}
+                value={cat}
+                style={{ fontWeight: "bold", color: "black" }}
+              />
+            ))}
+          </Picker>
+          <FlatList
+            data={podcastCategory}
+            renderItem={({ item }) => <PodcastComponent item={item} />}
+            keyExtractor={(item) =>
+              item.id?.toString() || Math.random().toString()
+            }
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.listContainer}
+            ItemSeparatorComponent={() => <View style={styles.separator} />}
+          />
         </ImageBackground>
       </View>
     </>
@@ -140,13 +157,19 @@ const styles = StyleSheet.create({
   listContainer: {
     padding: 10,
   },
+  logo: {
+    height: 200,
+    width: 200,
+    bottom: 80,
+  },
   separator: {
     width: 10,
   },
   messageText: {
-    fontSize: 16,
+    fontSize: 18,
     textAlign: "center",
-    color: "#ccc",
+    color: "black",
+    bottom: 40,
   },
   errorText: {
     fontSize: 16,
@@ -173,7 +196,5 @@ const styles = StyleSheet.create({
     borderColor: "black",
     fontWeight: "bold",
     borderRadius: 8,
-    
-  },  
-  
+  },
 });

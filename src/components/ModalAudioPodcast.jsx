@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, Pressable, ImageBackground } from "react-native";
+import { StyleSheet, Text, View, Image, Pressable, ImageBackground, Button } from "react-native";
 import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import { useGetPodcastByIdQuery } from "../services/podcastService";
 import { useEffect } from "react";
@@ -58,7 +58,6 @@ const ModalAudioPodcast = ({ id, onClose, item }) => {
       ) : (
         <View style={[styles.image, styles.placeholderImage]} />
       )}
-
       <Text style={styles.title}>{item?.titulo || "Sin título"}</Text>
       <Text style={styles.description}>
         {item?.descripcion || "Sin descripción"}
@@ -73,7 +72,6 @@ const ModalAudioPodcast = ({ id, onClose, item }) => {
           {statusPodcast?.playing ? "Pause" : "Play"}
         </Text>
       </Pressable>
-
       <Pressable style={styles.button} onPress={onClose}>
         <Text style={styles.buttonText}>Cerrar</Text>
       </Pressable>

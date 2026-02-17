@@ -1,10 +1,10 @@
 import { Pressable, StyleSheet, Text } from 'react-native';
 import React from 'react';
 
-const SubmitButton = ({ onPress, title }) => {
+const SubmitButton = ({ onPress, children }) => {
   return (
     <Pressable style={styles.submitButton} onPress={onPress}>
-      <Text style={styles.buttonText}>{title}</Text>
+      <Text style={styles.buttonText}>{children}</Text>
     </Pressable>
   );
 };

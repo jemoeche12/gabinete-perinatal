@@ -40,7 +40,7 @@ const Login = ({ navigation }) => {
           if (!dbInitialized) {
             Alert.alert(
               "Error de DB",
-              "La base de datos no está lista. Intente de nuevo."
+              "La base de datos no está lista. Intente de nuevo.",
             );
             return;
           }
@@ -53,7 +53,7 @@ const Login = ({ navigation }) => {
         } catch (error) {
           Alert.alert(
             "Error de Sesión",
-            error.message || "Error al guardar la sesión."
+            error.message || "Error al guardar la sesión.",
           );
         }
         triggerGetProfile(result.data.localId);
@@ -65,7 +65,7 @@ const Login = ({ navigation }) => {
     if (profileError) {
       Alert.alert(
         "Disculpe, algo salió mal al cargar la información",
-        JSON.stringify(profileError)
+        JSON.stringify(profileError),
       );
       return;
     }
@@ -108,7 +108,9 @@ const Login = ({ navigation }) => {
           isSecure={true}
           placeholder={"Mínimo 6 caracteres"}
         />
-        <SubmitButton onPress={onSubmit} title="Iniciar Sesion" />
+        <SubmitButton onPress={onSubmit}>
+          <Text>Inicio</Text>
+        </SubmitButton>
         <Pressable
           style={styles.button}
           onPress={() => navigation.navigate("Signup")}
