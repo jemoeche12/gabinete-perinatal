@@ -17,7 +17,7 @@ import Membresias from "./Membresias";
 
 const UpdateMembresias = ({ navigation }) => {
   const { email, localId, membresia, name, lastName } = useSelector(
-    (state) => state.auth.value
+    (state) => state.auth.value,
   );
 
   const membresiaActual = membresia?.tipo || "basico";
@@ -62,6 +62,11 @@ const UpdateMembresias = ({ navigation }) => {
         ],
         amount: selectedOption.amount / 100,
         currency: selectedOption.currency,
+        membresiaActual: {
+          amount: membresia.amount,
+          diasTotales: membresia.diasTotales,
+          fechaFin: membresia.fechaFin,
+        }
       };
 
       const response = await fetch(
@@ -72,7 +77,7 @@ const UpdateMembresias = ({ navigation }) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(requestData),
-        }
+        },
       );
 
       if (!response.ok) {
@@ -96,7 +101,7 @@ const UpdateMembresias = ({ navigation }) => {
       console.error("Error en fetchPaymentIntent:", error);
       Alert.alert(
         "Error de Conexión",
-        `No se pudo conectar con el servidor de pagos: ${error.message}`
+        `No se pudo conectar con el servidor de pagos: ${error.message}`,
       );
       return null;
     }
@@ -123,7 +128,7 @@ const UpdateMembresias = ({ navigation }) => {
         console.error("Error al inicializar PaymentSheet:", error);
         Alert.alert(
           "Error de Configuración",
-          `Error al configurar el pago: ${error.message}`
+          `Error al configurar el pago: ${error.message}`,
         );
         return false;
       }
@@ -138,13 +143,27 @@ const UpdateMembresias = ({ navigation }) => {
 
   const updateMembershipInFirebase = async () => {
     try {
+      const diasPorPeriodo = {
+        mensual: 30,
+        semestral: 180,
+        anual: 365,
+      };
+
+      const diasTotales = diasPorPeriodo[selectedOption.id] ?? 0;
+      const fechaInicio = Date.now();
+      const fechaFin = fechaInicio + diasTotales * 24 * 60 * 60 * 1000;
+
+      const membresiaData = {
+        tipo: selectedPlan,
+        subscriptionType: selectedOption.id,
+        fechaInicio,
+        fechaFin,
+        amount: selectedOption.amount,
+        diasTotales,
+      };
       await triggerUpdateProfile({
         localId,
-        membresia: {
-          tipo: selectedPlan,
-          subscriptionType: selectedOption.id,
-          fechaInicio: Date.now(),
-        },
+        membresia: membresiaData,
       }).unwrap();
 
       dispatch(
@@ -154,12 +173,8 @@ const UpdateMembresias = ({ navigation }) => {
           name,
           lastName,
           role: "user",
-          membresia: {
-            tipo: selectedPlan,
-            subscriptionType: selectedOption.id,
-            fechaInicio: Date.now(),
-          },
-        })
+          membresia: membresiaData,
+        }),
       );
 
       return true;
@@ -167,7 +182,7 @@ const UpdateMembresias = ({ navigation }) => {
       console.error("Error actualizando membresía en Firebase:", error);
       Alert.alert(
         "Error",
-        "No se pudo actualizar tu membresía. Por favor, intenta de nuevo."
+        "No se pudo actualizar tu membresía. Por favor, intenta de nuevo.",
       );
       return false;
     }
@@ -208,7 +223,7 @@ const UpdateMembresias = ({ navigation }) => {
     if (!hasChanges) {
       Alert.alert(
         "Sin cambios",
-        "Ya tienes este plan activo. Selecciona un plan diferente."
+        "Ya tienes este plan activo. Selecciona un plan diferente.",
       );
       return;
     }
@@ -246,13 +261,13 @@ const UpdateMembresias = ({ navigation }) => {
                 if (error.code === "Canceled") {
                   Alert.alert(
                     "Pago Cancelado",
-                    "Has cancelado el proceso de pago."
+                    "Has cancelado el proceso de pago.",
                   );
                 } else {
                   console.error("Error en presentPaymentSheet:", error);
                   Alert.alert(
                     "Error de Pago",
-                    `El pago no se pudo completar: ${error.message}`
+                    `El pago no se pudo completar: ${error.message}`,
                   );
                 }
                 setIsProcessing(false);
@@ -280,13 +295,13 @@ const UpdateMembresias = ({ navigation }) => {
                     navigation.goBack();
                   },
                 },
-              ]
+              ],
             );
           } catch (error) {
             console.error("Error en handleUpdateMembership:", error);
             Alert.alert(
               "Error",
-              "Ocurrió un error. Por favor, intenta de nuevo."
+              "Ocurrió un error. Por favor, intenta de nuevo.",
             );
             setIsProcessing(false);
           }
@@ -362,8 +377,8 @@ const UpdateMembresias = ({ navigation }) => {
             {!hasChanges
               ? "Selecciona un plan diferente"
               : selectedOption.amount > 0
-              ? `Pagar ${displayPrice} y Actualizar`
-              : "Actualizar Membresía"}
+                ? `Pagar ${displayPrice} y Actualizar`
+                : "Actualizar Membresía"}
           </Text>
         )}
       </Pressable>

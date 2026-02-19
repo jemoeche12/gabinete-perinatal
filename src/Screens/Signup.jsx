@@ -367,7 +367,7 @@ const Signup = ({ navigation }) => {
     if (option) {
       setSelectedOption({
         id: option.id || `${selectedPlan}_${option.period}`,
-        price: option.amount,
+        price: option.price,
         period: option.period,
         currency: option.currency,
       });

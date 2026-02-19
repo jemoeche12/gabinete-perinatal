@@ -24,7 +24,7 @@ const Membresias = ({ onSelectPlan, onSelectDuration }) => {
         "Acceso limitado a biblioteca",
         "Acceso limitado a guías",
         "Acceso limitado a podcasts",
-        "Talleres, citas y orientaciones (pago adicional)",
+        "Talleres y citas (pago adicional)",
       ],
     },
     {
@@ -32,31 +32,31 @@ const Membresias = ({ onSelectPlan, onSelectDuration }) => {
       name: "Intermedio",
       defaultPrice: "18€/mes",
       priceOptions: [
-        { 
-          id: "mensual", 
-          label: "Mensual", 
+        {
+          id: "mensual",
+          label: "Mensual",
           value: "18€/mes",
           amount: 1800,
           currency: "eur",
-          period: "mes"
+          period: "mes",
         },
-        { 
-          id: "semestral", 
-          label: "Semestral", 
-          value: "70€", 
+        {
+          id: "semestral",
+          label: "Semestral",
+          value: "70€",
           detail: "(11.67€/mes)",
           amount: 7000,
           currency: "eur",
-          period: "6 meses"
+          period: "6 meses",
         },
-        { 
-          id: "anual", 
-          label: "Anual", 
-          value: "100€", 
+        {
+          id: "anual",
+          label: "Anual",
+          value: "100€",
           detail: "(8.33€/mes)",
           amount: 10000,
           currency: "eur",
-          period: "año"
+          period: "año",
         },
       ],
       color: "#C9A690",
@@ -64,7 +64,8 @@ const Membresias = ({ onSelectPlan, onSelectDuration }) => {
         "Mayor parte del contenido desbloqueado",
         "Biblioteca ampliada",
         "Guías y podcasts extendidos",
-        "Talleres, citas y orientaciones (pago adicional)",
+        "6 Talleres gratis al año",
+        "Citas (pago adicional)",
       ],
       popular: true,
     },
@@ -79,7 +80,7 @@ const Membresias = ({ onSelectPlan, onSelectDuration }) => {
       color: "#B78270",
       features: [
         "Acceso completo a todo el contenido",
-        "1 taller gratis incluido",
+        "1 taller gratis por mes incluido",
         "Talleres y citas adicionales (pago adicional)",
       ],
     },
@@ -90,33 +91,39 @@ const Membresias = ({ onSelectPlan, onSelectDuration }) => {
     if (onSelectPlan) {
       onSelectPlan(planId);
     }
-    
+
     if (planId === "intermedio" && onSelectDuration) {
       const currentDuration = selectedDuration.intermedio || "mensual";
-      const plan = plans.find(p => p.id === "intermedio");
-      const option = plan.priceOptions.find(opt => opt.id === currentDuration);
+      const plan = plans.find((p) => p.id === "intermedio");
+      const option = plan.priceOptions.find(
+        (opt) => opt.id === currentDuration,
+      );
       onSelectDuration(option);
     }
-    
+
     if (planId === "premium" && onSelectDuration) {
-      const plan = plans.find(p => p.id === "premium");
+      const plan = plans.find((p) => p.id === "premium");
       onSelectDuration({
         amount: plan.amount,
         currency: plan.currency,
-        period: plan.period
+        period: plan.period,
       });
     }
   };
 
   const handleSelectDuration = (planId, durationId) => {
-    setSelectedDuration(prev => ({
+    setSelectedDuration((prev) => ({
       ...prev,
-      [planId]: durationId
+      [planId]: durationId,
     }));
-    
+
+    setSelectedPlan(planId);
+    if (onSelectPlan) {
+      onSelectPlan(planId);
+    }
     if (onSelectDuration) {
-      const plan = plans.find(p => p.id === planId);
-      const option = plan.priceOptions.find(opt => opt.id === durationId);
+      const plan = plans.find((p) => p.id === planId);
+      const option = plan.priceOptions.find((opt) => opt.id === durationId);
       onSelectDuration(option);
     }
   };
@@ -124,15 +131,17 @@ const Membresias = ({ onSelectPlan, onSelectDuration }) => {
   const getCurrentPrice = (plan) => {
     if (plan.priceOptions) {
       const currentDuration = selectedDuration[plan.id] || "mensual";
-      const option = plan.priceOptions.find(opt => opt.id === currentDuration);
+      const option = plan.priceOptions.find(
+        (opt) => opt.id === currentDuration,
+      );
       return {
         value: option.value,
-        detail: option.detail
+        detail: option.detail,
       };
     }
     return {
       value: plan.price,
-      detail: plan.priceDetail
+      detail: plan.priceDetail,
     };
   };
 
@@ -160,7 +169,7 @@ const Membresias = ({ onSelectPlan, onSelectDuration }) => {
               style={[
                 styles.planCard,
                 { borderColor: plan.color },
-                isSelected && styles.planCardSelected
+                isSelected && styles.planCardSelected,
               ]}
               activeOpacity={0.95}
               onPress={() => handleSelectPlan(plan.id)}
@@ -183,27 +192,33 @@ const Membresias = ({ onSelectPlan, onSelectDuration }) => {
                 <View style={styles.priceWrap}>
                   <Text style={styles.price}>{currentPrice.value}</Text>
                   {currentPrice.detail && (
-                    <Text style={styles.priceDetail}>{currentPrice.detail}</Text>
+                    <Text style={styles.priceDetail}>
+                      {currentPrice.detail}
+                    </Text>
                   )}
                 </View>
 
                 {plan.priceOptions && (
                   <View style={styles.priceOptions}>
                     {plan.priceOptions.map((opt) => {
-                      const isCurrentDuration = selectedDuration[plan.id] === opt.id;
+                      const isCurrentDuration =
+                        selectedDuration[plan.id] === opt.id;
                       return (
                         <Pressable
                           key={opt.id}
                           style={[
                             styles.priceOption,
-                            isCurrentDuration && styles.priceOptionSelected
+                            isCurrentDuration && styles.priceOptionSelected,
                           ]}
                           onPress={() => handleSelectDuration(plan.id, opt.id)}
                         >
-                          <Text style={[
-                            styles.priceOptionText,
-                            isCurrentDuration && styles.priceOptionTextSelected
-                          ]}>
+                          <Text
+                            style={[
+                              styles.priceOptionText,
+                              isCurrentDuration &&
+                                styles.priceOptionTextSelected,
+                            ]}
+                          >
                             {isCurrentDuration ? "✓ " : "• "}
                             {opt.label}: {opt.value}
                             {opt.detail && ` ${opt.detail}`}
@@ -288,20 +303,20 @@ const styles = StyleSheet.create({
     transform: [{ rotate: "45deg" }],
     zIndex: 10,
   },
-  popularText: { 
-    color: "#fff", 
-    fontWeight: "700", 
+  popularText: {
+    color: "#fff",
+    fontWeight: "700",
     fontSize: 11,
   },
-  planHeader: { 
-    paddingVertical: 14, 
-    alignItems: "center" 
+  planHeader: {
+    paddingVertical: 14,
+    alignItems: "center",
   },
-  planName: { 
-    fontSize: 20, 
-    fontWeight: "700", 
+  planName: {
+    fontSize: 20,
+    fontWeight: "700",
     color: "#fff",
-    textTransform: "capitalize"
+    textTransform: "capitalize",
   },
   planBody: {
     flex: 1,
@@ -309,26 +324,26 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     justifyContent: "space-between",
   },
-  priceWrap: { 
-    alignItems: "center", 
+  priceWrap: {
+    alignItems: "center",
     marginTop: 12,
-    marginBottom: 8
+    marginBottom: 8,
   },
-  price: { 
-    fontSize: 24, 
-    fontWeight: "800", 
-    color: "#333" 
+  price: {
+    fontSize: 24,
+    fontWeight: "800",
+    color: "#333",
   },
-  priceDetail: { 
-    fontSize: 13, 
-    color: "#666", 
-    marginTop: 2 
+  priceDetail: {
+    fontSize: 13,
+    color: "#666",
+    marginTop: 2,
   },
-  priceOptions: { 
+  priceOptions: {
     marginBottom: 12,
-    paddingHorizontal: 4
+    paddingHorizontal: 4,
   },
-  priceOption: { 
+  priceOption: {
     paddingVertical: 6,
     paddingHorizontal: 8,
     borderRadius: 6,
@@ -338,17 +353,17 @@ const styles = StyleSheet.create({
     backgroundColor: "#f0f0f0",
   },
   priceOptionText: {
-    fontSize: 13, 
-    color: "#555", 
-    lineHeight: 18
+    fontSize: 13,
+    color: "#555",
+    lineHeight: 18,
   },
   priceOptionTextSelected: {
     fontWeight: "600",
-    color: "#333"
+    color: "#333",
   },
-  featuresScroll: { 
-    maxHeight: 100, 
-    marginBottom: 8 
+  featuresScroll: {
+    maxHeight: 100,
+    marginBottom: 8,
   },
   featureRow: {
     flexDirection: "row",
@@ -361,20 +376,20 @@ const styles = StyleSheet.create({
     marginRight: 8,
     fontWeight: "700",
   },
-  featureText: { 
-    flex: 1, 
-    fontSize: 13, 
-    color: "#444", 
-    lineHeight: 18 
+  featureText: {
+    flex: 1,
+    fontSize: 13,
+    color: "#444",
+    lineHeight: 18,
   },
   selectButton: {
     paddingVertical: 10,
     borderRadius: 8,
     alignItems: "center",
   },
-  selectButtonText: { 
-    color: "#fff", 
-    fontWeight: "700" 
+  selectButtonText: {
+    color: "#fff",
+    fontWeight: "700",
   },
   footerNote: {
     fontSize: 11,

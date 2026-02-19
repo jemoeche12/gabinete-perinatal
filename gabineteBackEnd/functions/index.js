@@ -108,23 +108,35 @@ app.post("/create-payment-intent", async (req, res) => {
   });
 
   try {
-    const { amount, currency, cartItems, customerEmail, customerName } =
+    const { amount, currency, cartItems, customerEmail, customerName, membresiaActual } =
       req.body;
 
-    if (!amount || amount <= 0) {
-      return res.status(400).json({ error: "El monto debe ser mayor a 0" });
+      let amountFinal = amount;
+
+    if (membresiaActual && membresiaActual.fechaFin && membresiaActual.amount > 0) {
+
+      const ahora = Date.now();
+      const diasRestantes = (membresiaActual.fechaFin - ahora) / (1000 * 60 * 60 * 24)
+
+      if(diasRestantes > 0){
+        const creditoDiario = membresiaActual.amount / membresiaActual.diasTotales;
+        const creditoRestante = creditoDiario * diasRestantes;
+        amountFinal = Math.max(0, amount - creditoRestante / 100)
+      }
     }
 
     if (!currency) {
       return res.status(400).json({ error: "Currency es requerida" });
     }
 
-    const amountInCents = Math.round(amount * 100);
+    const amountInCents = Math.round(amountFinal * 100);
 
     const orderId = `order_${Date.now()}`;
     const productNames = cartItems
       .map((item) => item.titulo || item.name)
       .join(", ");
+
+
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amountInCents,
