@@ -18,8 +18,8 @@ import BannerMembresia from "../components/BannerMembresia";
 import { Modal } from "react-native";
 import LibraryComponent from "../components/LibraryComponent";
 
-const LibraryScreen = () => {
-  const [isMenuVisible, setIsMenuVisible] = useState(false);
+const LibraryScreen = ({visible}) => {
+  const [isMenuVisible, setIsMenuVisible] = useState(visible);
   const [requiredLevel, setRequiredLevel] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -45,7 +45,7 @@ const LibraryScreen = () => {
 
   return (
     <>
-      <CustomHeader />
+      <CustomHeader onMenuPress={toggleMenu}/>
       {isMenuVisible && (
         <MenuDesplegable onClose={toggleMenu} visible={isMenuVisible} />
       )}
