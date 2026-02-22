@@ -50,6 +50,14 @@ export const recursosApi = createApi({
         return responseTransformed;
       },
     }),
+    getProductByName: builder.query({
+  query: (productName) => `products.json?orderBy="title"&equalTo="${productName}"`,
+  transformResponse: (response) => {
+    if (!response) return null;
+    const responseTransformed = Object.values(response);
+    return responseTransformed.length > 0 ? responseTransformed[0] : null;
+  },
+}),
     getProductById: builder.query({
       query: (productId) => `products.json?orderBy="id"&equalTo=${productId}`,
       transformResponse: (response) => {
@@ -86,5 +94,6 @@ export const {
   useGetProductsByCategoryQuery,
   useGetProductByIdQuery,
   useGetProfileImageQuery,
+  useGetProductByNameQuery,
   usePostProfileImageMutation,
 } = recursosApi;

@@ -18,7 +18,7 @@ import BannerMembresia from "../components/BannerMembresia";
 import { Modal } from "react-native";
 import LibraryComponent from "../components/LibraryComponent";
 
-const LibraryScreen = ({visible}) => {
+const LibraryScreen = ({ visible }) => {
   const [isMenuVisible, setIsMenuVisible] = useState(visible);
   const [requiredLevel, setRequiredLevel] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -45,7 +45,7 @@ const LibraryScreen = ({visible}) => {
 
   return (
     <>
-      <CustomHeader onMenuPress={toggleMenu}/>
+      <CustomHeader onMenuPress={toggleMenu} />
       {isMenuVisible && (
         <MenuDesplegable onClose={toggleMenu} visible={isMenuVisible} />
       )}
@@ -63,7 +63,7 @@ const LibraryScreen = ({visible}) => {
           />
         </View>
       </Modal>
-      
+
       <FlatList
         data={categories}
         keyExtractor={(item) => item.id.toString()}
@@ -88,23 +88,19 @@ const LibraryScreen = ({visible}) => {
               <Image source={back} style={styles.backIcon} />
             </Pressable>
             <Text style={styles.text}>
-              Hemos organizado el contenido en diferentes botones temáticos,
-              para que puedas acceder fácilmente a la información que más te
-              interesa:{"\n\n"}- Encuentra información sobre cambios físicos y
-              emocionales, preparación para el parto y autocuidado.{"\n\n"}-
-              Consejos y herramientas para acompañar activamente en todo el
-              proceso.{"\n\n"}- Guía sobre cómo brindar apoyo desde la empatía y
-              el amor.{"\n\n"}- Recursos para fortalecer el lazo con tu bebé
-              desde el nacimiento.{"\n\n"}- Respuestas a preguntas comunes sobre
-              la gestación y el posparto.{"\n\n"}
-              Cada botón te llevará a contenido especializado, elaborado por
-              profesionales de la psicología perinatal.{"\n\n"}Explora, aprende
-              y vive esta etapa con toda la información.{"\n\n"}Recuerda que
-              estamos aquí para acompañarte.
+              Bienvenida/o a la sección BIBLIOTECA pensados para ti Organizamos
+              todo el contenido en botones temáticos, para que accedas fácil y
+              rápidamente a la información que necesitas. {"\n"}{"\n"}Cada botón te lleva a
+              contenido creado por profesionales de la psicología, con un
+              enfoque respetuoso y basado en evidencia. Además, cada tema está
+              identificado con un color, según la etapa del camino perinatal que
+              representa.{"\n"}{"\n"} Explora, aprende y vive esta etapa con herramientas
+              que cuidan tu bienestar emocional. {"\n"}{"\n"}Estamos para acompañarte con
+              respeto, cercanía y profesionalismo.
             </Text>
           </View>
         }
-          contentContainerStyle={styles.list}
+        contentContainerStyle={styles.list}
       />
     </>
   );
@@ -126,7 +122,10 @@ const styles = StyleSheet.create({
     width: "90%",
     marginHorizontal: "5%",
     fontSize: 24,
+    paddingTop: 20,
     paddingBottom: 20,
+    lineHeight: 28,
+    textAlign: "justify"
   },
   list: {
     backgroundColor: "#F8EDE3",
@@ -143,10 +142,10 @@ const styles = StyleSheet.create({
     height: 40,
     resizeMode: "contain",
   },
-   centeredView: {
+  centeredView: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.5)",
-   }
+  },
 });

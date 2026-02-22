@@ -6,21 +6,25 @@ import { setCategorySelected } from "../features/recursos/InformacionSlice";
 
 const CategoryItem = ({ category, navigation, canAccess, onPressLocked }) => {
   const dispatch = useDispatch();
-
   const handleNavigate = () => {
-    dispatch(setCategorySelected(category));
-    if (canAccess) {
-      navigation.navigate("ItemListCategory", { category });
-    } else {
+    if (!canAccess) {
       if (onPressLocked) onPressLocked(category.requiredLevel);
       return;
+    } else {
+      dispatch(setCategorySelected(category));
+      if (category.isDirect) {
+        navigation.navigate("Detail", { productName: category.name });
+      } else {
+        navigation.navigate("ItemListCategory", { category });
+      }
     }
   };
+ 
 
   return (
     <Card>
       <Pressable
-        style={[styles.productItem,!canAccess && styles.lockedItem]}
+        style={[styles.productItem, !canAccess && styles.lockedItem]}
         onPress={handleNavigate}
       >
         <Text

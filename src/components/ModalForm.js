@@ -36,7 +36,10 @@ const ModalForm = ({ modalVisible, setModalVisible }) => {
 
   const handleEnvioCita = async () => {
     if (!telefono.trim()) {
-      Alert.alert("Error de Formulario", "Por favor, ingresa un número de teléfono válido.");
+      Alert.alert(
+        "Error de Formulario",
+        "Por favor, ingresa un número de teléfono válido.",
+      );
       return;
     }
     if (!textConsulta.trim()) {
@@ -81,20 +84,20 @@ const ModalForm = ({ modalVisible, setModalVisible }) => {
       const emailSecretario = "jemoeche@gmail.com";
 
       await sendEmailFromClient({
-        to: [
-          { email: emailPsicologa },
-          { email: emailSecretario },
-        ],
+        to: [{ email: emailPsicologa }, { email: emailSecretario }],
         subject: "Nueva solicitud registrada",
         htmlContent: `
           <p>Hola, hemos recibido una solicitud de contacto a nombre de ${name} ${lastName}</p>
           <p>Día preferido de contacto: <strong>${diaSeleccionado}</strong></p>
+          <p>Numero de celular es: <strong>${telefono}</strong></p>
           <p>Por favor, agendar en el libro de contactos</p>
         `,
       });
     } catch (err) {
       const errorMessage =
-        err?.data?.message || err?.message || "Error desconocido al solicitar la cita.";
+        err?.data?.message ||
+        err?.message ||
+        "Error desconocido al solicitar la cita.";
       Alert.alert("Error al Enviar Solicitud", errorMessage);
     }
   };
@@ -110,8 +113,15 @@ const ModalForm = ({ modalVisible, setModalVisible }) => {
           <>
             <TextInput style={styles.input} value={name} editable={false} />
             <TextInput style={styles.input} value={lastName} editable={false} />
-            <Text style={styles.label}>Email (Nos contactaremos a este mail):</Text>
-            <TextInput style={styles.input} keyboardType="email-address" value={email} editable={false} />
+            <Text style={styles.label}>
+              Email (Nos contactaremos a este mail):
+            </Text>
+            <TextInput
+              style={styles.input}
+              keyboardType="email-address"
+              value={email}
+              editable={false}
+            />
           </>
         )}
 
@@ -127,7 +137,11 @@ const ModalForm = ({ modalVisible, setModalVisible }) => {
 
         <Text style={styles.label}>Día de preferencia para el contacto:</Text>
         <View style={styles.pickerContainer}>
-          <Picker selectedValue={diaSeleccionado} onValueChange={setDiaSeleccionado} style={styles.picker}>
+          <Picker
+            selectedValue={diaSeleccionado}
+            onValueChange={setDiaSeleccionado}
+            style={styles.picker}
+          >
             {diasDisponibles.map((dia) => (
               <Picker.Item key={dia} label={dia} value={dia} />
             ))}
@@ -145,11 +159,20 @@ const ModalForm = ({ modalVisible, setModalVisible }) => {
           placeholderTextColor="#999"
         />
 
-        <Pressable style={styles.button} onPress={handleEnvioCita} disabled={isCrearCita || profileLoading}>
-          <Text style={styles.buttonText}>{isCrearCita ? "Enviando Solicitud..." : "Solicitar"}</Text>
+        <Pressable
+          style={styles.button}
+          onPress={handleEnvioCita}
+          disabled={isCrearCita || profileLoading}
+        >
+          <Text style={styles.buttonText}>
+            {isCrearCita ? "Enviando Solicitud..." : "Solicitar"}
+          </Text>
         </Pressable>
 
-        <Pressable style={[styles.button, styles.closeButton]} onPress={() => setModalVisible(false)}>
+        <Pressable
+          style={[styles.button, styles.closeButton]}
+          onPress={() => setModalVisible(false)}
+        >
           <Text style={styles.buttonText}>Cerrar</Text>
         </Pressable>
       </ScrollView>

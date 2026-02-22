@@ -6,7 +6,7 @@ import {
   ScrollView,
   Image,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useGetTallerByIdQuery } from "../services/talleresService";
 import iconImageLoading from "../../assets/Red.png";
 import CustomHeader from "../components/CustomHeader";
@@ -14,15 +14,60 @@ import MenuDesplegable from "../components/MenuDesplegable";
 import { useDispatch, useSelector } from "react-redux";
 import { addCartItem } from "../features/cart/CartSlice";
 import back from "../../assets/icon/back.png";
+import { useVideoPlayer, VideoView } from "expo-video";
+import { getDownloadURL, getStorage, ref } from "firebase/storage";
+
+const VideoPlayer = ({ uri }) => {
+  const player = useVideoPlayer({ uri }, (player) => {
+    ((player.loop = false), (player.muted = false));
+  });
+
+  return (
+    <VideoView
+      player={player}
+      style={styles.video}
+      nativeControls={true}
+      contentFit="cover"
+      allowsFullscreen={true}
+    />
+  );
+};
 
 const DetailTalleres = ({ route, navigation, visible }) => {
   const { tallerId } = route.params;
   const { data: taller, isLoading, error } = useGetTallerByIdQuery(tallerId);
   const [isMenuVisible, setIsMenuVisible] = useState(visible);
+  const [videoUrl, setVideoUrl] = useState({ url1: null, url2: null });
   const dispatch = useDispatch();
 
   const cartItems = useSelector((state) => state.cart.value.itemCart);
   const isCartEmpty = cartItems.length === 0;
+
+  useEffect(() => {
+    const fetchVideo = async () => {
+      try {
+        const storage = getStorage();
+        const promise = [
+          taller?.storagePath1
+            ? getDownloadURL(ref(storage, taller.storagePath1))
+            : Promise.resolve(null),
+          taller?.storagePath2
+            ? getDownloadURL(ref(storage, taller.storagePath2))
+            : Promise.resolve(null),
+        ];
+
+        const [url1, url2] = await Promise.all(promise);
+        setVideoUrl({ url1, url2 });
+      } catch (error) {
+        console.error(error);
+        setVideoUrl({ url1: null, url2: null });
+      }
+    };
+
+    if (taller?.storagePath1 || taller?.storagePath2) {
+      fetchVideo();
+    }
+  }, [taller]);
 
   const handleAddItem = () => {
     dispatch(addCartItem({ ...taller }));
@@ -45,8 +90,7 @@ const DetailTalleres = ({ route, navigation, visible }) => {
     setIsMenuVisible(!isMenuVisible);
   };
 
-  const formatText = (text) =>
-  text?.replace(/\n+/g, " ").trim();
+  const formatText = (text) => text?.replace(/\n+/g, " ").trim();
 
   return (
     <>
@@ -64,6 +108,8 @@ const DetailTalleres = ({ route, navigation, visible }) => {
         <Text style={styles.title}>{taller.titulo}</Text>
         <Text style={styles.description}>{taller.objetivo}</Text>
         <Text style={styles.contenidos}>{formatText(taller.contenidos)}</Text>
+        {videoUrl.url1 && <VideoPlayer uri={videoUrl.url1} />}
+        {videoUrl.url2 && <VideoPlayer uri={videoUrl.url2} />}
         <View style={styles.modalidad}>
           <Text style={styles.modalidadText}>Dia: {taller.modalidad.dia}</Text>
           <Text style={styles.modalidadText}>
@@ -96,6 +142,12 @@ const DetailTalleres = ({ route, navigation, visible }) => {
 
 export default DetailTalleres;
 const styles = StyleSheet.create({
+  video: {
+    width: "100%",
+    height: 220,
+    borderRadius: 8,
+    marginBottom: 24,
+  },
   scrollContainer: {
     flexGrow: 1,
     padding: 16,
