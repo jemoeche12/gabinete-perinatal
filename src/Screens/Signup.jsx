@@ -520,7 +520,7 @@ const Signup = ({ navigation }) => {
               ) : (
                 <Text
                   style={{
-                    color: "#fff",
+                    color: "black",
                     fontSize: 18,
                     fontWeight: "600",
                     textAlign: "center",
