@@ -1,8 +1,20 @@
-import { StyleSheet, Text, View, Image, Pressable, ImageBackground, Button } from "react-native";
-import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  Pressable,
+  ImageBackground,
+  Button,
+} from "react-native";
+import {
+  useAudioPlayer,
+  useAudioPlayerStatus,
+  setAudioModeAsync,
+} from "expo-audio";
 import { useGetPodcastByIdQuery } from "../services/podcastService";
 import { useEffect } from "react";
-import fondo from '../../assets/fondos/PODCAST.jpg';
+import fondo from "../../assets/fondos/PODCAST.jpg";
 
 const ModalAudioPodcast = ({ id, onClose, item }) => {
   const audioSource = useGetPodcastByIdQuery(id);
@@ -10,6 +22,14 @@ const ModalAudioPodcast = ({ id, onClose, item }) => {
 
   const player = useAudioPlayer(podcastUrl || "", { updateInterval: 1000 });
   const statusPodcast = useAudioPlayerStatus(player);
+
+  useEffect(() => {
+    setAudioModeAsync({
+      playsInSilentMode: true,
+      staysActiveInBackground: true,
+      shouldPlayInBackground: true,
+    });
+  }, []);
 
   useEffect(() => {
     if (podcastUrl && player) {
@@ -52,7 +72,7 @@ const ModalAudioPodcast = ({ id, onClose, item }) => {
   };
 
   return (
-    <ImageBackground  source={fondo} style={styles.container}>
+    <ImageBackground source={fondo} style={styles.container}>
       {item?.urlImagen ? (
         <Image style={styles.image} source={{ uri: item.urlImagen }} />
       ) : (
@@ -63,7 +83,7 @@ const ModalAudioPodcast = ({ id, onClose, item }) => {
         {item?.descripcion || "Sin descripción"}
       </Text>
 
-       <Pressable
+      <Pressable
         style={styles.button}
         onPress={handlePlayPause}
         disabled={!podcastUrl}
@@ -106,11 +126,10 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    color:"black",
+    color: "black",
     fontWeight: "bold",
     marginTop: 8,
     textAlign: "center",
-
   },
   description: {
     color: "black",
@@ -125,15 +144,15 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: "center",
   },
-   button: {
-    backgroundColor: "white", 
+  button: {
+    backgroundColor: "white",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
     marginTop: 10,
   },
   buttonText: {
-    color: "black", 
+    color: "black",
     fontWeight: "bold",
     textAlign: "center",
   },

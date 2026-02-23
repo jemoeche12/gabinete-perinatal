@@ -11,10 +11,7 @@
       "image": "./assets/Red.png",
       "resizeMode": "cover",
       "backgroundColor": "#ffffff",
-      "imageSize": [
-        500,
-        500
-      ]
+      "imageSize": [500, 500]
     },
     "ios": {
       "supportsTablet": true
@@ -24,7 +21,8 @@
         "foregroundImage": "./assets/Red.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.jemoeche.gabineteperinatal"
+      "package": "com.jemoeche.gabineteperinatal",
+      "permissions": ["android.permission.FOREGROUND_SERVICE"]
     },
     "web": {
       "favicon": "./assets/Red.png"
