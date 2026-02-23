@@ -36,6 +36,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Roboto400',
     backgroundColor: "#fff",
+    color: "#000",
     marginBottom: 10,
   },
 })

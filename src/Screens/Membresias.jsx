@@ -92,6 +92,18 @@ const Membresias = ({ onSelectPlan, onSelectDuration }) => {
       onSelectPlan(planId);
     }
 
+    if(planId === "basico" && onSelectDuration){
+      onSelectDuration(
+        {
+          id: "basico",
+          amount: 0,
+          currency: "eur",
+          period: "gratis",
+          display: "Gratis"
+        }
+      )
+    }
+
     if (planId === "intermedio" && onSelectDuration) {
       const currentDuration = selectedDuration.intermedio || "mensual";
       const plan = plans.find((p) => p.id === "intermedio");
