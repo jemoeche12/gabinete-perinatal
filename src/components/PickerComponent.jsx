@@ -9,15 +9,16 @@ const PickerComponent = ({ motivo, setMotivo }) => {
         onValueChange={(itemValue) => setMotivo(itemValue)}
         style={styles.picker}
       >
-        <Picker.Item label="Seleccioná un motivo..." value="" />
-        <Picker.Item label="Consulta general sobre la app" value="consulta" />
+        <Picker.Item label="Seleccioná un motivo..." value="" color="#000000" />
+        <Picker.Item label="Consulta general sobre la app" value="consulta" color="#000000" />
         <Picker.Item
           label="Necesito orientación emocional"
           value="orientacion"
+          color="#000000"
         />
-        <Picker.Item label="Problemas técnicos o errores" value="tecnico" />
-        <Picker.Item label="Sugerencia o mejora" value="sugerencia" />
-        <Picker.Item label="Otro" value="otro" />
+        <Picker.Item label="Problemas técnicos o errores" value="tecnico" color="#000000"/>
+        <Picker.Item label="Sugerencia o mejora" value="sugerencia" color="#000000"/>
+        <Picker.Item label="Otro" value="otro" color="#000000"/>
       </Picker>
     </View>
   );
