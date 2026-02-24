@@ -45,7 +45,7 @@ const SobreNosotros = () => {
           comunidad. {"\n\n"}La creación de esta app surge del deseo de ampliar
           el alcance del acompañamiento psicológico, acercando recursos de
           calidad a quienes no siempre pueden acceder a un espacio terapéutico
-          tradicional.{"\n\n"} Nuestro propósito Nuestro propósito es tender
+          tradicional.{"\n\n"} Nuestro propósito es tender
           redes, humanizar el cuidado en salud mental y ofrecer un
           acompañamiento respetuoso, cercano y sensible.{"\n\n"}
           Acompañar implica estar, sostener, escuchar y validar. La Red de Apoyo

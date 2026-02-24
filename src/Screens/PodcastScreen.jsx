@@ -103,7 +103,7 @@ const PodcastScreen = () => {
                 key={index}
                 label={cat}
                 value={cat}
-                style={{ fontWeight: "bold", color: "black" }}
+                style={{ fontWeight: "bold", color: "black", backgroundColor: "white" }}
               />
             ))}
           </Picker>

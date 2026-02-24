@@ -121,7 +121,7 @@ const FormComponent = () => {
         keyboardType="email-address"
       />
       <Text style={styles.label}>Motivo de contacto:</Text>
-      <PickerComponent motivo={motivo} setMotivo={setMotivo} />
+      <PickerComponent style={styles.motivoForm} motivo={motivo} setMotivo={setMotivo} />
       <TextInput
         style={[styles.input, styles.textArea]}
         multiline
@@ -244,6 +244,9 @@ const styles = StyleSheet.create({
   },
   radioSelected: {
     backgroundColor: "#B78270",
+  },
+  motivoForm:{
+    color: "black"
   },
   radioLabel: {
     fontSize: 16,

@@ -28,7 +28,7 @@ const VideoPlayer = ({ uri }) => {
       style={styles.video}
       nativeControls={true}
       contentFit="cover"
-      allowsFullscreen={true}
+      fullscreenOptions={{isEnable: true}}
     />
   );
 };

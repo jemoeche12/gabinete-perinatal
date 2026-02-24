@@ -6,7 +6,7 @@ import UpdateMembresias from "../Screens/UpdateMembresias";
 
 
 
-const guidesStackNavigator = () => {
+const GuidesStackNavigator = () => {
     const Stack = createNativeStackNavigator();
     return (
         <Stack.Navigator initialRouteName="Guides" screenOptions={{
@@ -23,4 +23,4 @@ const guidesStackNavigator = () => {
 }
 
 
-export default guidesStackNavigator;
+export default GuidesStackNavigator;

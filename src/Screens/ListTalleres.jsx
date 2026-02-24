@@ -33,6 +33,9 @@ const ListTalleres = ({ navigation, visible }) => {
       </View>
     );
   if (error) return <Text>Error: {error.message}</Text>;
+
+  const sortedData = data ? [...data].sort((a, b) => a.price - b.price) : [];
+
   return (
     <>
       <CustomHeader onMenuPress={toggleMenu} />
@@ -48,7 +51,7 @@ const ListTalleres = ({ navigation, visible }) => {
         </Pressable>
         <FlatList
           contentContainerStyle={{ paddingBottom: 200 }}
-          data={data}
+          data={sortedData}
           keyExtractor={(item) => item.id.toString()}
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (
