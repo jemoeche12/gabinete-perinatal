@@ -11,20 +11,25 @@
       "image": "./assets/Red.png",
       "resizeMode": "cover",
       "backgroundColor": "#ffffff",
-      "imageSize": [500, 500]
+      "imageSize": [
+        500,
+        500
+      ]
     },
     "ios": {
       "supportsTablet": true
     },
     "android": {
-  "adaptiveIcon": {
-    "foregroundImage": "./assets/Red.png",
-    "backgroundColor": "#ffffff"
-  },
-  "package": "com.jemoeche.gabineteperinatal",
-  "permissions": ["android.permission.FOREGROUND_SERVICE"],
-  "versionCode": 2
-},
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/Red.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.jemoeche.gabineteperinatal",
+      "permissions": [
+        "android.permission.FOREGROUND_SERVICE"
+      ],
+      "versionCode": 2
+    },
     "web": {
       "favicon": "./assets/Red.png"
     },
@@ -39,7 +44,8 @@
       ],
       "expo-font",
       "expo-video",
-      "expo-audio"
+      "expo-audio",
+      "expo-web-browser"
     ],
     "extra": {
       "eas": {
