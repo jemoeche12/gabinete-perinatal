@@ -85,7 +85,7 @@ const PodcastScreen = () => {
             >
               <Image source={back} style={styles.backIcon} />
             </Pressable>
-            <Text style={styles.title}>Podcast</Text>
+            <Text style={styles.title}>PODCAST</Text>
           </View>
           <Picker
             selectedValue={categoriaSeleccionada}
@@ -98,6 +98,7 @@ const PodcastScreen = () => {
               value="todos"
               style={styles.pickerItem}
             />
+
             {categoriesPodcast.map((cat, index) => (
               <Picker.Item
                 key={index}
