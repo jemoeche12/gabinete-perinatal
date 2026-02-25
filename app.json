@@ -30,7 +30,6 @@
     },
     "plugins": [
       "expo-sqlite",
-      "expo-web-browser",
       [
         "@stripe/stripe-react-native",
         {
