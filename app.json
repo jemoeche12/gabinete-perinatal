@@ -2,7 +2,7 @@
   "expo": {
     "name": "Red de Apoyo Perinatal",
     "slug": "gabinete-perinatal",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/Red.png",
     "userInterfaceStyle": "dark",
@@ -17,13 +17,14 @@
       "supportsTablet": true
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/Red.png",
-        "backgroundColor": "#ffffff"
-      },
-      "package": "com.jemoeche.gabineteperinatal",
-      "permissions": ["android.permission.FOREGROUND_SERVICE"]
-    },
+  "adaptiveIcon": {
+    "foregroundImage": "./assets/Red.png",
+    "backgroundColor": "#ffffff"
+  },
+  "package": "com.jemoeche.gabineteperinatal",
+  "permissions": ["android.permission.FOREGROUND_SERVICE"],
+  "versionCode": 2
+},
     "web": {
       "favicon": "./assets/Red.png"
     },
