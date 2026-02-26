@@ -69,6 +69,11 @@ const TestDetailScreen = ({ route, navigation }) => {
     setModalVisible(true);
   };
 
+  const handleRedirect = () => {
+    setModalVisible(!modalVisible)
+    navigation.navigate("Tests")
+  }
+
   return (
       <ScrollView contentContainerStyle={styles.container}>
       <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
@@ -144,7 +149,7 @@ const TestDetailScreen = ({ route, navigation }) => {
               <Text style={styles.scoreText}>{mensajeResultado}</Text>
               <Pressable
                 style={[styles.button, styles.buttonClose]}
-                onPress={() => setModalVisible(!modalVisible)}
+                onPress={handleRedirect}
               >
                 <Text style={styles.buttonText}>Cerrar</Text>
               </Pressable>
