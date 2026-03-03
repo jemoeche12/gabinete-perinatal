@@ -11,10 +11,7 @@
       "image": "./assets/Red.png",
       "resizeMode": "cover",
       "backgroundColor": "#ffffff",
-      "imageSize": [
-        300,
-        300
-      ]
+      "imageSize": [300, 300]
     },
     "ios": {
       "supportsTablet": true
@@ -26,7 +23,11 @@
       },
       "package": "com.jemoeche.gabineteperinatal",
       "permissions": [
-        "android.permission.FOREGROUND_SERVICE"
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.READ_MEDIA_IMAGES"
       ],
       "versionCode": 3
     },
