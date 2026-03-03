@@ -37,12 +37,15 @@ const Talleres = ({ navigation, visible }) => {
           <FuncionTalleres />
         </ScrollView>
       </ImageBackground>
-      <AddButton
-        style={styles.btnTalleres}
-        title="Talleres"
-        onPress={() => navigation.navigate("ListTalleres")}
-        iconSource={iconTalleres}
-      />
+
+      <View style={styles.viewBtnTalleres}>
+        <AddButton
+          style={styles.btnTalleres}
+          title="Talleres"
+          onPress={() => navigation.navigate("ListTalleres")}
+          iconSource={iconTalleres}
+        />
+      </View>
     </View>
   );
 };
@@ -72,14 +75,16 @@ const styles = StyleSheet.create({
     padding: 20,
     fontFamily: "Roboto400",
   },
-    btnTalleres: {
-  position: "absolute",
-  right: 20,
-  bottom: 40,
-  backgroundColor: "#E6C6B7",
-  width: 100,
-  height: 100,
-  zIndex: 10,
-  elevation: 10,
+  viewBtnTalleres: {
+    position: "absolute",
+    right: 20,
+    bottom: 30,
+    zIndex: 10,
+    elevation: 10,
+  },
+  btnTalleres: {
+    backgroundColor: "#E6C6B7",
+    width: 100,
+    height: 100,
   },
 });

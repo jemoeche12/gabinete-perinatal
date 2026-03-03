@@ -92,8 +92,19 @@ const Login = ({ navigation }) => {
   ]);
 
   const onSubmit = () => {
-    triggerSignIn({ email, password });
+    if(!email || !password) {
+      setErrorMail(!email ? "El email esta mal" : "");
+      setErrorPassword(!password ? "La contraseña esta mal" : "");
+    } else {
+      triggerSignIn({ email, password });
+    }
   };
+  
+  useEffect(() => {
+    if (result.isError) {
+      Alert.alert(result.error.message || "Error al iniciar sesión. Tu mail o contraseña son incorrectos.");
+    }
+  }, [result.isError, result.error]);
 
   return (
     <ImageBackground source={fondoLogin} style={styles.container}>
