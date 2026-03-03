@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
   },
   centeredView: {
     flex: 1,
-
+    paddingTop: 22,
     backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalView: {

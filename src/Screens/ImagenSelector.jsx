@@ -6,16 +6,14 @@ import { usePostProfileImageMutation } from "../services/recursosService";
 import * as ImagePicker from "expo-image-picker";
 import { setImageCamera } from "../features/user/UserSlice";
 import { colors } from "../utils/customerStyle";
-import camera from "../../assets/icon/photo.png"
+import camera from "../../assets/icon/photo.png";
 import otherPhoto from "../../assets/icon/otherPhoto.png";
 import confirmPhoto from "../../assets/icon/confirmPhoto.png";
 
 const ImagenSelector = ({ navigation }) => {
   const [image, setImage] = useState(null);
   const [triggerPostImage, result] = usePostProfileImageMutation();
-
   const { localId } = useSelector((state) => state.auth.value);
-
   const dispatch = useDispatch();
 
   const verifyCameraPermission = async () => {
@@ -38,6 +36,29 @@ const ImagenSelector = ({ navigation }) => {
           const img = `data:image/jpg;base64,${result.assets[0].base64}`;
           setImage(img);
         }
+      }
+    } catch (error) {
+      alert(error);
+    }
+  };
+
+  const pickImageFromGallery = async () => {
+    try {
+      const permissionCamera = await verifyCameraPermission();
+      if (permissionCamera) {
+        let result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: (ImagePicker.MediaType = "images"),
+          allowsEditing: true,
+          aspect: [1, 1],
+          base64: true,
+          quality: 0.2,
+        });
+        if (!result.canceled) {
+          const img = `data:image/jpg;base64,${result.assets[0].base64}`;
+          setImage(img);
+        }
+      } else {
+        alert("Necesita permiso para acceder a la galeria de fotos");
       }
     } catch (error) {
       alert(error);
@@ -77,9 +98,17 @@ const ImagenSelector = ({ navigation }) => {
           <View style={styles.noFotoContainer}>
             <Text>No hay ninguna Foto</Text>
           </View>
-          <AddButton title="Tomar una Foto" onPress={pickImage}
+          <AddButton
+            title="Tomar una Foto"
+            onPress={pickImage}
             style={[styles.addButton, { backgroundColor: colors.btnCita }]}
             iconSource={camera}
+          />
+          <AddButton
+            title="Elegir de Galería"
+            onPress={pickImageFromGallery}
+            style={[styles.addButton, { backgroundColor: colors.btnGuia }]}
+            iconSource={otherPhoto}
           />
         </>
       )}
@@ -96,7 +125,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     gap: 20,
     marginTop: 40,
-    
   },
   image: {
     width: 200,
@@ -111,7 +139,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 10,
-     },
+  },
   addButton: {
     width: 135,
     height: 90,

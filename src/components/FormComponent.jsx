@@ -246,7 +246,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#B78270",
   },
   motivoForm:{
-    color: "black"
+    color: "black",
+    backgroundColor: "white",
   },
   radioLabel: {
     fontSize: 16,

@@ -14,12 +14,15 @@ const CommentItem = ({ comment, onDelete, onUpdate, userData }) => {
   const isOwner = comment.userId === userData?.localId;
   const isAdmin = userData?.role === "admin";
 
+  const name = userData?.name || "Usuario Anónimo";
+  
+
   return (
     <View style={styles.container}>
       {!isEditing && (
         <View>
+          <Text style={styles.text}>{name}</Text>
           <Text style={styles.text}>{comment.text}</Text>
-
           {(isOwner || isAdmin) && (
             <View style={styles.actionRow}>
               <Pressable onPress={() => setIsEditing(true)}>

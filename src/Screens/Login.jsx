@@ -166,5 +166,6 @@ const styles = StyleSheet.create({
     color: "black",
     fontSize: 18,
     fontFamily: "Roboto400",
+    placeholderTextColor: "gray",
   },
 });
