@@ -50,6 +50,7 @@ const ComunidadScreen = () => {
     ...authData,
     name: profileDate?.name || authData.name || "",
     lastName: profileDate?.lastName || authData.lastName || "",
+    img: authData.imageCamera || profileDate?.imageCamera || "",
   };
 
   const [refreshing, setRefreshing] = useState(false);
@@ -61,11 +62,9 @@ const ComunidadScreen = () => {
     const unsubscribePromise = dispatch(fetchPostsThunks());
 
     return () => {
-      unsubscribePromise.then((unsubscribe) => {
-        if (typeof unsubscribe === "function") {
-          unsubscribe();
-        }
-      });
+      if (typeof unsubscribe === "function") {
+        unsubscribe();
+      }
     };
   }, [dispatch]);
 
@@ -74,11 +73,9 @@ const ComunidadScreen = () => {
       const unsubscribePromise = dispatch(fetchCommentsThunks(postExpanded));
 
       return () => {
-        unsubscribePromise.then((unsubscribe) => {
-          if (typeof unsubscribe === "function") {
-            unsubscribe();
-          }
-        });
+        if (typeof unsubscribe === "function") {
+          unsubscribe();
+        }
       };
     }
   }, [dispatch, postExpanded]);
@@ -130,12 +127,14 @@ const ComunidadScreen = () => {
   const renderPost = ({ item }) => {
     const isExpanded = postExpanded === item.id;
 
+
     return (
       <View style={styles.postContainer}>
         <PostHeader
           name={item.name}
           avatar={item.avatar}
           createdAt={item.createdAt}
+          userData={userData}
         />
         <PostContent text={item.text} img={item.img} counter={item.counter} />
         <View style={styles.actionsContainer}>

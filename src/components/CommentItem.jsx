@@ -4,8 +4,11 @@ import {
   Text,
   TextInput,
   View,
+  Image,
 } from "react-native";
 import React, { useState } from "react";
+import { useGetProfileImageQuery } from "../services/recursosService";
+import { useGetProfileQuery } from "../services/userService";
 
 const CommentItem = ({ comment, onDelete, onUpdate, userData }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -14,14 +17,27 @@ const CommentItem = ({ comment, onDelete, onUpdate, userData }) => {
   const isOwner = comment.userId === userData?.localId;
   const isAdmin = userData?.role === "admin";
 
-  const name = userData?.name || "Usuario Anónimo";
-  
+  const { data: nameProfile } = useGetProfileQuery(comment.userId);
 
+  const name = nameProfile?.name || "Usuario Anónimo";
+  const imageComment = useGetProfileImageQuery(comment.userId, {
+    skip: !comment.userId,
+  });
   return (
     <View style={styles.container}>
       {!isEditing && (
         <View>
-          <Text style={styles.text}>{name}</Text>
+          <View style={styles.userRow}>
+            <Image
+              source={
+                imageComment.data
+                  ? { uri: imageComment.data.image }
+                  : require("../../assets/icon/avatar.png")
+                }
+              style={styles.userImage}
+            />
+            <Text style={styles.text}>{name}</Text>
+          </View>
           <Text style={styles.text}>{comment.text}</Text>
           {(isOwner || isAdmin) && (
             <View style={styles.actionRow}>
@@ -77,9 +93,12 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 14,
+    textAlign: "right",
+    marginVertical: 4,
   },
   actionRow: {
     flexDirection: "row",
+    justifyContent: "flex-end",
     gap: 12,
     marginTop: 8,
   },
@@ -93,5 +112,17 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderRadius: 6,
     minHeight: 40,
+    alignItems: "flex-end",
+  },
+  userImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
+  userRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    gap: 8,
   },
 });

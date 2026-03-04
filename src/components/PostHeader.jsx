@@ -1,16 +1,16 @@
 import { StyleSheet, Text, View, Image } from "react-native";
-import avatar from "../../assets/Red.png"
-import React from "react";
+import { useGetProfileImageQuery } from "../services/recursosService";
 
-const PostHeader = ({ name, avatar, createdAt }) => {
+const PostHeader = ({ name, avatar, createdAt, userData }) => {
   const formattedDate = new Date(createdAt).toLocaleString();
 
-  const avatar2 = "../../assets/Red.png"
+  
 
   return (
     <View style={styles.container}>
+
       <Image
-        source={{ uri: avatar2 }}
+        source={{ uri: avatar }}
         style={styles.avatar}
       />
       <View>

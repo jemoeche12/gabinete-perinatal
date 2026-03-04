@@ -52,31 +52,39 @@ export const addComment = async (postId, text, userData) => {
   }
 };
 
-export const getComments = (postId, onUpdate) => {
+export const getComments = (postId, onUpdate, onError) => {
   try {
     const postIdValidation = validateId(postId, "Post ID");
     if (!postIdValidation.valid) {
-      return { success: false, message: postIdValidation.message };
+      onError?.(postIdValidation.message);
+      return () => {};
     }
 
     const commentRef = ref(db, `comments/${postIdValidation.value}`);
-    const listener = onValue(commentRef, (snapshot) => {
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        const comments = Object.entries(data)
-          .map(([id, commentsData]) => ({
-            id,
-            ...commentsData,
-          }))
-          .sort((a, b) => a.createdAt - b.createdAt);
-        onUpdate(comments);
-      } else {
-        onUpdate([]);
+
+    const listener = onValue(
+      commentRef,
+      (snapshot) => {
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          const comments = Object.entries(data)
+            .map(([id, commentsData]) => ({ id, ...commentsData }))
+            .sort((a, b) => a.createdAt - b.createdAt);
+          onUpdate(comments);
+        } else {
+          onUpdate([]);
+        }
+      },
+      (error) => {
+        console.error("Error al obtener los comentarios", error);
+        onError?.(error);
       }
-    });
+    );
+
     return () => off(commentRef, "value", listener);
   } catch (error) {
     console.error("Error al obtener los comentarios", error);
+    onError?.(error);
     return () => {};
   }
 };

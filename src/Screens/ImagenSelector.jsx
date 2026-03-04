@@ -65,14 +65,16 @@ const ImagenSelector = ({ navigation }) => {
     }
   };
 
-  const confirmImage = () => {
-    try {
-      dispatch(setImageCamera(image));
-      triggerPostImage({ localId, image });
-      navigation.goBack();
-    } catch (erro) {
-      alert(erro);
-    }
+  const confirmImage =  async() => {
+    if (image) {
+      try {
+        dispatch(setImageCamera(image));
+        await triggerPostImage({ localId, image }).unwrap();
+        navigation.goBack();
+      } catch (error) {
+        alert(error);
+      }
+    } 
   };
 
   return (

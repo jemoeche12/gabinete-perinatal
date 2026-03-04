@@ -26,6 +26,7 @@ export const addPost = async (text, img, userData) => {
     if (!textValidation.valid)
       return { success: false, message: textValidation.message };
 
+
     const userValidation = validateUser(userData);
     if (!userValidation.valid) {
       return { success: false, message: userValidation.message };
@@ -43,7 +44,7 @@ export const addPost = async (text, img, userData) => {
       }`.trim(),
       text: cleanedText,
       createdAt: Date.now(),
-      avatar: userData.avatar || null,
+      avatar: userData.img || userData.avatar || null,
       img: img || null,
       counter: 0,
     };
