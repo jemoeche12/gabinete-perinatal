@@ -2,7 +2,7 @@
   "expo": {
     "name": "Red de Apoyo Perinatal",
     "slug": "gabinete-perinatal",
-    "version": "1.0.4",
+    "version": "1.0.6",
     "orientation": "portrait",
     "icon": "./assets/Red.png",
     "userInterfaceStyle": "dark",
@@ -29,7 +29,7 @@
         "android.permission.WRITE_EXTERNAL_STORAGE",
         "android.permission.READ_MEDIA_IMAGES"
       ],
-      "versionCode": 5
+      "versionCode": 6
     },
     "web": {
       "favicon": "./assets/Red.png"
