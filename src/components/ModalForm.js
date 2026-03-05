@@ -143,7 +143,7 @@ const ModalForm = ({ modalVisible, setModalVisible }) => {
             style={styles.picker}
           >
             {diasDisponibles.map((dia) => (
-              <Picker.Item key={dia} label={dia} value={dia} />
+              <Picker.Item key={dia} label={dia} value={dia} style={{color: "black", backgroundColor: "white"}}/>
             ))}
           </Picker>
         </View>

@@ -121,7 +121,7 @@ const FormComponent = () => {
         keyboardType="email-address"
       />
       <Text style={styles.label}>Motivo de contacto:</Text>
-      <PickerComponent style={styles.motivoForm} motivo={motivo} setMotivo={setMotivo} />
+      <PickerComponent style={{color: "black", backgroundColor: "white"}} motivo={motivo} setMotivo={setMotivo} />
       <TextInput
         style={[styles.input, styles.textArea]}
         multiline

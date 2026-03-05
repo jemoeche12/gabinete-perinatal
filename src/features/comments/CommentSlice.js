@@ -19,12 +19,12 @@ export const commentSlice = createSlice({
       state.comments.push(payload);
     },
     removeCommentLocal: (state, { payload }) => {
-      state.comments = state.comments.filter(comment => comment.id !== payload.id);
+      state.comments = state.comments.filter(comment => comment.id !== payload);
     },
     updateCommentLocal: (state, { payload }) => {
       const index = state.comments.findIndex(comment => comment.id === payload.id);
       if (index !== -1) {
-        state.comments[index] = payload;
+        state.comments[index] = { ...state.comments[index], text: payload.text };
       }
     },
     setLoading: (state, { payload }) => {

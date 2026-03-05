@@ -126,7 +126,7 @@ export const deleteComment = async (postId, commentId, userData) => {
   }
 };
 
-export const updateComment = async (postId, commentId, userData, newText) => {
+export const updateComment = async (postId, commentId, newText, userData) => {
 
   const postCheck = validateId(postId, "post ID");
   if(!postCheck.valid) return {valid: false, message: postCheck.message};

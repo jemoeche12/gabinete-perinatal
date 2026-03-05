@@ -6,7 +6,7 @@ import {
   View,
   Image,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useGetProfileImageQuery } from "../services/recursosService";
 import { useGetProfileQuery } from "../services/userService";
 
@@ -20,9 +20,16 @@ const CommentItem = ({ comment, onDelete, onUpdate, userData }) => {
   const { data: nameProfile } = useGetProfileQuery(comment.userId);
 
   const name = nameProfile?.name || "Usuario Anónimo";
+  const lastname = nameProfile?.lastName || "";
   const imageComment = useGetProfileImageQuery(comment.userId, {
     skip: !comment.userId,
   });
+
+  useEffect(() => {
+    setNewText(comment.text);
+  }, [comment.text]);
+
+  
   return (
     <View style={styles.container}>
       {!isEditing && (
@@ -33,10 +40,15 @@ const CommentItem = ({ comment, onDelete, onUpdate, userData }) => {
                 imageComment.data
                   ? { uri: imageComment.data.image }
                   : require("../../assets/icon/avatar.png")
-                }
+              }
               style={styles.userImage}
             />
-            <Text style={styles.text}>{name}</Text>
+            <View style={{ alignItems: "flex-end", flexDirection: "column" }} >
+              <Text style={styles.textName}>{name} {lastname}</Text>
+              <Text style={styles.textDate}>
+                {new Date(comment.createdAt).toLocaleString()}
+              </Text>
+            </View>
           </View>
           <Text style={styles.text}>{comment.text}</Text>
           {(isOwner || isAdmin) && (
@@ -91,10 +103,21 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
   },
-  text: {
-    fontSize: 14,
+  textName: {
+    fontSize: 16,
+    fontWeight: "bold",
     textAlign: "right",
-    marginVertical: 4,
+  },
+  text: {
+    fontSize: 16,
+    textAlign: "right",
+    marginBottom: 8,
+    marginTop: 8,
+  },
+  textDate: {
+    fontSize: 12,
+    color: "#666",
+    textAlign: "right",
   },
   actionRow: {
     flexDirection: "row",

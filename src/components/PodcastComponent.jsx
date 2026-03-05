@@ -37,17 +37,17 @@ const styles = StyleSheet.create({
   containerPodcast: {
     alignItems: "center",
     borderRadius: 12,
-    width: 200,
-    height: 250,
+    width: 175,
+    height: 175,
   },
   imgPodcast: {
-    width: 200,
-    height: 200,
-    borderRadius: 8,
+    width: 175,
+    height: 175,
+    borderRadius: 12,
     resizeMode: "cover",
   },
   podcastInfo: {
-    width: 200,
+    width: 175,
     marginTop: 10,
   },
   titulo: {

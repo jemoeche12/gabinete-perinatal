@@ -44,7 +44,7 @@ export const addPost = async (text, img, userData) => {
       }`.trim(),
       text: cleanedText,
       createdAt: Date.now(),
-      avatar: userData.img || userData.avatar || null,
+      avatar: userData.image || userData.avatar || null,
       img: img || null,
       counter: 0,
     };

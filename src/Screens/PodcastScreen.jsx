@@ -21,6 +21,7 @@ import logo from "../../assets/Red.png";
 
 const PodcastScreen = () => {
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("todos");
+  const [numColumns, setNumColumns] = useState(2);
 
   const navigation = useNavigation();
 
@@ -39,7 +40,7 @@ const PodcastScreen = () => {
   if (loadingCategories || loadingPodcasts) {
     return (
       <View style={styles.centerContainer}>
-        <Image source={logo} style={styles.logo}/>
+        <Image source={logo} style={styles.logo} />
         <Text style={styles.messageText}>Cargando, espere por favor...</Text>
       </View>
     );
@@ -61,7 +62,7 @@ const PodcastScreen = () => {
     return (
       <View style={styles.centerContainer}>
         <Pressable
-          style={{top: 40, left: 20, position: "absolute"}}
+          style={{ top: 40, left: 20, position: "absolute" }}
           onPress={() => navigation.goBack()}
         >
           <Image source={back} style={styles.backIcon} />
@@ -98,23 +99,29 @@ const PodcastScreen = () => {
               value="todos"
               style={styles.pickerItem}
             />
-
             {categoriesPodcast.map((cat, index) => (
               <Picker.Item
                 key={index}
                 label={cat}
                 value={cat}
-                style={{ fontWeight: "bold", color: "black", backgroundColor: "white" }}
+                style={{
+                  fontWeight: "bold",
+                  color: "black",
+                  backgroundColor: "white",
+                }}
               />
             ))}
           </Picker>
           <FlatList
+            key={numColumns}
             data={podcastCategory}
             renderItem={({ item }) => <PodcastComponent item={item} />}
             keyExtractor={(item) =>
               item.id?.toString() || Math.random().toString()
             }
-            horizontal={true}
+            columnWrapperStyle={{ gap: 16 }}
+            numColumns={2}
+            horizontal={false}
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.listContainer}
             ItemSeparatorComponent={() => <View style={styles.separator} />}
@@ -151,12 +158,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginVertical: 25,
+    marginVertical: 15,
     textAlign: "center",
     color: "black",
   },
   listContainer: {
     padding: 10,
+    gap: 16,
   },
   logo: {
     height: 200,

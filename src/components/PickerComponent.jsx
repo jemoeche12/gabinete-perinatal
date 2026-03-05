@@ -1,24 +1,25 @@
 import { View, StyleSheet } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 
-const PickerComponent = ({ motivo, setMotivo, style }) => {
+const PickerComponent = ({ motivo, setMotivo }) => {
   return (
     <View style={styles.pickerContainer}>
       <Picker
         selectedValue={motivo}
         onValueChange={(itemValue) => setMotivo(itemValue)}
-        style={[styles.picker, style]}
+        style={styles.picker}
       >
-        <Picker.Item label="Seleccioná un motivo..." value="" color="#000000" />
-        <Picker.Item label="Consulta general sobre la app" value="consulta" color="#000000" />
+        <Picker.Item label="Seleccioná un motivo..." value="" color="#000000" backgroundColor="white"/>
+        <Picker.Item label="Consulta general sobre la app" value="consulta" color="#000000" backgroundColor="white"/>
         <Picker.Item
           label="Necesito orientación emocional"
           value="orientacion"
           color="#000000"
+          backgroundColor="white" 
         />
-        <Picker.Item label="Problemas técnicos o errores" value="tecnico" color="#000000"/>
-        <Picker.Item label="Sugerencia o mejora" value="sugerencia" color="#000000"/>
-        <Picker.Item label="Otro" value="otro" color="#000000"/>
+        <Picker.Item label="Problemas técnicos o errores" value="tecnico" color="#000000" backgroundColor="white"/>
+        <Picker.Item label="Sugerencia o mejora" value="sugerencia" color="#000000" backgroundColor="white"/>
+        <Picker.Item label="Otro" value="otro" color="#000000" backgroundColor="white"/>
       </Picker>
     </View>
   );

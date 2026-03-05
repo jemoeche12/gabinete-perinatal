@@ -31,6 +31,7 @@ import PostContent from "../components/PostContent";
 import CommentList from "../components/CommentList";
 import CommentInput from "../components/CommentInput";
 import { useGetProfileQuery } from "../services/userService";
+import { useGetProfileImageQuery } from "../services/recursosService";
 import fondo from "../../assets/fondos/fondo_APP.jpg";
 import { useNavigation } from "@react-navigation/native";
 import back from "../../assets/icon/back.png";
@@ -45,12 +46,15 @@ const ComunidadScreen = () => {
   const authData = useSelector((state) => state.auth.value);
 
   const { data: profileDate } = useGetProfileQuery(authData.localId);
+  const imgProfileDate = useGetProfileImageQuery(authData.localId, {
+    skip: !authData.localId,
+  });
 
   const userData = {
     ...authData,
     name: profileDate?.name || authData.name || "",
     lastName: profileDate?.lastName || authData.lastName || "",
-    img: authData.imageCamera || profileDate?.imageCamera || "",
+    image: authData.imageCamera || imgProfileDate?.data?.image || "",
   };
 
   const [refreshing, setRefreshing] = useState(false);
