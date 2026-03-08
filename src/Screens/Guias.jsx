@@ -42,66 +42,72 @@ const Guias = () => {
   };
 
   return (
-    <ScrollView style={styles.container}   showsVerticalScrollIndicator={false}>
+    <>
       <CustomHeader onMenuPress={toggleMenu} />
-      <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Image source={back} style={styles.backIcon} />
-      </Pressable>
-      {isMenuVisible && (
-        <MenuDesplegable onClose={toggleMenu} visible={isMenuVisible} />
-      )}
-      <Modal
-        visible={modalVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.centeredView}>
-          <BannerMembresia
-            requiredLevel={requiredLevel}
-            onClose={() => setModalVisible(false)}
-            onNavigateToPlans={handleNavigateToPlans}
-          />
-        </View>
-      </Modal>
-      <View style={styles.view}>
-        <Text style={styles.text}>
-          Bienvenidas/os a las Guías de la Red de Apoyo Perinatal{"\n\n"}
-          Criar, gestar y acompañar la vida no ocurre en un solo momento: es un
-          proceso emocional, físico y vincular que comienza mucho antes del
-          nacimiento y continúa a lo largo del tiempo.{"\n\n"}
-          Desde la Red de Apoyo Perinatal, creamos estas guías para acompañarte
-          de manera respetuosa, profesional y cercana en cada etapa del camino,
-          {"\n\n"} brindándote herramientas concretas para cuidar el bienestar
-          emocional de toda la familia.{"\n\n"}
-          En esta sección de la app encontrarás guías pensadas para acompañarte
-          en:
-        </Text>
-      </View>
-      <FlatList
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        data={data}
-        keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={{
-          paddingHorizontal: 20,
-          paddingVertical: 20,
-        }}
-        ItemSeparatorComponent={() => <View style={{ width: 15 }} />}
-        renderItem={({ item }) => {
-          const canAccess = canAccessByLevel(item.requiredLevel);
-          return (
-            <GuidesComponent
-              category={item}
-              navigation={navigation}
-              canAccess={canAccess}
-              onPressLocked={handleLockedPress}
-              description={item.description}
+        {isMenuVisible && (
+          <MenuDesplegable onClose={toggleMenu} visible={isMenuVisible} />
+        )}
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        <Pressable
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Image source={back} style={styles.backIcon} />
+        </Pressable>
+        <Modal
+          visible={modalVisible}
+          animationType="slide"
+          transparent={true}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View style={styles.centeredView}>
+            <BannerMembresia
+              requiredLevel={requiredLevel}
+              onClose={() => setModalVisible(false)}
+              onNavigateToPlans={handleNavigateToPlans}
             />
-          );
-        }}
-      />
-    </ScrollView>
+          </View>
+        </Modal>
+        <View style={styles.view}>
+          <Text style={styles.text}>
+            Bienvenidas/os a las Guías de la Red de Apoyo Perinatal{"\n\n"}
+            Criar, gestar y acompañar la vida no ocurre en un solo momento: es
+            un proceso emocional, físico y vincular que comienza mucho antes del
+            nacimiento y continúa a lo largo del tiempo.{"\n\n"}
+            Desde la Red de Apoyo Perinatal, creamos estas guías para
+            acompañarte de manera respetuosa, profesional y cercana en cada
+            etapa del camino,
+            {"\n\n"} brindándote herramientas concretas para cuidar el bienestar
+            emocional de toda la familia.{"\n\n"}
+            En esta sección de la app encontrarás guías pensadas para
+            acompañarte en:
+          </Text>
+        </View>
+        <FlatList
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          data={data}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={{
+            paddingHorizontal: 20,
+            paddingVertical: 20,
+          }}
+          ItemSeparatorComponent={() => <View style={{ width: 15 }} />}
+          renderItem={({ item }) => {
+            const canAccess = canAccessByLevel(item.requiredLevel);
+            return (
+              <GuidesComponent
+                category={item}
+                navigation={navigation}
+                canAccess={canAccess}
+                onPressLocked={handleLockedPress}
+                description={item.description}
+              />
+            );
+          }}
+        />
+      </ScrollView>
+    </>
   );
 };
 
@@ -135,7 +141,7 @@ const styles = StyleSheet.create({
     height: 40,
     resizeMode: "contain",
   },
-    centeredView: {
+  centeredView: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",

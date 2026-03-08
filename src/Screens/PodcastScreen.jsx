@@ -165,6 +165,7 @@ const styles = StyleSheet.create({
   listContainer: {
     padding: 10,
     gap: 16,
+    alignItems: "center",
   },
   logo: {
     height: 200,

@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 18,
-    textAlign: "center",
+    textAlign: "left",
     color: "white",
     fontWeight: "300",
     marginVertical: 30,
