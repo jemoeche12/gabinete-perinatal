@@ -8,19 +8,28 @@ const {
   HttpsError,
 } = require("firebase-functions/v2/https");
 
-
+const { MercadoPagoConfig, Payment } = require("mercadopago");
+const crypto = require("crypto");
+const path = require("path");
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 const mailjetApiKey = process.env.MAILJET_API_KEY;
 const mailjetApiSecret = process.env.MAILJET_API_SECRET;
 
+const mpAccessToken = process.env.MP_ACCESS_TOKEN;
+const mpWebhookSecret = process.env.MP_WEBHOOK_SECRET;
 
 const app = express();
 app.use(cors({ origin: true }));
 
 const admin = require("firebase-admin");
 if (!admin.apps.length) admin.initializeApp();
+
+const mpClient = new MercadoPagoConfig({ accessToken: mpAccessToken });
+const mpPayment = new Payment(mpClient);
+
+app.use(express.static(path.join(__dirname, "public")));
 
 const sendEmailFromClient = async ({ email, subject, body }) => {
   return Promise.resolve();
@@ -31,7 +40,7 @@ app.use(
     verify: (req, res, buf) => {
       req.rawBody = buf;
     },
-  })
+  }),
 );
 
 app.post("/webhook", async (request, response) => {
@@ -46,7 +55,7 @@ app.post("/webhook", async (request, response) => {
     event = stripe.webhooks.constructEvent(
       request.rawBody,
       signature,
-      stripeWebhookSecret
+      stripeWebhookSecret,
     );
   } catch (err) {
     console.error("⚠️  Error verificando firma del webhook:", err.message);
@@ -108,20 +117,31 @@ app.post("/create-payment-intent", async (req, res) => {
   });
 
   try {
-    const { amount, currency, cartItems, customerEmail, customerName, membresiaActual } =
-      req.body;
+    const {
+      amount,
+      currency,
+      cartItems,
+      customerEmail,
+      customerName,
+      membresiaActual,
+    } = req.body;
 
-      let amountFinal = amount;
+    let amountFinal = amount;
 
-    if (membresiaActual && membresiaActual.fechaFin && membresiaActual.amount > 0) {
-
+    if (
+      membresiaActual &&
+      membresiaActual.fechaFin &&
+      membresiaActual.amount > 0
+    ) {
       const ahora = Date.now();
-      const diasRestantes = (membresiaActual.fechaFin - ahora) / (1000 * 60 * 60 * 24)
+      const diasRestantes =
+        (membresiaActual.fechaFin - ahora) / (1000 * 60 * 60 * 24);
 
-      if(diasRestantes > 0){
-        const creditoDiario = membresiaActual.amount / membresiaActual.diasTotales;
+      if (diasRestantes > 0) {
+        const creditoDiario =
+          membresiaActual.amount / membresiaActual.diasTotales;
         const creditoRestante = creditoDiario * diasRestantes;
-        amountFinal = Math.max(0, amount - creditoRestante / 100)
+        amountFinal = Math.max(0, amount - creditoRestante / 100);
       }
     }
 
@@ -135,8 +155,6 @@ app.post("/create-payment-intent", async (req, res) => {
     const productNames = cartItems
       .map((item) => item.titulo || item.name)
       .join(", ");
-
-
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amountInCents,
@@ -164,6 +182,79 @@ app.post("/create-payment-intent", async (req, res) => {
   }
 });
 
+app.post("/create-mp-order", async (req, res) => {
+  const { amount, customerEmail, customerName, cartItems } =
+    req.body;
+
+  if (!amount || !customerEmail || !customerName) {
+    return res.status(400).json({ error: "Faltan campos requeridos" });
+  }
+  try {
+    const description = cartItems?.map((item) => item.titulo || item.name).join(", ");
+
+    const orderRef = admin.database().ref("/ordenes").push();
+    await orderRef.set({
+      estado: "pending",
+      metodo: "mercado_pago",
+      amount,
+      customerEmail,
+      customerName,
+      description,
+      cartItems: cartItems || [],
+      createdAt: Date.now(),
+    });
+
+    res.json({ orderId: orderRef.key, publicKey: process.env.MP_PUBLIC_KEY });
+  } catch (error) {
+    console.error("Error creando orden de Mercado Pago:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
+
+app.post("/create-mercadopago-payment", async (req, res) => {
+  const { token, paymentMethod, payer, orderId } = req.body;
+
+  if (!token || !paymentMethod || !payer || !orderId) {
+    return res.status(400).json({ error: "Faltan campos requeridos" });
+  }
+
+  try {
+    const orderSnap = await admin
+      .database()
+      .ref(`ordenes/${orderId}`)
+      .once("value");
+    if (!orderSnap.exists()) {
+      return res.status(404).json({ error: "Orden no encontrada" });
+    }
+    const orderData = orderSnap.val();
+
+    const order = await mpPayment.create({
+      body: {
+        transaction_amount: orderData.amount,
+        token,
+        description: orderData.description,
+        installments: 1,
+        payment_method_id: paymentMethod,
+        payer: {
+          email: orderData.customerEmail,
+          name: orderData.customerName,
+        },
+        metadata: {
+          order_id: orderId,
+        },
+      },
+    });
+    res.json({
+      status: order.status,
+      id: order.id,
+    });
+  } catch (error) {
+    console.error("Error creando pago de Mercado Pago:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
+
+
 app.get("/health", (req, res) => {
   res.json({ status: "OK", timestamp: new Date().toISOString() });
 });
@@ -173,14 +264,85 @@ app.use((error, req, res, next) => {
   res.status(500).json({ error: "Error interno del servidor" });
 });
 
+app.post("/mercadopago-webhook", async (req, res) => {
+  const xSignature = req.headers["x-signature"];
+  const xRequestId = req.headers["x-request-id"];
+  const dataId = req.query["data.id"];
+
+  if (xSignature && mpWebhookSecret) {
+    const parts = {};
+    xSignature.split(",").forEach((part) => {
+      const [key, value] = part.trim().split("=");
+      parts[key] = value;
+    });
+
+    const { ts, v1 } = parts;
+
+    if (ts && v1) {
+      const manifest = `id:${dataId};request-id:${xRequestId};ts:${ts};`;
+      const hmac = crypto.createHmac("sha256", mpWebhookSecret);
+      hmac.update(manifest);
+      const expectedSignature = hmac.digest("hex");
+
+      if (expectedSignature !== v1) {
+        console.warn("Webhook MP con firma inválida");
+        return res.sendStatus(401);
+      }
+    }
+  }
+
+  try {
+    const type = req.query.type || req.body?.type;
+
+    if (type !== "payment") return res.sendStatus(200);
+    if (!dataId) return res.sendStatus(200);
+
+    const payment = await mpPayment.get({ id: dataId });
+
+    const orderId = payment.metadata?.order_id;
+    if (!orderId) return res.sendStatus(200);
+
+    const orderRef = admin.database().ref(`/ordenes/${orderId}`);
+    const orderSnap = await orderRef.once("value");
+
+    if (!orderSnap.exists()) {
+      console.error(`Orden ${orderId} no encontrada`);
+      return res.sendStatus(200);
+    }
+
+    const order = orderSnap.val();
+
+    if (order.estado === "pagado") return res.sendStatus(200);
+
+    if (payment.status === "approved") {
+      await orderRef.update({
+        estado: "pagado",
+        fecha_pago: Date.now(),
+        mp_payment_id: payment.id,
+      });
+    } else if (payment.status === "rejected") {
+      await orderRef.update({
+        estado: "rechazado",
+        mp_payment_id: payment.id,
+      });
+    }
+
+    res.sendStatus(200);
+
+  } catch (error) {
+    console.error("Error en webhook MP:", error);
+    res.sendStatus(500);
+  }
+});
+
 const sendEmailFunction = onCall(async (request) => {
   if (!mailjetApiKey || !mailjetApiSecret) {
     console.error(
-      "Faltan las claves de Mailjet en la configuración de Firebase Functions."
+      "Faltan las claves de Mailjet en la configuración de Firebase Functions.",
     );
     throw new HttpsError(
       "failed-precondition",
-      "Mailjet no está configurado correctamente en Firebase Functions. Por favor, configura 'MAILJET_API_KEY' y 'MAILJET_API_SECRET'."
+      "Mailjet no está configurado correctamente en Firebase Functions. Por favor, configura 'MAILJET_API_KEY' y 'MAILJET_API_SECRET'.",
     );
   }
 
@@ -198,7 +360,7 @@ const sendEmailFunction = onCall(async (request) => {
   ) {
     throw new HttpsError(
       "invalid-argument",
-      "Destinatarios de email inválidos. Se requiere un array de objetos con propiedad 'email'."
+      "Destinatarios de email inválidos. Se requiere un array de objetos con propiedad 'email'.",
     );
   }
 
@@ -240,11 +402,11 @@ const sendEmailFunction = onCall(async (request) => {
         "Error desconocido en Mailjet.";
       console.error(
         "Mailjet no reportó éxito en el envío:",
-        JSON.stringify(response.body, null, 2)
+        JSON.stringify(response.body, null, 2),
       );
       throw new HttpsError(
         "internal",
-        `Mailjet no pudo enviar el email: ${mailjetErrorMessage}`
+        `Mailjet no pudo enviar el email: ${mailjetErrorMessage}`,
       );
     }
   } catch (error) {
@@ -257,7 +419,7 @@ const sendEmailFunction = onCall(async (request) => {
 
     throw new HttpsError(
       "internal",
-      errorMessage || "Error interno al enviar email."
+      errorMessage || "Error interno al enviar email.",
     );
   }
 });

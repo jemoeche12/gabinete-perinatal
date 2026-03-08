@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>Checkout</title>
+  <script src="https://sdk.mercadopago.com/js/v2"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f5f5f5;
+      margin: 0;
+    }
+    #paymentBrick_container {
+      max-width: 500px;
+      margin: auto;
+    }
+    #loading {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="loading">Cargando...</div>
+  <div id="paymentBrick_container"></div>
+
+  <script>
+   
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get("orderId");
+    const amount = parseFloat(params.get("amount"));
+    const publicKey = params.get("publicKey");
+
+    if (!orderId || !amount || !publicKey) {
+      notifyApp({ status: "error", message: "Parámetros inválidos" });
+    } else {
+      initBrick();
+    }
+
+    function initBrick() {
+      const mp = new MercadoPago(publicKey, { locale: "es-AR" });
+      const bricksBuilder = mp.bricks();
+
+      bricksBuilder.create("payment", "paymentBrick_container", {
+        initialization: {
+          amount: amount,
+        },
+        callbacks: {
+          onReady: () => {
+            document.getElementById("loading").style.display = "none";
+          },
+          onSubmit: async (formData) => {
+            try {
+              const BACKEND_URL = "https://api-yela3b24ha-uc.a.run.app";
+
+              const response = await fetch(`${BACKEND_URL}/create-mercadopago-payment`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  token: formData.token,
+                  paymentMethod: formData.payment_method_id,
+                  payer: formData.payer,
+                  orderId: orderId,
+                }),
+              });
+
+              const result = await response.json();
+
+              if (!response.ok) {
+                throw new Error(result.error || "Error en el pago");
+              }
+
+              notifyApp({ status: result.status, paymentId: result.id });
+
+              return result;
+
+            } catch (error) {
+              notifyApp({ status: "error", message: error.message });
+              throw error;
+            }
+          },
+          onError: (error) => {
+            console.error("Brick error:", error);
+            notifyApp({ status: "error", message: error.message });
+          },
+        },
+      });
+    }
+
+    function notifyApp(data) {
+      if (window.ReactNativeWebView) {
+        window.ReactNativeWebView.postMessage(JSON.stringify(data));
+      }
+    }
+  </script>
+
+</body>
+</html>

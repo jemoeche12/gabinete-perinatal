@@ -11,7 +11,10 @@
       "image": "./assets/Red.png",
       "resizeMode": "cover",
       "backgroundColor": "#ffffff",
-      "imageSize": [300, 300]
+      "imageSize": [
+        300,
+        300
+      ]
     },
     "ios": {
       "supportsTablet": true
@@ -46,7 +49,8 @@
       "expo-font",
       "expo-video",
       "expo-audio",
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-localization"
     ],
     "extra": {
       "eas": {

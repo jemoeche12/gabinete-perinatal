@@ -7,18 +7,27 @@ import {
   Alert,
   ActivityIndicator,
   ScrollView,
+  Modal,
 } from "react-native";
+import WebView from "react-native-webview";
 import { useStripe } from "@stripe/stripe-react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../features/user/UserSlice";
 import { useUpdateUserProfileMutation } from "../services/userService";
 import { sendEmailFromClient } from "../services/emailService";
 import Membresias from "./Membresias";
+import * as Localization from "expo-localization";
 
 const UpdateMembresias = ({ navigation }) => {
+  const [showWebView, setShowWebView] = useState(false);
+  const [mpCheckoutUrl, setMpCheckoutUrl] = useState("");
   const { email, localId, membresia, name, lastName } = useSelector(
     (state) => state.auth.value,
   );
+
+  const region = Localization.getLocales()[0].regionCode;
+  const SUDAMERICA = ["AR", "BO", "CL", "CO", "EC", "PY", "PE", "UY", "VE"];
+  const isSudamerica = SUDAMERICA.includes(region);
 
   const membresiaActual = membresia?.tipo || "basico";
 
@@ -66,7 +75,7 @@ const UpdateMembresias = ({ navigation }) => {
           amount: membresia.amount,
           diasTotales: membresia.diasTotales,
           fechaFin: membresia.fechaFin,
-        }
+        },
       };
 
       const response = await fetch(
@@ -104,6 +113,80 @@ const UpdateMembresias = ({ navigation }) => {
         `No se pudo conectar con el servidor de pagos: ${error.message}`,
       );
       return null;
+    }
+  };
+
+  const handleMercadoPago = async () => {
+    try {
+      setIsProcessing(true);
+
+      const cartItems = [
+        {
+          title: `Actualización a ${selectedPlan} - ${selectedOption.period}`,
+          name: `Plan ${selectedPlan}`,
+        },
+      ];
+      const response = await fetch(
+        `https://api-yela3b24ha-uc.a.run.app/create-mp-order`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            amount: selectedOption.amount / 100,
+            customerName: name || "Usuario",
+            customerEmail: email,
+            cartItems,
+          }),
+        },
+      );
+      const data = await response.json();
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Error del servidor:", errorText);
+        throw new Error(`Server error: ${response.status}`);
+      }
+
+      const BACKEND_URL = "https://api-yela3b24ha-uc.a.run.app";
+      const checkoutUrl = `${BACKEND_URL}/checkout.html?orderId=${data.orderId}&amount=${selectedOption.amount / 100}&publicKey=${data.publicKey}`;
+      setMpCheckoutUrl(checkoutUrl);
+      setShowWebView(true);
+      setIsProcessing(false);
+    } catch (error) {
+      console.error("Error en handleMercadoPago:", error);
+      Alert.alert(
+        "Error de Conexión",
+        `No se pudo conectar con el servidor de pagos: ${error.message}`,
+      );
+      setIsProcessing(false);
+    }
+  };
+
+  const handleWebViewMessage = async (event) => {
+    const data = JSON.parse(event.nativeEvent.data);
+
+    if (data.status === "approved") {
+      setShowWebView(false);
+
+      const updated = await updateMembershipInFirebase();
+      if (!updated) return;
+
+      await sendConfirmationEmail();
+
+      Alert.alert("¡Pago exitoso!", "Tu membresía ha sido actualizada.", [
+        { text: "OK", onPress: () => navigation.goBack() },
+      ]);
+    } else if (data.status === "pending") {
+      setShowWebView(false);
+      Alert.alert(
+        "Pago pendiente",
+        "Tu pago está siendo procesado. Te avisaremos cuando se confirme.",
+      );
+    } else if (data.status === "error") {
+      setShowWebView(false);
+      Alert.alert("Error en el pago", data.message || "Intentá de nuevo.");
     }
   };
 
@@ -364,7 +447,7 @@ const UpdateMembresias = ({ navigation }) => {
           styles.updateButton,
           (!hasChanges || isProcessing) && styles.updateButtonDisabled,
         ]}
-        onPress={handleUpdateMembership}
+        onPress={isSudamerica ? handleMercadoPago : handleUpdateMembership}
         disabled={!hasChanges || isProcessing}
       >
         {isProcessing ? (
@@ -382,6 +465,31 @@ const UpdateMembresias = ({ navigation }) => {
           </Text>
         )}
       </Pressable>
+      <Modal visible={showWebView} animationType="slide">
+        <View style={{ flex: 1 }}>
+          {/* Botón para cerrar */}
+          <Pressable
+            onPress={() => setShowWebView(false)}
+            style={{
+              padding: 16,
+              backgroundColor: "#f9f9f9",
+              borderBottomWidth: 1,
+              borderBottomColor: "#eee",
+            }}
+          >
+            <Text style={{ color: "#B78270", fontWeight: "700" }}>
+              ✕ Cancelar pago
+            </Text>
+          </Pressable>
+
+          <WebView
+            source={{ uri: mpCheckoutUrl }}
+            onMessage={handleWebViewMessage}
+            javaScriptEnabled
+            domStorageEnabled
+          />
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
