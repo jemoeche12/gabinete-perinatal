@@ -16,7 +16,6 @@ import { setUser } from "../features/user/UserSlice";
 import { useUpdateUserProfileMutation } from "../services/userService";
 import { sendEmailFromClient } from "../services/emailService";
 import Membresias from "./Membresias";
-import * as Localization from "expo-localization";
 
 const UpdateMembresias = ({ navigation }) => {
   const [showWebView, setShowWebView] = useState(false);
@@ -25,9 +24,6 @@ const UpdateMembresias = ({ navigation }) => {
     (state) => state.auth.value,
   );
 
-  const region = Localization.getLocales()[0].regionCode;
-  const SUDAMERICA = ["AR", "BO", "CL", "CO", "EC", "PY", "PE", "UY", "VE"];
-  const isSudamerica = SUDAMERICA.includes(region);
 
   const membresiaActual = membresia?.tipo || "basico";
 
@@ -151,6 +147,7 @@ const UpdateMembresias = ({ navigation }) => {
 
       const BACKEND_URL = "https://api-yela3b24ha-uc.a.run.app";
       const checkoutUrl = `${BACKEND_URL}/checkout.html?orderId=${data.orderId}&amount=${selectedOption.amount / 100}&publicKey=${data.publicKey}`;
+      console.log("Checkout URL:", checkoutUrl);
       setMpCheckoutUrl(checkoutUrl);
       setShowWebView(true);
       setIsProcessing(false);
@@ -185,7 +182,7 @@ const UpdateMembresias = ({ navigation }) => {
         "Tu pago está siendo procesado. Te avisaremos cuando se confirme.",
       );
     } else if (data.status === "error") {
-      setShowWebView(false);
+      
       Alert.alert("Error en el pago", data.message || "Intentá de nuevo.");
     }
   };
@@ -401,98 +398,126 @@ const UpdateMembresias = ({ navigation }) => {
         ).toFixed(2)}`;
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.scrollContent}
-    >
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Actualizar Membresía</Text>
-        <Text style={styles.headerSubtitle}>
-          Plan actual:{" "}
-          <Text style={styles.currentPlanText}>{membresiaActual}</Text>
-        </Text>
-      </View>
+  <ScrollView
+    style={styles.container}
+    contentContainerStyle={styles.scrollContent}
+  >
+    <View style={styles.header}>
+      <Text style={styles.headerTitle}>Actualizar Membresía</Text>
+      <Text style={styles.headerSubtitle}>
+        Plan actual:{" "}
+        <Text style={styles.currentPlanText}>{membresiaActual}</Text>
+      </Text>
+    </View>
 
-      <Membresias
-        onSelectPlan={handlePlanSelect}
-        onSelectDuration={handleDurationSelect}
-      />
+    <Membresias
+      onSelectPlan={handlePlanSelect}
+      onSelectDuration={handleDurationSelect}
+    />
 
-      {hasChanges && (
-        <View style={styles.summaryCard}>
-          <Text style={styles.summaryTitle}>Cambio de membresía</Text>
+    {hasChanges && (
+      <View style={styles.summaryCard}>
+        <Text style={styles.summaryTitle}>Cambio de membresía</Text>
+        <View style={styles.summaryRow}>
+          <Text style={styles.summaryLabel}>De:</Text>
+          <Text style={styles.summaryValue}>{membresiaActual}</Text>
+        </View>
+        <View style={styles.summaryRow}>
+          <Text style={styles.summaryLabel}>A:</Text>
+          <Text style={[styles.summaryValue, styles.summaryHighlight]}>
+            {selectedPlan}
+          </Text>
+        </View>
+        {selectedOption.amount > 0 && (
           <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>De:</Text>
-            <Text style={styles.summaryValue}>{membresiaActual}</Text>
-          </View>
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>A:</Text>
-            <Text style={[styles.summaryValue, styles.summaryHighlight]}>
-              {selectedPlan}
+            <Text style={styles.summaryLabel}>Precio:</Text>
+            <Text style={[styles.summaryValue, styles.summaryPrice]}>
+              {displayPrice} / {selectedOption.period}
             </Text>
           </View>
-          {selectedOption.amount > 0 && (
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>Precio:</Text>
-              <Text style={[styles.summaryValue, styles.summaryPrice]}>
-                {displayPrice} / {selectedOption.period}
-              </Text>
-            </View>
-          )}
-        </View>
-      )}
+        )}
+      </View>
+    )}
 
+    {hasChanges && selectedOption.amount > 0 ? (
+      <View>
+        <Pressable
+          style={[styles.updateButton, isProcessing && styles.updateButtonDisabled]}
+          onPress={handleUpdateMembership}
+          disabled={isProcessing}
+        >
+          {isProcessing ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="small" color="#fff" />
+              <Text style={styles.updateButtonText}>Procesando...</Text>
+            </View>
+          ) : (
+            <Text style={styles.updateButtonText}>
+              Pagar con tarjeta {displayPrice}
+            </Text>
+          )}
+        </Pressable>
+
+        <Pressable
+          style={[
+            styles.updateButton,
+            { backgroundColor: "#009EE3", marginTop: 10 },
+            isProcessing && styles.updateButtonDisabled,
+          ]}
+          onPress={handleMercadoPago}
+          disabled={isProcessing}
+        >
+          <Text style={styles.updateButtonText}>
+            Pagar con Mercado Pago {displayPrice}
+          </Text>
+        </Pressable>
+      </View>
+    ) : (
       <Pressable
         style={[
           styles.updateButton,
           (!hasChanges || isProcessing) && styles.updateButtonDisabled,
         ]}
-        onPress={isSudamerica ? handleMercadoPago : handleUpdateMembership}
+        onPress={handleUpdateMembership}
         disabled={!hasChanges || isProcessing}
       >
-        {isProcessing ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="small" color="#fff" />
-            <Text style={styles.updateButtonText}>Procesando...</Text>
-          </View>
-        ) : (
-          <Text style={styles.updateButtonText}>
-            {!hasChanges
-              ? "Selecciona un plan diferente"
-              : selectedOption.amount > 0
-                ? `Pagar ${displayPrice} y Actualizar`
-                : "Actualizar Membresía"}
-          </Text>
-        )}
+        <Text style={styles.updateButtonText}>
+          {!hasChanges ? "Selecciona un plan diferente" : "Actualizar Membresía"}
+        </Text>
       </Pressable>
-      <Modal visible={showWebView} animationType="slide">
-        <View style={{ flex: 1 }}>
-          {/* Botón para cerrar */}
-          <Pressable
-            onPress={() => setShowWebView(false)}
-            style={{
-              padding: 16,
-              backgroundColor: "#f9f9f9",
-              borderBottomWidth: 1,
-              borderBottomColor: "#eee",
-            }}
-          >
-            <Text style={{ color: "#B78270", fontWeight: "700" }}>
-              ✕ Cancelar pago
-            </Text>
-          </Pressable>
+    )}
 
-          <WebView
-            source={{ uri: mpCheckoutUrl }}
-            onMessage={handleWebViewMessage}
-            javaScriptEnabled
-            domStorageEnabled
-          />
-        </View>
-      </Modal>
-    </ScrollView>
+    <Modal visible={showWebView} animationType="slide">
+      <View style={{ flex: 1 }}>
+        <Pressable
+          onPress={() => setShowWebView(false)}
+          style={{
+            padding: 16,
+            backgroundColor: "#f9f9f9",
+            borderBottomWidth: 1,
+            borderBottomColor: "#eee",
+          }}
+        >
+          <Text style={{ color: "#B78270", fontWeight: "700" }}>
+            ✕ Cancelar pago
+          </Text>
+        </Pressable>
+
+        <WebView
+          source={{ uri: mpCheckoutUrl }}
+          onMessage={handleWebViewMessage}
+          javaScriptEnabled
+          domStorageEnabled
+           onError={(e) => console.log("WebView error:", e.nativeEvent)}
+  onHttpError={(e) => console.log("WebView HTTP error:", e.nativeEvent)}
+        />
+      </View>
+    </Modal>
+
+  </ScrollView>
   );
-};
+}
+  
 
 export default UpdateMembresias;
 

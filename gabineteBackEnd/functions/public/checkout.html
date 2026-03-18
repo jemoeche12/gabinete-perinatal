@@ -29,7 +29,7 @@
 
   <div id="loading">Cargando...</div>
   <div id="paymentBrick_container"></div>
-
+<div id="debug" style="background:#ff4444;color:white;padding:10px;font-size:11px;word-break:break-all;"></div>
   <script>
    
     const params = new URLSearchParams(window.location.search);
@@ -44,6 +44,9 @@
     }
 
     function initBrick() {
+      console.log("Public Key recibida:", publicKey);
+  console.log("Amount recibido:", amount);
+  console.log("OrderId recibido:", orderId);
       const mp = new MercadoPago(publicKey, { locale: "es-AR" });
       const bricksBuilder = mp.bricks();
 
@@ -85,10 +88,10 @@
               throw error;
             }
           },
-          onError: (error) => {
-            console.error("Brick error:", error);
-            notifyApp({ status: "error", message: error.message });
-          },
+         onError: (error) => {
+  document.getElementById("debug").innerHTML = "ERROR: " + JSON.stringify(error);
+  notifyApp({ status: "error", message: error.message });
+}
         },
       });
     }

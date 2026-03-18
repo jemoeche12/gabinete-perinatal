@@ -1,7 +1,6 @@
 import {
   FlatList,
   StyleSheet,
-  Text,
   View,
   Image,
   Pressable,
@@ -43,11 +42,7 @@ const ItemListCategory = ({ navigation, route, visible }) => {
   return (
     <>
       <CustomHeader onMenuPress={toggleMenu} />
-      <View style={styles.container}>
-        {isMenuVisible && (
-          <MenuDesplegable onClose={toggleMenu} visible={isMenuVisible} />
-        )}
-        <FlatList
+        <FlatList style={styles.container}
           data={productsFiltered}
           renderItem={({ item }) => (
             <View style={styles.productItem}>
@@ -58,6 +53,10 @@ const ItemListCategory = ({ navigation, route, visible }) => {
           contentContainerStyle={styles.list}
           ListHeaderComponent={
             <View style={styles.view}>
+              {isMenuVisible && (
+                <MenuDesplegable onClose={toggleMenu} visible={isMenuVisible} />
+              )}
+
               <Pressable
                 style={styles.backButton}
                 onPress={() => navigation.goBack()}
@@ -67,7 +66,6 @@ const ItemListCategory = ({ navigation, route, visible }) => {
             </View>
           }
         />
-      </View>
     </>
   );
 };
@@ -91,7 +89,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   list: {
-    flex: 1,
+    flexGrow: 1,
   },
   productItem: {
     backgroundColor: "#DEC3B2",

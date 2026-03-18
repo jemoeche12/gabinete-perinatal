@@ -19,6 +19,7 @@ const mailjetApiSecret = process.env.MAILJET_API_SECRET;
 
 const mpAccessToken = process.env.MP_ACCESS_TOKEN;
 const mpWebhookSecret = process.env.MP_WEBHOOK_SECRET;
+const mpPublicKey = process.env.MP_PUBLIC_KEY;
 
 const app = express();
 app.use(cors({ origin: true }));
@@ -167,6 +168,7 @@ app.post("/create-payment-intent", async (req, res) => {
         product_names: productNames,
         total_amount: amount.toString(),
         integration_check: "accept_a_payment",
+        type: "membresia",
       },
     });
 
@@ -183,14 +185,15 @@ app.post("/create-payment-intent", async (req, res) => {
 });
 
 app.post("/create-mp-order", async (req, res) => {
-  const { amount, customerEmail, customerName, cartItems } =
-    req.body;
+  const { amount, customerEmail, customerName, cartItems } = req.body;
 
   if (!amount || !customerEmail || !customerName) {
     return res.status(400).json({ error: "Faltan campos requeridos" });
   }
   try {
-    const description = cartItems?.map((item) => item.titulo || item.name).join(", ");
+    const description = cartItems
+      ?.map((item) => item.titulo || item.name)
+      .join(", ");
 
     const orderRef = admin.database().ref("/ordenes").push();
     await orderRef.set({
@@ -204,7 +207,7 @@ app.post("/create-mp-order", async (req, res) => {
       createdAt: Date.now(),
     });
 
-    res.json({ orderId: orderRef.key, publicKey: process.env.MP_PUBLIC_KEY });
+    res.json({ orderId: orderRef.key, publicKey: mpPublicKey });
   } catch (error) {
     console.error("Error creando orden de Mercado Pago:", error);
     res.status(500).json({ error: "Error interno del servidor" });
@@ -254,7 +257,6 @@ app.post("/create-mercadopago-payment", async (req, res) => {
   }
 });
 
-
 app.get("/health", (req, res) => {
   res.json({ status: "OK", timestamp: new Date().toISOString() });
 });
@@ -268,6 +270,8 @@ app.post("/mercadopago-webhook", async (req, res) => {
   const xSignature = req.headers["x-signature"];
   const xRequestId = req.headers["x-request-id"];
   const dataId = req.query["data.id"];
+  console.log("Webhook MP recibido - query:", JSON.stringify(req.query));
+  console.log("Webhook MP recibido - body:", JSON.stringify(req.body));
 
   if (xSignature && mpWebhookSecret) {
     const parts = {};
@@ -328,7 +332,6 @@ app.post("/mercadopago-webhook", async (req, res) => {
     }
 
     res.sendStatus(200);
-
   } catch (error) {
     console.error("Error en webhook MP:", error);
     res.sendStatus(500);
@@ -424,5 +427,8 @@ const sendEmailFunction = onCall(async (request) => {
   }
 });
 
-exports.api = onRequest(app);
+exports.api = onRequest(
+  { secrets: ["MP_ACCESS_TOKEN", "MP_PUBLIC_KEY", "MP_WEBHOOK_SECRET"] },
+  app
+);
 exports.sendEmailFunction = sendEmailFunction;
