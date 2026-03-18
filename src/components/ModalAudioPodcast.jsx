@@ -1,41 +1,69 @@
 import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  Pressable,
-  ImageBackground,
-  Button,
+  StyleSheet, Text, View, Image,
+  Pressable, ImageBackground, Button,
 } from "react-native";
-import {
-  useAudioPlayer,
-  useAudioPlayerStatus,
-  setAudioModeAsync,
-} from "expo-audio";
+import { Audio } from "expo-av";
 import { useGetPodcastByIdQuery } from "../services/podcastService";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import fondo from "../../assets/fondos/PODCAST.jpg";
 
 const ModalAudioPodcast = ({ id, onClose, item }) => {
   const audioSource = useGetPodcastByIdQuery(id);
   const podcastUrl = audioSource.data?.urlAudio ?? null;
-
-  const player = useAudioPlayer(podcastUrl || "", { updateInterval: 1000 });
-  const statusPodcast = useAudioPlayerStatus(player);
+  const soundRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    setAudioModeAsync({
-      playsInSilentMode: true,
+    Audio.setAudioModeAsync({
+      playsInSilentModeIOS: true,
       staysActiveInBackground: true,
-      shouldPlayInBackground: true,
+      shouldDuckAndroid: true,
     });
   }, []);
 
   useEffect(() => {
-    if (podcastUrl && player) {
-      player.replace(podcastUrl);
+    if (!podcastUrl) return;
+
+    const loadSound = async () => {
+      if (soundRef.current) {
+        await soundRef.current.unloadAsync();
+      }
+      const { sound } = await Audio.Sound.createAsync(
+        { uri: podcastUrl },
+        { shouldPlay: false }
+      );
+      soundRef.current = sound;
+      setIsLoaded(true);
+
+      sound.setOnPlaybackStatusUpdate((status) => {
+        if (status.isLoaded) {
+          setIsPlaying(status.isPlaying);
+        }
+      });
+    };
+
+    loadSound();
+
+    return () => {
+      if (soundRef.current) {
+        soundRef.current.unloadAsync();
+      }
+    };
+  }, [podcastUrl]);
+
+  const handlePlayPause = async () => {
+    if (!soundRef.current || !isLoaded) return;
+    const status = await soundRef.current.getStatusAsync();
+    if (status.isPlaying) {
+      await soundRef.current.pauseAsync();
+    } else {
+      if (status.didJustFinish) {
+        await soundRef.current.setPositionAsync(0);
+      }
+      await soundRef.current.playAsync();
     }
-  }, [podcastUrl, player]);
+  };
 
   if (audioSource.isLoading) {
     return (
@@ -54,23 +82,6 @@ const ModalAudioPodcast = ({ id, onClose, item }) => {
     );
   }
 
-  const handlePlayPause = () => {
-    if (!player || !statusPodcast) return;
-
-    try {
-      if (statusPodcast.playing) {
-        player.pause();
-      } else {
-        if (statusPodcast.didJustFinish) {
-          player.seekTo(0);
-        }
-        player.play();
-      }
-    } catch (error) {
-      console.error("Error playing/pausing audio:", error);
-    }
-  };
-
   return (
     <ImageBackground source={fondo} style={styles.container}>
       {item?.urlImagen ? (
@@ -82,14 +93,13 @@ const ModalAudioPodcast = ({ id, onClose, item }) => {
       <Text style={styles.description}>
         {item?.descripcion || "Sin descripción"}
       </Text>
-
       <Pressable
         style={styles.button}
         onPress={handlePlayPause}
-        disabled={!podcastUrl}
+        disabled={!isLoaded}
       >
         <Text style={styles.buttonText}>
-          {statusPodcast?.playing ? "Pause" : "Play"}
+          {isPlaying ? "Pause" : "Play"}
         </Text>
       </Pressable>
       <Pressable style={styles.button} onPress={onClose}>
@@ -120,10 +130,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  placeholderText: {
-    fontSize: 24,
-    color: "#ccc",
-  },
   title: {
     fontSize: 18,
     color: "black",
@@ -136,13 +142,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
     marginVertical: 8,
-  },
-
-  debug: {
-    fontSize: 10,
-    color: "black",
-    marginBottom: 10,
-    textAlign: "center",
   },
   button: {
     backgroundColor: "white",

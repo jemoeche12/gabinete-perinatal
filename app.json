@@ -48,7 +48,6 @@
       ],
       "expo-font",
       "expo-video",
-      "expo-audio",
       "expo-web-browser",
       "expo-localization"
     ],
