@@ -13,8 +13,9 @@ import ComunidadScreen from "../Screens/ComunidadScreen";
 import DueloStackNavigator from "./DueloStackNavigator";
 import guidesStackNavigator from "./GuidesStackNavigator";
 
+const Stack = createNativeStackNavigator();
+
 const RootStackNavigator = () => {
-  const Stack = createNativeStackNavigator();
   return (
     <Stack.Navigator
       screenOptions={{

@@ -240,7 +240,6 @@ app.post("/create-mercadopago-payment", async (req, res) => {
         payment_method_id: paymentMethod,
         payer: {
           email: orderData.customerEmail,
-          name: orderData.customerName,
         },
         metadata: {
           order_id: orderId,
@@ -252,8 +251,10 @@ app.post("/create-mercadopago-payment", async (req, res) => {
       id: order.id,
     });
   } catch (error) {
-    console.error("Error creando pago de Mercado Pago:", error);
-    res.status(500).json({ error: "Error interno del servidor" });
+    console.error("Error creando pago MP:", JSON.stringify(error));
+    res
+      .status(500)
+      .json({ error: error.message || "Error interno del servidor" });
   }
 });
 
@@ -270,8 +271,7 @@ app.post("/mercadopago-webhook", async (req, res) => {
   const xSignature = req.headers["x-signature"];
   const xRequestId = req.headers["x-request-id"];
   const dataId = req.query["data.id"];
-  console.log("Webhook MP recibido - query:", JSON.stringify(req.query));
-  console.log("Webhook MP recibido - body:", JSON.stringify(req.body));
+  
 
   if (xSignature && mpWebhookSecret) {
     const parts = {};
@@ -302,7 +302,7 @@ app.post("/mercadopago-webhook", async (req, res) => {
     if (!dataId) return res.sendStatus(200);
 
     const payment = await mpPayment.get({ id: dataId });
-
+    
     const orderId = payment.metadata?.order_id;
     if (!orderId) return res.sendStatus(200);
 
@@ -429,6 +429,6 @@ const sendEmailFunction = onCall(async (request) => {
 
 exports.api = onRequest(
   { secrets: ["MP_ACCESS_TOKEN", "MP_PUBLIC_KEY", "MP_WEBHOOK_SECRET"] },
-  app
+  app,
 );
 exports.sendEmailFunction = sendEmailFunction;

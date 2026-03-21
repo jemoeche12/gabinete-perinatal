@@ -176,10 +176,13 @@ const Signup = ({ navigation }) => {
           {
             text: "OK",
             onPress: () => {
-              navigation.reset({
-                index: 0,
-                routes: [{ name: "Main" }],
-              });
+              setTimeout(() => {
+
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: "Main", params: { screen: "Home" } }],
+                });
+              }, 200);
             },
           },
         ],
