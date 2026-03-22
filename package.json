@@ -17,16 +17,16 @@
     "@reduxjs/toolkit": "^2.8.2",
     "@stripe/stripe-react-native": "0.58.0",
     "crypto-js": "^4.2.0",
-    "expo": "^55.0.2",
-    "expo-av": "^16.0.8",
+    "expo": "~55.0.2",
+    "expo-asset": "~55.0.10",
+    "expo-audio": "~55.0.9",
     "expo-font": "~55.0.4",
-    "expo-image-picker": "~55.0.9",
-    "expo-localization": "~55.0.8",
-    "expo-modules-autolinking": "~55.0.7",
-    "expo-sqlite": "~55.0.10",
+    "expo-image-picker": "~55.0.13",
+    "expo-localization": "~55.0.9",
+    "expo-sqlite": "~55.0.11",
     "expo-status-bar": "~55.0.4",
-    "expo-video": "~55.0.9",
-    "expo-web-browser": "~55.0.9",
+    "expo-video": "~55.0.11",
+    "expo-web-browser": "~55.0.10",
     "express": "^5.1.0",
     "firebase": "^11.9.1",
     "node-mailjet": "^6.0.8",
@@ -48,8 +48,18 @@
     "react-redux": "^9.2.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.26.0",
-    "baseline-browser-mapping": "^2.8.28"
+    "@babel/core": "^7.26.0"
+  },
+  "expo": {
+    "doctor": {
+      "reactNativeDirectoryCheck": {
+        "exclude": [
+          "express",
+          "node-mailjet",
+          "crypto-js"
+        ]
+      }
+    }
   },
   "private": true
 }

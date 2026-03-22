@@ -6,18 +6,14 @@
     "orientation": "portrait",
     "icon": "./assets/Red.png",
     "userInterfaceStyle": "dark",
-    "newArchEnabled": true,
     "splash": {
       "image": "./assets/Red.png",
       "resizeMode": "cover",
-      "backgroundColor": "#ffffff",
-      "imageSize": [
-        300,
-        300
-      ]
+      "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.jemoeche.gabineteperinatal"
     },
     "android": {
       "adaptiveIcon": {
@@ -49,7 +45,9 @@
       "expo-font",
       "expo-video",
       "expo-web-browser",
-      "expo-localization"
+      "expo-localization",
+      "expo-audio",
+      "expo-asset"
     ],
     "extra": {
       "eas": {
