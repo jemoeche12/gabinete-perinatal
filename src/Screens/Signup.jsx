@@ -450,7 +450,7 @@ const Signup = ({ navigation }) => {
 
           {selectedOption?.price > 0 && provider === "mercadopago" && (
             <Pressable
-              style={[styles.mpButton, isLoading && styles.mpButtonDisabled]}
+              style={[ styles.mpButton, isLoading && styles.mpButtonDisabled]}
               onPress={handleMercadoPago}
               disabled={isLoading || !dbInitialized}
             >
@@ -493,156 +493,35 @@ const Signup = ({ navigation }) => {
 export default Signup;
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-  },
-  scrollContainer: {
-    flexGrow: 1,
-  },
-  header: {
-    fontSize: 26,
-    fontWeight: "700",
-    color: "#B78270",
-    marginTop: 40,
-    marginBottom: 10,
-    textAlign: "center",
-  },
-  form: {
-    width: "92%",
-    backgroundColor: "rgba(255,255,255,0.95)",
-    borderRadius: 12,
-    marginHorizontal: "4%",
-    marginVertical: 40,
-    padding: 18,
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 6,
-    elevation: 3,
-  },
-  title: {
-    color: "#B78270",
-    fontSize: 22,
-    fontWeight: "700",
-    marginBottom: 16,
-    textAlign: "center",
-  },
-  optionsContainer: {
-    marginVertical: 16,
-  },
-  optionsLabel: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#555",
-    marginBottom: 10,
-  },
-  optionButton: {
-    borderWidth: 2,
-    borderRadius: 10,
-    padding: 16,
-    marginBottom: 10,
-    backgroundColor: "#fff",
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 1 },
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  optionButtonSelected: {
-    backgroundColor: "#f9f9f9",
-    borderWidth: 2.5,
-    elevation: 4,
-  },
-  optionContent: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  optionLeft: {
-    flex: 1,
-  },
-  optionPeriod: {
-    fontSize: 16,
-    color: "#555",
-    textTransform: "capitalize",
-    marginBottom: 4,
-  },
-  optionTextSelected: {
-    fontWeight: "700",
-    color: "#333",
-    fontSize: 17,
-  },
-  selectedBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 12,
-    alignSelf: "flex-start",
-    marginTop: 4,
-  },
-  selectedBadgeText: {
-    color: "#fff",
-    fontSize: 11,
-    fontWeight: "600",
-  },
-  optionPrice: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  planInfo: {
-    backgroundColor: "#f9f9f9",
-    padding: 14,
-    borderRadius: 8,
-    marginVertical: 12,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    borderLeftWidth: 4,
-  },
-  planDetails: {
-    flex: 1,
-  },
-  planLabel: {
-    fontSize: 13,
-    color: "#666",
-    marginBottom: 2,
-  },
-  planName: {
-    fontSize: 18,
-    fontWeight: "bold",
-    textTransform: "capitalize",
-  },
-  planPeriod: {
-    fontSize: 12,
-    color: "#888",
-    marginTop: 2,
-    fontStyle: "italic",
-  },
-  priceText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  loadingContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 10,
-  },
-  loadingText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  sub: {
-    color: "#555",
-    textAlign: "center",
-    marginTop: 10,
-  },
-  subLink: {
-    color: "#B78270",
-    textAlign: "center",
-    marginTop: 4,
-    textDecorationLine: "underline",
-  },
+  background: { flex: 1 },
+  scrollContainer: { flexGrow: 1 },
+  header: { fontSize: 26, fontWeight: "700", color: "#B78270", marginTop: 40, marginBottom: 10, textAlign: "center" },
+  form: { width: "92%", backgroundColor: "rgba(255,255,255,0.95)", borderRadius: 12, marginHorizontal: "4%", marginVertical: 40, padding: 18, shadowColor: "#000", shadowOpacity: 0.08, shadowOffset: { width: 0, height: 2 }, shadowRadius: 6, elevation: 3 },
+  title: { color: "#B78270", fontSize: 22, fontWeight: "700", marginBottom: 16, textAlign: "center" },
+  optionsContainer: { marginVertical: 16 },
+  optionsLabel: { fontSize: 15, fontWeight: "600", color: "#555", marginBottom: 10 },
+  optionButton: { borderWidth: 2, borderRadius: 10, padding: 16, marginBottom: 10, backgroundColor: "#fff", shadowColor: "#000", shadowOpacity: 0.05, shadowOffset: { width: 0, height: 1 }, shadowRadius: 3, elevation: 2 },
+  optionButtonSelected: { backgroundColor: "#f9f9f9", borderWidth: 2.5, elevation: 4 },
+  optionContent: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  optionLeft: { flex: 1 },
+  optionPeriod: { fontSize: 16, color: "#555", textTransform: "capitalize", marginBottom: 4 },
+  optionTextSelected: { fontWeight: "700", color: "#333", fontSize: 17 },
+  selectedBadge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 12, alignSelf: "flex-start", marginTop: 4 },
+  selectedBadgeText: { color: "#fff", fontSize: 11, fontWeight: "600" },
+  optionPrice: { fontSize: 22, fontWeight: "bold", color: "#333" },
+  planInfo: { backgroundColor: "#f9f9f9", padding: 14, borderRadius: 8, marginVertical: 12, flexDirection: "row", justifyContent: "space-between", alignItems: "center", borderLeftWidth: 4 },
+  planDetails: { flex: 1 },
+  planLabel: { fontSize: 13, color: "#666", marginBottom: 2 },
+  planName: { fontSize: 18, fontWeight: "bold", textTransform: "capitalize" },
+  planPeriod: { fontSize: 12, color: "#888", marginTop: 2, fontStyle: "italic" },
+  priceText: { fontSize: 20, fontWeight: "bold", color: "#333" },
+  loadingContainer: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10 },
+  loadingText: { color: "#fff", fontSize: 16, fontWeight: "600" },
+  mpButton: { backgroundColor: "#009EE3", borderRadius: 8, padding: 14, alignItems: "center", marginTop: 10 },
+  mpButtonDisabled: { opacity: 0.6 },
+  mpButtonText: { color: "#fff", fontSize: 18, fontWeight: "600" },
+  sub: { color: "#555", textAlign: "center", marginTop: 10 },
+  subLink: { color: "#B78270", textAlign: "center", marginTop: 4, textDecorationLine: "underline" },
+  webViewHeader: { padding: 16, backgroundColor: "#f9f9f9", borderBottomWidth: 1, borderBottomColor: "#eee" },
+  webViewClose: { color: "#B78270", fontWeight: "700" },
 });
