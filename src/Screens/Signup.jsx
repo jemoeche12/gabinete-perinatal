@@ -40,7 +40,12 @@ const PLAN_CONFIG = {
     color: "#C9A690",
     options: [
       { id: "intermedio_month", price: 18, period: "mes", currency: "eur" },
-      { id: "intermedio_6months", price: 70, period: "6 meses", currency: "eur" },
+      {
+        id: "intermedio_6months",
+        price: 70,
+        period: "6 meses",
+        currency: "eur",
+      },
       { id: "intermedio_year", price: 100, period: "año", currency: "eur" },
     ],
   },
@@ -78,7 +83,8 @@ const Signup = ({ navigation }) => {
   const { provider } = usePaymentProvider();
 
   const [triggerSignUp, result] = useSignUpMutation();
-  const [triggerUpdateProfile, { isLoading: profileLoading }] = useUpdateUserProfileMutation();
+  const [triggerUpdateProfile, { isLoading: profileLoading }] =
+    useUpdateUserProfileMutation();
 
   useEffect(() => {
     const currentPlan = PLAN_CONFIG[selectedPlan];
@@ -96,8 +102,10 @@ const Signup = ({ navigation }) => {
     if (result.isError) {
       const errorData = result.error?.data?.error || result.error;
       Alert.alert("Error", errorData.message || "Ocurrió un error.");
-      if (errorData.message?.includes("EMAIL_EXISTS")) setErrorMail("Email ya en uso");
-      if (errorData.message?.includes("WEAK_PASSWORD")) setErrorPassword("Contraseña débil");
+      if (errorData.message?.includes("EMAIL_EXISTS"))
+        setErrorMail("Email ya en uso");
+      if (errorData.message?.includes("WEAK_PASSWORD"))
+        setErrorPassword("Contraseña débil");
       setPassword("");
       setIsProcessingPayment(false);
     }
@@ -124,19 +132,21 @@ const Signup = ({ navigation }) => {
         },
       }).unwrap();
 
-      dispatch(setUser({
-        email: userEmail,
-        idToken,
-        localId,
-        name,
-        lastName,
-        role: "user",
-        membresia: {
-          tipo: selectedPlan,
-          subscriptionType: selectedOption?.id || "basico_free",
-          fechaInicio: Date.now(),
-        },
-      }));
+      dispatch(
+        setUser({
+          email: userEmail,
+          idToken,
+          localId,
+          name,
+          lastName,
+          role: "user",
+          membresia: {
+            tipo: selectedPlan,
+            subscriptionType: selectedOption?.id || "basico_free",
+            fechaInicio: Date.now(),
+          },
+        }),
+      );
 
       const planName = PLAN_CONFIG[selectedPlan]?.name || selectedPlan;
       const currencySymbol = selectedOption?.currency === "eur" ? "€" : "$";
@@ -149,9 +159,11 @@ const Signup = ({ navigation }) => {
             <h2 style="color: #B78270;">¡Hola ${name || ""}!</h2>
             <p>Gracias por registrarte en la Red Perinatal Digital.</p>
             <p>Tu plan seleccionado es: <strong>${planName}</strong></p>
-            ${selectedOption?.price > 0
-              ? `<p>Tu pago de ${currencySymbol}${selectedOption.price} (${selectedOption.period}) ha sido procesado exitosamente.</p>`
-              : ""}
+            ${
+              selectedOption?.price > 0
+                ? `<p>Tu pago de ${currencySymbol}${selectedOption.price} (${selectedOption.period}) ha sido procesado exitosamente.</p>`
+                : ""
+            }
             <p>¡Esperamos que disfrutes de todos nuestros recursos!</p>
             <br>
             <p>Saludos,<br>El equipo de Red Perinatal Digital</p>
@@ -161,19 +173,23 @@ const Signup = ({ navigation }) => {
 
       setIsProcessingPayment(false);
 
-      Alert.alert("¡Registro exitoso!", "Tu cuenta ha sido creada correctamente.", [
-        {
-          text: "OK",
-          onPress: () => {
-            setTimeout(() => {
-              navigation.reset({
-                index: 0,
-                routes: [{ name: "Main", params: { screen: "Home" } }],
-              });
-            }, 400);
+      Alert.alert(
+        "¡Registro exitoso!",
+        "Tu cuenta ha sido creada correctamente.",
+        [
+          {
+            text: "OK",
+            onPress: () => {
+              setTimeout(() => {
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: "Main", params: { screen: "Home" } }],
+                });
+              }, 400);
+            },
           },
-        },
-      ]);
+        ],
+      );
     } catch (err) {
       setIsProcessingPayment(false);
       Alert.alert("Error en el registro", err.message || "Error inesperado.");
@@ -184,12 +200,30 @@ const Signup = ({ navigation }) => {
     setErrorMail("");
     setErrorPassword("");
 
-    if (!name.trim()) { Alert.alert("Campo requerido", "Por favor, ingresa tu nombre."); return false; }
-    if (!lastName.trim()) { Alert.alert("Campo requerido", "Por favor, ingresa tu apellido."); return false; }
-    if (!email.trim()) { Alert.alert("Campo requerido", "Por favor, ingresa tu email."); return false; }
-    if (!/\S+@\S+\.\S+/.test(email)) { setErrorMail("Email inválido"); return false; }
-    if (!password) { Alert.alert("Campo requerido", "Por favor, ingresa una contraseña."); return false; }
-    if (password.length < 6) { setErrorPassword("La contraseña debe tener al menos 6 caracteres"); return false; }
+    if (!name.trim()) {
+      Alert.alert("Campo requerido", "Por favor, ingresa tu nombre.");
+      return false;
+    }
+    if (!lastName.trim()) {
+      Alert.alert("Campo requerido", "Por favor, ingresa tu apellido.");
+      return false;
+    }
+    if (!email.trim()) {
+      Alert.alert("Campo requerido", "Por favor, ingresa tu email.");
+      return false;
+    }
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      setErrorMail("Email inválido");
+      return false;
+    }
+    if (!password) {
+      Alert.alert("Campo requerido", "Por favor, ingresa una contraseña.");
+      return false;
+    }
+    if (password.length < 6) {
+      setErrorPassword("La contraseña debe tener al menos 6 caracteres");
+      return false;
+    }
 
     return true;
   };
@@ -204,7 +238,12 @@ const Signup = ({ navigation }) => {
         body: JSON.stringify({
           customerName: `${name} ${lastName}`,
           customerEmail: email,
-          cartItems: [{ titulo: `Membresía ${planName} - ${selectedOption.period}`, name: `Plan ${planName}` }],
+          cartItems: [
+            {
+              titulo: `Membresía ${planName} - ${selectedOption.period}`,
+              name: `Plan ${planName}`,
+            },
+          ],
           amount: selectedOption.price,
           currency: selectedOption.currency,
         }),
@@ -219,7 +258,10 @@ const Signup = ({ navigation }) => {
       return data.clientSecret;
     } catch (error) {
       console.error("Error en fetchPaymentIntent:", error);
-      Alert.alert("Error de Conexión", `No se pudo conectar con el servidor: ${error.message}`);
+      Alert.alert(
+        "Error de Conexión",
+        `No se pudo conectar con el servidor: ${error.message}`,
+      );
       return null;
     }
   };
@@ -263,7 +305,9 @@ const Signup = ({ navigation }) => {
           amount: selectedOption.price,
           customerEmail: email,
           customerName: `${name} ${lastName}`,
-          cartItems: [{ titulo: `Membresía ${planName} - ${selectedOption.period}` }],
+          cartItems: [
+            { titulo: `Membresía ${planName} - ${selectedOption.period}` },
+          ],
         }),
       });
 
@@ -277,7 +321,10 @@ const Signup = ({ navigation }) => {
       setIsProcessingPayment(false);
     } catch (error) {
       console.error("Error en handleMercadoPago:", error);
-      Alert.alert("Error de Conexión", `No se pudo conectar con el servidor: ${error.message}`);
+      Alert.alert(
+        "Error de Conexión",
+        `No se pudo conectar con el servidor: ${error.message}`,
+      );
       setIsProcessingPayment(false);
     }
   };
@@ -293,7 +340,13 @@ const Signup = ({ navigation }) => {
       Alert.alert(
         "Pago pendiente",
         "Tu pago está siendo procesado. Igual completamos tu registro.",
-        [{ text: "OK", onPress: () => triggerSignUp({ email, password, returnSecureToken: true }) }],
+        [
+          {
+            text: "OK",
+            onPress: () =>
+              triggerSignUp({ email, password, returnSecureToken: true }),
+          },
+        ],
       );
     } else if (data.status === "error") {
       Alert.alert("Error en el pago", data.message || "Intentá de nuevo.");
@@ -334,7 +387,10 @@ const Signup = ({ navigation }) => {
 
       triggerSignUp({ email, password, returnSecureToken: true });
     } catch (error) {
-      Alert.alert("Error", error.message || "Ocurrió un error al procesar el pago");
+      Alert.alert(
+        "Error",
+        error.message || "Ocurrió un error al procesar el pago",
+      );
       setIsProcessingPayment(false);
     }
   };
@@ -344,7 +400,11 @@ const Signup = ({ navigation }) => {
   const isLoading = result.isLoading || profileLoading || isProcessingPayment;
 
   return (
-    <ImageBackground source={fondoSignUp} style={styles.background} resizeMode="cover">
+    <ImageBackground
+      source={fondoSignUp}
+      style={styles.background}
+      resizeMode="cover"
+    >
       <ScrollView
         contentContainerStyle={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
@@ -352,12 +412,15 @@ const Signup = ({ navigation }) => {
       >
         <Membresias
           onSelectPlan={(planId) => setSelectedPlan(planId)}
-          onSelectDuration={(option) => option && setSelectedOption({
-            id: option.id || `${selectedPlan}_${option.period}`,
-            price: option.price,
-            period: option.period,
-            currency: option.currency,
-          })}
+          onSelectDuration={(option) =>
+            option &&
+            setSelectedOption({
+              id: option.id || `${selectedPlan}_${option.period}`,
+              price: option.price,
+              period: option.period,
+              currency: option.currency,
+            })
+          }
         />
 
         <Text style={styles.header}>Crea tu cuenta</Text>
@@ -366,8 +429,17 @@ const Signup = ({ navigation }) => {
           <Text style={styles.title}>Registro</Text>
 
           <InputForm label="Nombre" value={name} onChangeText={setName} />
-          <InputForm label="Apellido" value={lastName} onChangeText={setLastName} />
-          <InputForm label="Email" value={email} onChangeText={setEmail} error={errorMail} />
+          <InputForm
+            label="Apellido"
+            value={lastName}
+            onChangeText={setLastName}
+          />
+          <InputForm
+            label="Email"
+            value={email}
+            onChangeText={setEmail}
+            error={errorMail}
+          />
           <InputForm
             label="Contraseña"
             placeholder="Mínimo 6 caracteres"
@@ -385,7 +457,8 @@ const Signup = ({ navigation }) => {
                   key={option.id}
                   style={[
                     styles.optionButton,
-                    selectedOption?.id === option.id && styles.optionButtonSelected,
+                    selectedOption?.id === option.id &&
+                      styles.optionButtonSelected,
                     { borderColor: currentPlan.color },
                   ]}
                   onPress={() => setSelectedOption(option)}
@@ -393,17 +466,38 @@ const Signup = ({ navigation }) => {
                 >
                   <View style={styles.optionContent}>
                     <View style={styles.optionLeft}>
-                      <Text style={[styles.optionPeriod, selectedOption?.id === option.id && styles.optionTextSelected]}>
+                      <Text
+                        style={[
+                          styles.optionPeriod,
+                          selectedOption?.id === option.id &&
+                            styles.optionTextSelected,
+                        ]}
+                      >
                         {option.period}
                       </Text>
                       {selectedOption?.id === option.id && (
-                        <View style={[styles.selectedBadge, { backgroundColor: currentPlan.color }]}>
-                          <Text style={styles.selectedBadgeText}>✓ Seleccionado</Text>
+                        <View
+                          style={[
+                            styles.selectedBadge,
+                            { backgroundColor: currentPlan.color },
+                          ]}
+                        >
+                          <Text style={styles.selectedBadgeText}>
+                            ✓ Seleccionado
+                          </Text>
                         </View>
                       )}
                     </View>
-                    <Text style={[styles.optionPrice, selectedOption?.id === option.id && { color: currentPlan.color }]}>
-                      {option.currency === "eur" ? "€" : "$"}{option.price}
+                    <Text
+                      style={[
+                        styles.optionPrice,
+                        selectedOption?.id === option.id && {
+                          color: currentPlan.color,
+                        },
+                      ]}
+                    >
+                      {option.currency === "eur" ? "€" : "$"}
+                      {option.price}
                     </Text>
                   </View>
                 </TouchableOpacity>
@@ -411,46 +505,72 @@ const Signup = ({ navigation }) => {
             </View>
           )}
 
-          <View style={[styles.planInfo, { borderLeftColor: currentPlan?.color || "#B78270" }]}>
+          <View
+            style={[
+              styles.planInfo,
+              { borderLeftColor: currentPlan?.color || "#B78270" },
+            ]}
+          >
             <View style={styles.planDetails}>
               <Text style={styles.planLabel}>Plan seleccionado:</Text>
-              <Text style={[styles.planName, { color: currentPlan?.color || "#B78270" }]}>
+              <Text
+                style={[
+                  styles.planName,
+                  { color: currentPlan?.color || "#B78270" },
+                ]}
+              >
                 {currentPlan?.name || "Básico"}
               </Text>
               {selectedOption?.price > 0 && (
-                <Text style={styles.planPeriod}>por {selectedOption.period}</Text>
+                <Text style={styles.planPeriod}>
+                  por {selectedOption.period}
+                </Text>
               )}
             </View>
             <Text style={styles.priceText}>
-              {selectedOption?.price === 0 ? "Gratis" : `${currencySymbol}${selectedOption?.price}`}
+              {selectedOption?.price === 0
+                ? "Gratis"
+                : `${currencySymbol}${selectedOption?.price}`}
             </Text>
           </View>
-
-          <SubmitButton
-            onPress={onSubmit}
-            disabled={isLoading || !dbInitialized}
-          >
-            {isLoading ? (
-              <View style={styles.loadingContainer}>
-                <ActivityIndicator size="small" color="#fff" />
-                <Text style={styles.loadingText}>
-                  {isProcessingPayment ? "Procesando..." : "Registrando..."}
-                </Text>
-              </View>
-            ) : (
-              <Text style={{ color: "black", fontSize: 18, fontWeight: "600", textAlign: "center" }}>
-                {selectedOption?.price === 0
-                  ? "Registrarme"
-                  : provider === "mercadopago"
-                    ? "Pagar con tarjeta (Stripe)"
-                    : "Pagar y Registrarme"}
+          {selectedOption?.price === 0 && (
+            <SubmitButton
+              onPress={onSubmit}
+              disabled={isLoading || !dbInitialized}
+            >
+              <Text
+                style={{
+                  color: "black",
+                  fontSize: 18,
+                  fontWeight: "600",
+                  textAlign: "center",
+                }}
+              >
+                Registrarme
               </Text>
-            )}
-          </SubmitButton>
+            </SubmitButton>
+          )}
+
+          {selectedOption?.price > 0 && provider !== "mercadopago" && (
+            <Pressable
+              style={[styles.mpButton, isLoading && styles.mpButtonDisabled, { backgroundColor: "#B78270" }]}
+              onPress={onSubmit}
+              disabled={isLoading || !dbInitialized}
+            >
+              {isProcessingPayment ? (
+                <View style={styles.loadingContainer}>
+                  <ActivityIndicator size="small" color="#fff" /> 
+                </View>
+              ) : (
+                <Text style={styles.mpButtonText}>Pagar con Stripe</Text>
+              )}
+            </Pressable>
+
+          )}
 
           {selectedOption?.price > 0 && provider === "mercadopago" && (
             <Pressable
-              style={[ styles.mpButton, isLoading && styles.mpButtonDisabled]}
+              style={[styles.mpButton, isLoading && styles.mpButtonDisabled]}
               onPress={handleMercadoPago}
               disabled={isLoading || !dbInitialized}
             >
@@ -495,33 +615,128 @@ export default Signup;
 const styles = StyleSheet.create({
   background: { flex: 1 },
   scrollContainer: { flexGrow: 1 },
-  header: { fontSize: 26, fontWeight: "700", color: "#B78270", marginTop: 40, marginBottom: 10, textAlign: "center" },
-  form: { width: "92%", backgroundColor: "rgba(255,255,255,0.95)", borderRadius: 12, marginHorizontal: "4%", marginVertical: 40, padding: 18, shadowColor: "#000", shadowOpacity: 0.08, shadowOffset: { width: 0, height: 2 }, shadowRadius: 6, elevation: 3 },
-  title: { color: "#B78270", fontSize: 22, fontWeight: "700", marginBottom: 16, textAlign: "center" },
+  header: {
+    fontSize: 26,
+    fontWeight: "700",
+    color: "#B78270",
+    marginTop: 40,
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  form: {
+    width: "92%",
+    backgroundColor: "rgba(255,255,255,0.95)",
+    borderRadius: 12,
+    marginHorizontal: "4%",
+    marginVertical: 40,
+    padding: 18,
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  title: {
+    color: "#B78270",
+    fontSize: 22,
+    fontWeight: "700",
+    marginBottom: 16,
+    textAlign: "center",
+  },
   optionsContainer: { marginVertical: 16 },
-  optionsLabel: { fontSize: 15, fontWeight: "600", color: "#555", marginBottom: 10 },
-  optionButton: { borderWidth: 2, borderRadius: 10, padding: 16, marginBottom: 10, backgroundColor: "#fff", shadowColor: "#000", shadowOpacity: 0.05, shadowOffset: { width: 0, height: 1 }, shadowRadius: 3, elevation: 2 },
-  optionButtonSelected: { backgroundColor: "#f9f9f9", borderWidth: 2.5, elevation: 4 },
-  optionContent: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  optionsLabel: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#555",
+    marginBottom: 10,
+  },
+  optionButton: {
+    borderWidth: 2,
+    borderRadius: 10,
+    padding: 16,
+    marginBottom: 10,
+    backgroundColor: "#fff",
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  optionButtonSelected: {
+    backgroundColor: "#f9f9f9",
+    borderWidth: 2.5,
+    elevation: 4,
+  },
+  optionContent: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
   optionLeft: { flex: 1 },
-  optionPeriod: { fontSize: 16, color: "#555", textTransform: "capitalize", marginBottom: 4 },
+  optionPeriod: {
+    fontSize: 16,
+    color: "#555",
+    textTransform: "capitalize",
+    marginBottom: 4,
+  },
   optionTextSelected: { fontWeight: "700", color: "#333", fontSize: 17 },
-  selectedBadge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 12, alignSelf: "flex-start", marginTop: 4 },
+  selectedBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 12,
+    alignSelf: "flex-start",
+    marginTop: 4,
+  },
   selectedBadgeText: { color: "#fff", fontSize: 11, fontWeight: "600" },
   optionPrice: { fontSize: 22, fontWeight: "bold", color: "#333" },
-  planInfo: { backgroundColor: "#f9f9f9", padding: 14, borderRadius: 8, marginVertical: 12, flexDirection: "row", justifyContent: "space-between", alignItems: "center", borderLeftWidth: 4 },
+  planInfo: {
+    backgroundColor: "#f9f9f9",
+    padding: 14,
+    borderRadius: 8,
+    marginVertical: 12,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderLeftWidth: 4,
+  },
   planDetails: { flex: 1 },
   planLabel: { fontSize: 13, color: "#666", marginBottom: 2 },
   planName: { fontSize: 18, fontWeight: "bold", textTransform: "capitalize" },
-  planPeriod: { fontSize: 12, color: "#888", marginTop: 2, fontStyle: "italic" },
+  planPeriod: {
+    fontSize: 12,
+    color: "#888",
+    marginTop: 2,
+    fontStyle: "italic",
+  },
   priceText: { fontSize: 20, fontWeight: "bold", color: "#333" },
-  loadingContainer: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10 },
+  loadingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+  },
   loadingText: { color: "#fff", fontSize: 16, fontWeight: "600" },
-  mpButton: { backgroundColor: "#009EE3", borderRadius: 8, padding: 14, alignItems: "center", marginTop: 10 },
+  mpButton: {
+    backgroundColor: "#009EE3",
+    borderRadius: 8,
+    padding: 14,
+    alignItems: "center",
+    marginTop: 10,
+  },
   mpButtonDisabled: { opacity: 0.6 },
   mpButtonText: { color: "#fff", fontSize: 18, fontWeight: "600" },
   sub: { color: "#555", textAlign: "center", marginTop: 10 },
-  subLink: { color: "#B78270", textAlign: "center", marginTop: 4, textDecorationLine: "underline" },
-  webViewHeader: { padding: 16, backgroundColor: "#f9f9f9", borderBottomWidth: 1, borderBottomColor: "#eee" },
+  subLink: {
+    color: "#B78270",
+    textAlign: "center",
+    marginTop: 4,
+    textDecorationLine: "underline",
+  },
+  webViewHeader: {
+    padding: 16,
+    backgroundColor: "#f9f9f9",
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+  },
   webViewClose: { color: "#B78270", fontWeight: "700" },
 });
