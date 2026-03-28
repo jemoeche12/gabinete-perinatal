@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
+  Modal,
   Pressable,
   StyleSheet,
   Text,
@@ -9,8 +10,8 @@ import {
   ImageBackground,
   ScrollView,
   TouchableOpacity,
-  KeyboardAvoidingView,
 } from "react-native";
+import WebView from "react-native-webview";
 import { useStripe } from "@stripe/stripe-react-native";
 import InputForm from "../components/InputForm";
 import SubmitButton from "../components/SubmitButton";
@@ -22,6 +23,9 @@ import { sendEmailFromClient } from "../services/emailService";
 import { useUpdateUserProfileMutation } from "../services/userService";
 import fondoSignUp from "../../assets/fondos/CONTACTO.jpg";
 import Membresias from "./Membresias";
+import { usePaymentProvider } from "../hooks/usePaymentProvider";
+
+const API_BASE_URL = "https://api-yela3b24ha-uc.a.run.app";
 
 const PLAN_CONFIG = {
   basico: {
@@ -36,12 +40,7 @@ const PLAN_CONFIG = {
     color: "#C9A690",
     options: [
       { id: "intermedio_month", price: 18, period: "mes", currency: "eur" },
-      {
-        id: "intermedio_6months",
-        price: 70,
-        period: "6 meses",
-        currency: "eur",
-      },
+      { id: "intermedio_6months", price: 70, period: "6 meses", currency: "eur" },
       { id: "intermedio_year", price: 100, period: "año", currency: "eur" },
     ],
   },
@@ -69,14 +68,17 @@ const Signup = ({ navigation }) => {
     currency: "eur",
   });
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [showWebView, setShowWebView] = useState(false);
+  const [mpCheckoutUrl, setMpCheckoutUrl] = useState("");
 
   const { insertSession, dbInitialized } = useDBContext();
   const dispatch = useDispatch();
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
 
+  const { provider } = usePaymentProvider();
+
   const [triggerSignUp, result] = useSignUpMutation();
-  const [triggerUpdateProfile, { isLoading: profileLoading }] =
-    useUpdateUserProfileMutation();
+  const [triggerUpdateProfile, { isLoading: profileLoading }] = useUpdateUserProfileMutation();
 
   useEffect(() => {
     const currentPlan = PLAN_CONFIG[selectedPlan];
@@ -94,10 +96,8 @@ const Signup = ({ navigation }) => {
     if (result.isError) {
       const errorData = result.error?.data?.error || result.error;
       Alert.alert("Error", errorData.message || "Ocurrió un error.");
-      if (errorData.message?.includes("EMAIL_EXISTS"))
-        setErrorMail("Email ya en uso");
-      if (errorData.message?.includes("WEAK_PASSWORD"))
-        setErrorPassword("Contraseña débil");
+      if (errorData.message?.includes("EMAIL_EXISTS")) setErrorMail("Email ya en uso");
+      if (errorData.message?.includes("WEAK_PASSWORD")) setErrorPassword("Contraseña débil");
       setPassword("");
       setIsProcessingPayment(false);
     }
@@ -110,11 +110,7 @@ const Signup = ({ navigation }) => {
         return;
       }
 
-      await insertSession({
-        email: userEmail,
-        localId,
-        token: idToken,
-      });
+      await insertSession({ email: userEmail, localId, token: idToken });
 
       await triggerUpdateProfile({
         localId,
@@ -128,21 +124,19 @@ const Signup = ({ navigation }) => {
         },
       }).unwrap();
 
-      dispatch(
-        setUser({
-          email: userEmail,
-          idToken,
-          localId,
-          name,
-          lastName,
-          role: "user",
-          membresia: {
-            tipo: selectedPlan,
-            subscriptionType: selectedOption?.id || "basico_free",
-            fechaInicio: Date.now(),
-          },
-        }),
-      );
+      dispatch(setUser({
+        email: userEmail,
+        idToken,
+        localId,
+        name,
+        lastName,
+        role: "user",
+        membresia: {
+          tipo: selectedPlan,
+          subscriptionType: selectedOption?.id || "basico_free",
+          fechaInicio: Date.now(),
+        },
+      }));
 
       const planName = PLAN_CONFIG[selectedPlan]?.name || selectedPlan;
       const currencySymbol = selectedOption?.currency === "eur" ? "€" : "$";
@@ -155,11 +149,9 @@ const Signup = ({ navigation }) => {
             <h2 style="color: #B78270;">¡Hola ${name || ""}!</h2>
             <p>Gracias por registrarte en la Red Perinatal Digital.</p>
             <p>Tu plan seleccionado es: <strong>${planName}</strong></p>
-            ${
-              selectedOption?.price > 0
-                ? `<p>Tu pago de ${currencySymbol}${selectedOption.price} (${selectedOption.period}) ha sido procesado exitosamente.</p>`
-                : ""
-            }
+            ${selectedOption?.price > 0
+              ? `<p>Tu pago de ${currencySymbol}${selectedOption.price} (${selectedOption.period}) ha sido procesado exitosamente.</p>`
+              : ""}
             <p>¡Esperamos que disfrutes de todos nuestros recursos!</p>
             <br>
             <p>Saludos,<br>El equipo de Red Perinatal Digital</p>
@@ -169,24 +161,19 @@ const Signup = ({ navigation }) => {
 
       setIsProcessingPayment(false);
 
-      Alert.alert(
-        "¡Registro exitoso!",
-        "Tu cuenta ha sido creada correctamente.",
-        [
-          {
-            text: "OK",
-            onPress: () => {
-              setTimeout(() => {
-
-                navigation.reset({
-                  index: 0,
-                  routes: [{ name: "Main", params: { screen: "Home" } }],
-                });
-              }, 200);
-            },
+      Alert.alert("¡Registro exitoso!", "Tu cuenta ha sido creada correctamente.", [
+        {
+          text: "OK",
+          onPress: () => {
+            setTimeout(() => {
+              navigation.reset({
+                index: 0,
+                routes: [{ name: "Main", params: { screen: "Home" } }],
+              });
+            }, 400);
           },
-        ],
-      );
+        },
+      ]);
     } catch (err) {
       setIsProcessingPayment(false);
       Alert.alert("Error en el registro", err.message || "Error inesperado.");
@@ -197,30 +184,12 @@ const Signup = ({ navigation }) => {
     setErrorMail("");
     setErrorPassword("");
 
-    if (!name.trim()) {
-      Alert.alert("Campo requerido", "Por favor, ingresa tu nombre.");
-      return false;
-    }
-    if (!lastName.trim()) {
-      Alert.alert("Campo requerido", "Por favor, ingresa tu apellido.");
-      return false;
-    }
-    if (!email.trim()) {
-      Alert.alert("Campo requerido", "Por favor, ingresa tu email.");
-      return false;
-    }
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      setErrorMail("Email inválido");
-      return false;
-    }
-    if (!password) {
-      Alert.alert("Campo requerido", "Por favor, ingresa una contraseña.");
-      return false;
-    }
-    if (password.length < 6) {
-      setErrorPassword("La contraseña debe tener al menos 6 caracteres");
-      return false;
-    }
+    if (!name.trim()) { Alert.alert("Campo requerido", "Por favor, ingresa tu nombre."); return false; }
+    if (!lastName.trim()) { Alert.alert("Campo requerido", "Por favor, ingresa tu apellido."); return false; }
+    if (!email.trim()) { Alert.alert("Campo requerido", "Por favor, ingresa tu email."); return false; }
+    if (!/\S+@\S+\.\S+/.test(email)) { setErrorMail("Email inválido"); return false; }
+    if (!password) { Alert.alert("Campo requerido", "Por favor, ingresa una contraseña."); return false; }
+    if (password.length < 6) { setErrorPassword("La contraseña debe tener al menos 6 caracteres"); return false; }
 
     return true;
   };
@@ -229,53 +198,28 @@ const Signup = ({ navigation }) => {
     try {
       const planName = PLAN_CONFIG[selectedPlan]?.name || selectedPlan;
 
-      const requestData = {
-        customerName: `${name} ${lastName}`,
-        customerEmail: email,
-        cartItems: [
-          {
-            titulo: `Membresía ${planName} - ${selectedOption.period}`,
-            name: `Plan ${planName}`,
-          },
-        ],
-        amount: selectedOption.price,
-        currency: selectedOption.currency,
-      };
+      const response = await fetch(`${API_BASE_URL}/create-payment-intent`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerName: `${name} ${lastName}`,
+          customerEmail: email,
+          cartItems: [{ titulo: `Membresía ${planName} - ${selectedOption.period}`, name: `Plan ${planName}` }],
+          amount: selectedOption.price,
+          currency: selectedOption.currency,
+        }),
+      });
 
-      const response = await fetch(
-        `https://api-yela3b24ha-uc.a.run.app/create-payment-intent`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(requestData),
-        },
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Error del servidor:", errorText);
-        throw new Error(`Server error: ${response.status} - ${errorText}`);
-      }
+      if (!response.ok) throw new Error(`Server error: ${response.status}`);
 
       const data = await response.json();
-
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      if (!data.clientSecret) {
-        throw new Error("No se recibió el clientSecret del servidor");
-      }
+      if (data.error) throw new Error(data.error);
+      if (!data.clientSecret) throw new Error("No se recibió el clientSecret");
 
       return data.clientSecret;
     } catch (error) {
       console.error("Error en fetchPaymentIntent:", error);
-      Alert.alert(
-        "Error de Conexión",
-        `No se pudo conectar con el servidor de pagos: ${error.message}.`,
-      );
+      Alert.alert("Error de Conexión", `No se pudo conectar con el servidor: ${error.message}`);
       return null;
     }
   };
@@ -283,35 +227,76 @@ const Signup = ({ navigation }) => {
   const initializePaymentSheet = async () => {
     try {
       const clientSecret = await fetchPaymentIntent();
-
-      if (!clientSecret) {
-        return false;
-      }
+      if (!clientSecret) return false;
 
       const { error } = await initPaymentSheet({
         paymentIntentClientSecret: clientSecret,
         merchantDisplayName: "Red Perinatal Digital",
         allowsDelayedPaymentMethods: true,
-        defaultBillingDetails: {
-          name: `${name} ${lastName}`,
-          email: email,
-        },
+        defaultBillingDetails: { name: `${name} ${lastName}`, email },
       });
 
       if (error) {
-        console.error("Error al inicializar PaymentSheet:", error);
-        Alert.alert(
-          "Error de Configuración",
-          `Error al configurar el pago: ${error.message}`,
-        );
+        Alert.alert("Error de Configuración", error.message);
         return false;
       }
 
       return true;
     } catch (error) {
-      console.error("Error inesperado en initializePaymentSheet:", error);
-      Alert.alert("Error", `Error inesperado: ${error.message}`);
+      Alert.alert("Error", error.message);
       return false;
+    }
+  };
+
+  const handleMercadoPago = async () => {
+    if (!validateForm()) return;
+
+    setIsProcessingPayment(true);
+
+    try {
+      const planName = PLAN_CONFIG[selectedPlan]?.name || selectedPlan;
+
+      const response = await fetch(`${API_BASE_URL}/create-mp-order`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: selectedOption.price,
+          customerEmail: email,
+          customerName: `${name} ${lastName}`,
+          cartItems: [{ titulo: `Membresía ${planName} - ${selectedOption.period}` }],
+        }),
+      });
+
+      if (!response.ok) throw new Error(`Server error: ${response.status}`);
+
+      const data = await response.json();
+
+      const checkoutUrl = `${API_BASE_URL}/checkout.html?orderId=${data.orderId}&amount=${selectedOption.price}&publicKey=${data.publicKey}`;
+      setMpCheckoutUrl(checkoutUrl);
+      setShowWebView(true);
+      setIsProcessingPayment(false);
+    } catch (error) {
+      console.error("Error en handleMercadoPago:", error);
+      Alert.alert("Error de Conexión", `No se pudo conectar con el servidor: ${error.message}`);
+      setIsProcessingPayment(false);
+    }
+  };
+
+  const handleWebViewMessage = async (event) => {
+    const data = JSON.parse(event.nativeEvent.data);
+
+    if (data.status === "approved") {
+      setShowWebView(false);
+      triggerSignUp({ email, password, returnSecureToken: true });
+    } else if (data.status === "pending") {
+      setShowWebView(false);
+      Alert.alert(
+        "Pago pendiente",
+        "Tu pago está siendo procesado. Igual completamos tu registro.",
+        [{ text: "OK", onPress: () => triggerSignUp({ email, password, returnSecureToken: true }) }],
+      );
+    } else if (data.status === "error") {
+      Alert.alert("Error en el pago", data.message || "Intentá de nuevo.");
     }
   };
 
@@ -341,11 +326,7 @@ const Signup = ({ navigation }) => {
         if (error.code === "Canceled") {
           Alert.alert("Pago Cancelado", "Has cancelado el proceso de pago.");
         } else {
-          console.error("Error en presentPaymentSheet:", error);
-          Alert.alert(
-            "Error de Pago",
-            `El pago no se pudo completar: ${error.message}`,
-          );
+          Alert.alert("Error de Pago", error.message);
         }
         setIsProcessingPayment(false);
         return;
@@ -353,194 +334,158 @@ const Signup = ({ navigation }) => {
 
       triggerSignUp({ email, password, returnSecureToken: true });
     } catch (error) {
-      console.error("Error en el proceso de pago:", error);
-      Alert.alert(
-        "Error",
-        error.message || "Ocurrió un error al procesar el pago",
-      );
+      Alert.alert("Error", error.message || "Ocurrió un error al procesar el pago");
       setIsProcessingPayment(false);
-    }
-  };
-
-  const handlePlanSelect = (planId) => {
-    setSelectedPlan(planId);
-  };
-
-  const handleDurationSelect = (option) => {
-    if (option) {
-      setSelectedOption({
-        id: option.id || `${selectedPlan}_${option.period}`,
-        price: option.price,
-        period: option.period,
-        currency: option.currency,
-      });
     }
   };
 
   const currentPlan = PLAN_CONFIG[selectedPlan];
   const currencySymbol = selectedOption?.currency === "eur" ? "€" : "$";
+  const isLoading = result.isLoading || profileLoading || isProcessingPayment;
 
   return (
-    <ImageBackground
-      source={fondoSignUp}
-      style={styles.background}
-      resizeMode="cover"
-    >
-        <ScrollView
-          contentContainerStyle={styles.scrollContainer}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
-          <Membresias
-            onSelectPlan={handlePlanSelect}
-            onSelectDuration={handleDurationSelect}
+    <ImageBackground source={fondoSignUp} style={styles.background} resizeMode="cover">
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <Membresias
+          onSelectPlan={(planId) => setSelectedPlan(planId)}
+          onSelectDuration={(option) => option && setSelectedOption({
+            id: option.id || `${selectedPlan}_${option.period}`,
+            price: option.price,
+            period: option.period,
+            currency: option.currency,
+          })}
+        />
+
+        <Text style={styles.header}>Crea tu cuenta</Text>
+
+        <View style={styles.form}>
+          <Text style={styles.title}>Registro</Text>
+
+          <InputForm label="Nombre" value={name} onChangeText={setName} />
+          <InputForm label="Apellido" value={lastName} onChangeText={setLastName} />
+          <InputForm label="Email" value={email} onChangeText={setEmail} error={errorMail} />
+          <InputForm
+            label="Contraseña"
+            placeholder="Mínimo 6 caracteres"
+            value={password}
+            onChangeText={setPassword}
+            error={errorPassword}
+            isSecure
           />
-          <Text style={styles.header}>Crea tu cuenta</Text>
-          <View style={styles.form}>
-            <Text style={styles.title}>Registro</Text>
 
-            <InputForm label="Nombre" value={name} onChangeText={setName} />
-            <InputForm
-              label="Apellido"
-              value={lastName}
-              onChangeText={setLastName}
-            />
-            <InputForm
-              label="Email"
-              value={email}
-              onChangeText={setEmail}
-              error={errorMail}
-            />
-            <InputForm
-              label="Contraseña"
-              placeholder="Mínimo 6 caracteres"
-              value={password}
-              onChangeText={setPassword}
-              error={errorPassword}
-              isSecure
-            />
-            {currentPlan?.options && currentPlan.options.length > 1 && (
-              <View style={styles.optionsContainer}>
-                <Text style={styles.optionsLabel}>Selecciona el período:</Text>
-                {currentPlan.options.map((option) => (
-                  <TouchableOpacity
-                    key={option.id}
-                    style={[
-                      styles.optionButton,
-                      selectedOption?.id === option.id &&
-                        styles.optionButtonSelected,
-                      { borderColor: currentPlan.color },
-                    ]}
-                    onPress={() => setSelectedOption(option)}
-                    activeOpacity={0.7}
-                  >
-                    <View style={styles.optionContent}>
-                      <View style={styles.optionLeft}>
-                        <Text
-                          style={[
-                            styles.optionPeriod,
-                            selectedOption?.id === option.id &&
-                              styles.optionTextSelected,
-                          ]}
-                        >
-                          {option.period}
-                        </Text>
-                        {selectedOption?.id === option.id && (
-                          <View
-                            style={[
-                              styles.selectedBadge,
-                              { backgroundColor: currentPlan.color },
-                            ]}
-                          >
-                            <Text style={styles.selectedBadgeText}>
-                              ✓ Seleccionado
-                            </Text>
-                          </View>
-                        )}
-                      </View>
-                      <Text
-                        style={[
-                          styles.optionPrice,
-                          selectedOption?.id === option.id && {
-                            color: currentPlan.color,
-                          },
-                        ]}
-                      >
-                        {option.currency === "eur" ? "€" : "$"}
-                        {option.price}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
-
-            <View
-              style={[
-                styles.planInfo,
-                { borderLeftColor: currentPlan?.color || "#B78270" },
-              ]}
-            >
-              <View style={styles.planDetails}>
-                <Text style={styles.planLabel}>Plan seleccionado:</Text>
-                <Text
+          {currentPlan?.options && currentPlan.options.length > 1 && (
+            <View style={styles.optionsContainer}>
+              <Text style={styles.optionsLabel}>Selecciona el período:</Text>
+              {currentPlan.options.map((option) => (
+                <TouchableOpacity
+                  key={option.id}
                   style={[
-                    styles.planName,
-                    { color: currentPlan?.color || "#B78270" },
+                    styles.optionButton,
+                    selectedOption?.id === option.id && styles.optionButtonSelected,
+                    { borderColor: currentPlan.color },
                   ]}
+                  onPress={() => setSelectedOption(option)}
+                  activeOpacity={0.7}
                 >
-                  {currentPlan?.name || "Básico"}
-                </Text>
-                {selectedOption && selectedOption.price > 0 && (
-                  <Text style={styles.planPeriod}>
-                    por {selectedOption.period}
-                  </Text>
-                )}
-              </View>
-              <Text style={styles.priceText}>
-                {selectedOption?.price === 0
-                  ? "Gratis"
-                  : `${currencySymbol}${selectedOption?.price}`}
-              </Text>
+                  <View style={styles.optionContent}>
+                    <View style={styles.optionLeft}>
+                      <Text style={[styles.optionPeriod, selectedOption?.id === option.id && styles.optionTextSelected]}>
+                        {option.period}
+                      </Text>
+                      {selectedOption?.id === option.id && (
+                        <View style={[styles.selectedBadge, { backgroundColor: currentPlan.color }]}>
+                          <Text style={styles.selectedBadgeText}>✓ Seleccionado</Text>
+                        </View>
+                      )}
+                    </View>
+                    <Text style={[styles.optionPrice, selectedOption?.id === option.id && { color: currentPlan.color }]}>
+                      {option.currency === "eur" ? "€" : "$"}{option.price}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
             </View>
+          )}
 
-            <SubmitButton
-              onPress={onSubmit}
-              disabled={
-                result.isLoading ||
-                profileLoading ||
-                !dbInitialized ||
-                isProcessingPayment
-              }
-            >
-              {result.isLoading || profileLoading || isProcessingPayment ? (
-                <View style={styles.loadingContainer}>
-                  <ActivityIndicator size="small" color="#fff" />
-                  <Text style={styles.loadingText}>
-                    {isProcessingPayment ? "Procesando..." : "Registrando..."}
-                  </Text>
-                </View>
-              ) : (
-                <Text
-                  style={{
-                    color: "black",
-                    fontSize: 18,
-                    fontWeight: "600",
-                    textAlign: "center",
-                  }}
-                >
-                  {selectedOption?.price === 0
-                    ? "Registrarme"
-                    : "Pagar y Registrarme"}
-                </Text>
+          <View style={[styles.planInfo, { borderLeftColor: currentPlan?.color || "#B78270" }]}>
+            <View style={styles.planDetails}>
+              <Text style={styles.planLabel}>Plan seleccionado:</Text>
+              <Text style={[styles.planName, { color: currentPlan?.color || "#B78270" }]}>
+                {currentPlan?.name || "Básico"}
+              </Text>
+              {selectedOption?.price > 0 && (
+                <Text style={styles.planPeriod}>por {selectedOption.period}</Text>
               )}
-            </SubmitButton>
-            <Text style={styles.sub}>¿Ya tienes una cuenta?</Text>
-            <Pressable onPress={() => navigation.navigate("Login")}>
-              <Text style={styles.subLink}>Iniciar Sesión</Text>
-            </Pressable>
+            </View>
+            <Text style={styles.priceText}>
+              {selectedOption?.price === 0 ? "Gratis" : `${currencySymbol}${selectedOption?.price}`}
+            </Text>
           </View>
-        </ScrollView>
+
+          <SubmitButton
+            onPress={onSubmit}
+            disabled={isLoading || !dbInitialized}
+          >
+            {isLoading ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="small" color="#fff" />
+                <Text style={styles.loadingText}>
+                  {isProcessingPayment ? "Procesando..." : "Registrando..."}
+                </Text>
+              </View>
+            ) : (
+              <Text style={{ color: "black", fontSize: 18, fontWeight: "600", textAlign: "center" }}>
+                {selectedOption?.price === 0
+                  ? "Registrarme"
+                  : provider === "mercadopago"
+                    ? "Pagar con tarjeta (Stripe)"
+                    : "Pagar y Registrarme"}
+              </Text>
+            )}
+          </SubmitButton>
+
+          {selectedOption?.price > 0 && provider === "mercadopago" && (
+            <Pressable
+              style={[styles.mpButton, isLoading && styles.mpButtonDisabled]}
+              onPress={handleMercadoPago}
+              disabled={isLoading || !dbInitialized}
+            >
+              {isProcessingPayment ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Text style={styles.mpButtonText}>Pagar con Mercado Pago</Text>
+              )}
+            </Pressable>
+          )}
+
+          <Text style={styles.sub}>¿Ya tienes una cuenta?</Text>
+          <Pressable onPress={() => navigation.navigate("Login")}>
+            <Text style={styles.subLink}>Iniciar Sesión</Text>
+          </Pressable>
+        </View>
+      </ScrollView>
+
+      <Modal visible={showWebView} animationType="slide">
+        <View style={{ flex: 1 }}>
+          <Pressable
+            onPress={() => setShowWebView(false)}
+            style={styles.webViewHeader}
+          >
+            <Text style={styles.webViewClose}>✕ Cancelar pago</Text>
+          </Pressable>
+          <WebView
+            source={{ uri: mpCheckoutUrl }}
+            onMessage={handleWebViewMessage}
+            javaScriptEnabled
+            domStorageEnabled
+            userAgent="Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
+          />
+        </View>
+      </Modal>
     </ImageBackground>
   );
 };

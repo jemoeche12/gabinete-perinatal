@@ -32,6 +32,7 @@ export const AuthSlice = createSlice({
       state.value.name = payload.name ?? state.value.name;
       state.value.lastName = payload.lastName ?? state.value.lastName;
       state.value.role = payload.role ?? state.value.role;
+      
 
       if (payload.membresia !== undefined) {
         let normalizedMembresia;

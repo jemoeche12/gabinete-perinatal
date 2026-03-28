@@ -16,21 +16,23 @@ import { setUser } from "../features/user/UserSlice";
 import { useUpdateUserProfileMutation } from "../services/userService";
 import { sendEmailFromClient } from "../services/emailService";
 import Membresias from "./Membresias";
+import { usePaymentProvider } from "../hooks/usePaymentProvider";
+
 
 const UpdateMembresias = ({ navigation }) => {
   const [showWebView, setShowWebView] = useState(false);
   const [mpCheckoutUrl, setMpCheckoutUrl] = useState("");
-  const { email, localId, membresia, name, lastName } = useSelector(
+  const { email, localId, membresia, name, lastName, idToken } = useSelector(
     (state) => state.auth.value,
   );
-
   const membresiaActual = membresia?.tipo || "basico";
+
 
   const dispatch = useDispatch();
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const [triggerUpdateProfile, { isLoading: profileLoading }] =
-    useUpdateUserProfileMutation();
-
+  useUpdateUserProfileMutation();
+  
   const [selectedPlan, setSelectedPlan] = useState(membresiaActual || "basico");
   const [selectedOption, setSelectedOption] = useState({
     id: "basico_free",
@@ -46,13 +48,14 @@ const UpdateMembresias = ({ navigation }) => {
   const handlePlanSelect = (planId) => {
     setSelectedPlan(planId);
   };
-
+  
   const handleDurationSelect = (option) => {
     if (option) {
       setSelectedOption(option);
     }
   };
-
+  
+  const {provider} = usePaymentProvider(idToken);
   const fetchPaymentIntent = async () => {
     try {
       const requestData = {
@@ -111,6 +114,7 @@ const UpdateMembresias = ({ navigation }) => {
     }
   };
 
+  
   const handleMercadoPago = async () => {
     try {
       setIsProcessing(true);
@@ -436,58 +440,53 @@ const UpdateMembresias = ({ navigation }) => {
         </View>
       )}
 
-      {hasChanges && selectedOption.amount > 0 ? (
-        <View>
-          <Pressable
-            style={[
-              styles.updateButton,
-              isProcessing && styles.updateButtonDisabled,
-            ]}
-            onPress={handleUpdateMembership}
-            disabled={isProcessing}
-          >
-            {isProcessing ? (
-              <View style={styles.loadingContainer}>
-                <ActivityIndicator size="small" color="#fff" />
-                <Text style={styles.updateButtonText}>Procesando...</Text>
-              </View>
-            ) : (
-              <Text style={styles.updateButtonText}>
-                Pagar con tarjeta {displayPrice}
-              </Text>
-            )}
-          </Pressable>
-
-          <Pressable
-            style={[
-              styles.updateButton,
-              { backgroundColor: "#009EE3", marginTop: 10 },
-              isProcessing && styles.updateButtonDisabled,
-            ]}
-            onPress={handleMercadoPago}
-            disabled={isProcessing}
-          >
-            <Text style={styles.updateButtonText}>
-              Pagar con Mercado Pago {displayPrice}
-            </Text>
-          </Pressable>
+{hasChanges && selectedOption.amount > 0 ? (
+  <View>
+    <Pressable
+      style={[styles.updateButton, isProcessing && styles.updateButtonDisabled]}
+      onPress={handleUpdateMembership}
+      disabled={isProcessing}
+    >
+      {isProcessing ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="small" color="#fff" />
+          <Text style={styles.updateButtonText}>Procesando...</Text>
         </View>
       ) : (
-        <Pressable
-          style={[
-            styles.updateButton,
-            (!hasChanges || isProcessing) && styles.updateButtonDisabled,
-          ]}
-          onPress={handleUpdateMembership}
-          disabled={!hasChanges || isProcessing}
-        >
-          <Text style={styles.updateButtonText}>
-            {!hasChanges
-              ? "Selecciona un plan diferente"
-              : "Actualizar Membresía"}
-          </Text>
-        </Pressable>
+        <Text style={styles.updateButtonText}>Pagar con tarjeta {displayPrice}</Text>
       )}
+    </Pressable>
+
+    {provider === "mercadopago" && (
+      <Pressable
+        style={[
+          styles.updateButton,
+          { backgroundColor: "#009EE3", marginTop: 10 },
+          isProcessing && styles.updateButtonDisabled,
+        ]}
+        onPress={handleMercadoPago}
+        disabled={isProcessing}
+      >
+        <Text style={styles.updateButtonText}>
+          Pagar con Mercado Pago {displayPrice}
+        </Text>
+      </Pressable>
+    )}
+    </View>  
+  ) : (
+  <Pressable
+    style={[
+      styles.updateButton,
+      (!hasChanges || isProcessing) && styles.updateButtonDisabled,
+    ]}
+    onPress={handleUpdateMembership}
+    disabled={!hasChanges || isProcessing}
+  >
+    <Text style={styles.updateButtonText}>
+      {!hasChanges ? "Selecciona un plan diferente" : "Actualizar Membresía"}
+    </Text>
+  </Pressable>
+)}
 
       <Modal visible={showWebView} animationType="slide">
         <View style={{ flex: 1 }}>
