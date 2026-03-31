@@ -49,14 +49,10 @@ function getClientIp(req) {
   return req.ip;
 }
 
-// ─── GET PAYMENT PROVIDER ────────────────────────────────────────────────────
-// Con token   → caché en Firestore por uid (usuarios logueados)
-// Sin token   → detección directa por IP, sin escribir en Firestore (Signup)
-app.get("/get-payment-provider", async (req, res) => {
-  const CACHE_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 días
 
+app.get("/get-payment-provider", async (req, res) => {
+  const CACHE_TTL_MS = 30 * 24 * 60 * 60 * 1000; 
   try {
-    // ── Intentar leer token (opcional) ──
     const authHeader = req.headers.authorization ?? "";
     const idToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
 
@@ -67,11 +63,10 @@ app.get("/get-payment-provider", async (req, res) => {
         const decoded = await admin.auth().verifyIdToken(idToken);
         userId = decoded.uid;
       } catch {
-        // Token inválido → tratar como anónimo
+        console.warn("Token de autenticación inválido en get-payment-provider");
       }
     }
 
-    // ── Con uid: intentar caché en Firestore ──
     if (userId) {
       const userConfigRef = admin.firestore().collection("user_configs").doc(userId);
       const doc = await userConfigRef.get();
@@ -87,11 +82,9 @@ app.get("/get-payment-provider", async (req, res) => {
         }
       }
 
-      // Caché expirada o inexistente → detectar
       const countryCode = detectCountry(req);
       const provider = MP_COUNTRIES.has(countryCode) ? "mercadopago" : "stripe";
 
-      // Guardar en Firestore sin bloquear
       userConfigRef.set({
         paymentProvider: provider,
         country: countryCode,
@@ -101,7 +94,6 @@ app.get("/get-payment-provider", async (req, res) => {
       return res.json({ provider, country: countryCode, source: "detection" });
     }
 
-    // ── Sin uid (Signup): solo detección por IP ──
     const countryCode = detectCountry(req);
     const provider = MP_COUNTRIES.has(countryCode) ? "mercadopago" : "stripe";
 
@@ -114,16 +106,13 @@ app.get("/get-payment-provider", async (req, res) => {
 });
 
 function detectCountry(req) {
-  // Header nativo de GCP/App Engine — más confiable que geoip
   const gcpCountry = req.headers["x-appengine-country"];
   if (gcpCountry && gcpCountry !== "ZZ") return gcpCountry;
 
-  // Fallback: geoip-lite local
   const ip = getClientIp(req);
   const geo = geoip.lookup(ip);
   return geo?.country ?? "US";
 }
-// ─────────────────────────────────────────────────────────────────────────────
 
 app.post("/webhook", async (request, response) => {
   const signature = request.headers["stripe-signature"];
