@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
+  Modal,
   Pressable,
   StyleSheet,
   Text,
@@ -9,8 +10,8 @@ import {
   ImageBackground,
   ScrollView,
   TouchableOpacity,
-  KeyboardAvoidingView,
 } from "react-native";
+import WebView from "react-native-webview";
 import { useStripe } from "@stripe/stripe-react-native";
 import InputForm from "../components/InputForm";
 import SubmitButton from "../components/SubmitButton";
@@ -22,6 +23,9 @@ import { sendEmailFromClient } from "../services/emailService";
 import { useUpdateUserProfileMutation } from "../services/userService";
 import fondoSignUp from "../../assets/fondos/CONTACTO.jpg";
 import Membresias from "./Membresias";
+import { usePaymentProvider } from "../hooks/usePaymentProvider";
+
+const API_BASE_URL = "https://api-yela3b24ha-uc.a.run.app";
 
 const PLAN_CONFIG = {
   basico: {
@@ -69,10 +73,14 @@ const Signup = ({ navigation }) => {
     currency: "eur",
   });
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [showWebView, setShowWebView] = useState(false);
+  const [mpCheckoutUrl, setMpCheckoutUrl] = useState("");
 
   const { insertSession, dbInitialized } = useDBContext();
   const dispatch = useDispatch();
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
+
+  const { provider } = usePaymentProvider();
 
   const [triggerSignUp, result] = useSignUpMutation();
   const [triggerUpdateProfile, { isLoading: profileLoading }] =
@@ -110,11 +118,7 @@ const Signup = ({ navigation }) => {
         return;
       }
 
-      await insertSession({
-        email: userEmail,
-        localId,
-        token: idToken,
-      });
+      await insertSession({ email: userEmail, localId, token: idToken });
 
       await triggerUpdateProfile({
         localId,
@@ -176,10 +180,12 @@ const Signup = ({ navigation }) => {
           {
             text: "OK",
             onPress: () => {
-              navigation.reset({
-                index: 0,
-                routes: [{ name: "Main" }],
-              });
+              setTimeout(() => {
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: "Main", params: { screen: "Home" } }],
+                });
+              }, 400);
             },
           },
         ],
@@ -226,52 +232,35 @@ const Signup = ({ navigation }) => {
     try {
       const planName = PLAN_CONFIG[selectedPlan]?.name || selectedPlan;
 
-      const requestData = {
-        customerName: `${name} ${lastName}`,
-        customerEmail: email,
-        cartItems: [
-          {
-            titulo: `Membresía ${planName} - ${selectedOption.period}`,
-            name: `Plan ${planName}`,
-          },
-        ],
-        amount: selectedOption.price,
-        currency: selectedOption.currency,
-      };
+      const response = await fetch(`${API_BASE_URL}/create-payment-intent`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerName: `${name} ${lastName}`,
+          customerEmail: email,
+          cartItems: [
+            {
+              titulo: `Membresía ${planName} - ${selectedOption.period}`,
+              name: `Plan ${planName}`,
+            },
+          ],
+          amount: selectedOption.price,
+          currency: selectedOption.currency,
+        }),
+      });
 
-      const response = await fetch(
-        `https://api-yela3b24ha-uc.a.run.app/create-payment-intent`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(requestData),
-        },
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Error del servidor:", errorText);
-        throw new Error(`Server error: ${response.status} - ${errorText}`);
-      }
+      if (!response.ok) throw new Error(`Server error: ${response.status}`);
 
       const data = await response.json();
-
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      if (!data.clientSecret) {
-        throw new Error("No se recibió el clientSecret del servidor");
-      }
+      if (data.error) throw new Error(data.error);
+      if (!data.clientSecret) throw new Error("No se recibió el clientSecret");
 
       return data.clientSecret;
     } catch (error) {
       console.error("Error en fetchPaymentIntent:", error);
       Alert.alert(
         "Error de Conexión",
-        `No se pudo conectar con el servidor de pagos: ${error.message}.`,
+        `No se pudo conectar con el servidor: ${error.message}`,
       );
       return null;
     }
@@ -280,35 +269,87 @@ const Signup = ({ navigation }) => {
   const initializePaymentSheet = async () => {
     try {
       const clientSecret = await fetchPaymentIntent();
-
-      if (!clientSecret) {
-        return false;
-      }
+      if (!clientSecret) return false;
 
       const { error } = await initPaymentSheet({
         paymentIntentClientSecret: clientSecret,
         merchantDisplayName: "Red Perinatal Digital",
         allowsDelayedPaymentMethods: true,
-        defaultBillingDetails: {
-          name: `${name} ${lastName}`,
-          email: email,
-        },
+        defaultBillingDetails: { name: `${name} ${lastName}`, email },
       });
 
       if (error) {
-        console.error("Error al inicializar PaymentSheet:", error);
-        Alert.alert(
-          "Error de Configuración",
-          `Error al configurar el pago: ${error.message}`,
-        );
+        Alert.alert("Error de Configuración", error.message);
         return false;
       }
 
       return true;
     } catch (error) {
-      console.error("Error inesperado en initializePaymentSheet:", error);
-      Alert.alert("Error", `Error inesperado: ${error.message}`);
+      Alert.alert("Error", error.message);
       return false;
+    }
+  };
+
+  const handleMercadoPago = async () => {
+    if (!validateForm()) return;
+
+    setIsProcessingPayment(true);
+
+    try {
+      const planName = PLAN_CONFIG[selectedPlan]?.name || selectedPlan;
+
+      const response = await fetch(`${API_BASE_URL}/create-mp-order`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: selectedOption.price,
+          customerEmail: email,
+          customerName: `${name} ${lastName}`,
+          cartItems: [
+            { titulo: `Membresía ${planName} - ${selectedOption.period}` },
+          ],
+        }),
+      });
+
+      if (!response.ok) throw new Error(`Server error: ${response.status}`);
+
+      const data = await response.json();
+
+      const checkoutUrl = `${API_BASE_URL}/checkout.html?orderId=${data.orderId}&amount=${selectedOption.price}&publicKey=${data.publicKey}`;
+      setMpCheckoutUrl(checkoutUrl);
+      setShowWebView(true);
+      setIsProcessingPayment(false);
+    } catch (error) {
+      console.error("Error en handleMercadoPago:", error);
+      Alert.alert(
+        "Error de Conexión",
+        `No se pudo conectar con el servidor: ${error.message}`,
+      );
+      setIsProcessingPayment(false);
+    }
+  };
+
+  const handleWebViewMessage = async (event) => {
+    const data = JSON.parse(event.nativeEvent.data);
+
+    if (data.status === "approved") {
+      setShowWebView(false);
+      triggerSignUp({ email, password, returnSecureToken: true });
+    } else if (data.status === "pending") {
+      setShowWebView(false);
+      Alert.alert(
+        "Pago pendiente",
+        "Tu pago está siendo procesado. Igual completamos tu registro.",
+        [
+          {
+            text: "OK",
+            onPress: () =>
+              triggerSignUp({ email, password, returnSecureToken: true }),
+          },
+        ],
+      );
+    } else if (data.status === "error") {
+      Alert.alert("Error en el pago", data.message || "Intentá de nuevo.");
     }
   };
 
@@ -338,11 +379,7 @@ const Signup = ({ navigation }) => {
         if (error.code === "Canceled") {
           Alert.alert("Pago Cancelado", "Has cancelado el proceso de pago.");
         } else {
-          console.error("Error en presentPaymentSheet:", error);
-          Alert.alert(
-            "Error de Pago",
-            `El pago no se pudo completar: ${error.message}`,
-          );
+          Alert.alert("Error de Pago", error.message);
         }
         setIsProcessingPayment(false);
         return;
@@ -350,7 +387,6 @@ const Signup = ({ navigation }) => {
 
       triggerSignUp({ email, password, returnSecureToken: true });
     } catch (error) {
-      console.error("Error en el proceso de pago:", error);
       Alert.alert(
         "Error",
         error.message || "Ocurrió un error al procesar el pago",
@@ -359,23 +395,9 @@ const Signup = ({ navigation }) => {
     }
   };
 
-  const handlePlanSelect = (planId) => {
-    setSelectedPlan(planId);
-  };
-
-  const handleDurationSelect = (option) => {
-    if (option) {
-      setSelectedOption({
-        id: option.id || `${selectedPlan}_${option.period}`,
-        price: option.price,
-        period: option.period,
-        currency: option.currency,
-      });
-    }
-  };
-
   const currentPlan = PLAN_CONFIG[selectedPlan];
   const currencySymbol = selectedOption?.currency === "eur" ? "€" : "$";
+  const isLoading = result.isLoading || profileLoading || isProcessingPayment;
 
   return (
     <ImageBackground
@@ -383,161 +405,207 @@ const Signup = ({ navigation }) => {
       style={styles.background}
       resizeMode="cover"
     >
-        <ScrollView
-          contentContainerStyle={styles.scrollContainer}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
-          <Membresias
-            onSelectPlan={handlePlanSelect}
-            onSelectDuration={handleDurationSelect}
-          />
-          <Text style={styles.header}>Crea tu cuenta</Text>
-          <View style={styles.form}>
-            <Text style={styles.title}>Registro</Text>
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <Membresias
+          onSelectPlan={(planId) => setSelectedPlan(planId)}
+          onSelectDuration={(option) =>
+            option &&
+            setSelectedOption({
+              id: option.id || `${selectedPlan}_${option.period}`,
+              price: option.price,
+              period: option.period,
+              currency: option.currency,
+            })
+          }
+        />
 
-            <InputForm label="Nombre" value={name} onChangeText={setName} />
-            <InputForm
-              label="Apellido"
-              value={lastName}
-              onChangeText={setLastName}
-            />
-            <InputForm
-              label="Email"
-              value={email}
-              onChangeText={setEmail}
-              error={errorMail}
-            />
-            <InputForm
-              label="Contraseña"
-              placeholder="Mínimo 6 caracteres"
-              value={password}
-              onChangeText={setPassword}
-              error={errorPassword}
-              isSecure
-            />
-            {currentPlan?.options && currentPlan.options.length > 1 && (
-              <View style={styles.optionsContainer}>
-                <Text style={styles.optionsLabel}>Selecciona el período:</Text>
-                {currentPlan.options.map((option) => (
-                  <TouchableOpacity
-                    key={option.id}
-                    style={[
-                      styles.optionButton,
-                      selectedOption?.id === option.id &&
-                        styles.optionButtonSelected,
-                      { borderColor: currentPlan.color },
-                    ]}
-                    onPress={() => setSelectedOption(option)}
-                    activeOpacity={0.7}
-                  >
-                    <View style={styles.optionContent}>
-                      <View style={styles.optionLeft}>
-                        <Text
-                          style={[
-                            styles.optionPeriod,
-                            selectedOption?.id === option.id &&
-                              styles.optionTextSelected,
-                          ]}
-                        >
-                          {option.period}
-                        </Text>
-                        {selectedOption?.id === option.id && (
-                          <View
-                            style={[
-                              styles.selectedBadge,
-                              { backgroundColor: currentPlan.color },
-                            ]}
-                          >
-                            <Text style={styles.selectedBadgeText}>
-                              ✓ Seleccionado
-                            </Text>
-                          </View>
-                        )}
-                      </View>
+        <Text style={styles.header}>Crea tu cuenta</Text>
+
+        <View style={styles.form}>
+          <Text style={styles.title}>Registro</Text>
+
+          <InputForm label="Nombre" value={name} onChangeText={setName} />
+          <InputForm
+            label="Apellido"
+            value={lastName}
+            onChangeText={setLastName}
+          />
+          <InputForm
+            label="Email"
+            value={email}
+            onChangeText={setEmail}
+            error={errorMail}
+          />
+          <InputForm
+            label="Contraseña"
+            placeholder="Mínimo 6 caracteres"
+            value={password}
+            onChangeText={setPassword}
+            error={errorPassword}
+            isSecure
+          />
+
+          {currentPlan?.options && currentPlan.options.length > 1 && (
+            <View style={styles.optionsContainer}>
+              <Text style={styles.optionsLabel}>Selecciona el período:</Text>
+              {currentPlan.options.map((option) => (
+                <TouchableOpacity
+                  key={option.id}
+                  style={[
+                    styles.optionButton,
+                    selectedOption?.id === option.id &&
+                      styles.optionButtonSelected,
+                    { borderColor: currentPlan.color },
+                  ]}
+                  onPress={() => setSelectedOption(option)}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.optionContent}>
+                    <View style={styles.optionLeft}>
                       <Text
                         style={[
-                          styles.optionPrice,
-                          selectedOption?.id === option.id && {
-                            color: currentPlan.color,
-                          },
+                          styles.optionPeriod,
+                          selectedOption?.id === option.id &&
+                            styles.optionTextSelected,
                         ]}
                       >
-                        {option.currency === "eur" ? "€" : "$"}
-                        {option.price}
+                        {option.period}
                       </Text>
+                      {selectedOption?.id === option.id && (
+                        <View
+                          style={[
+                            styles.selectedBadge,
+                            { backgroundColor: currentPlan.color },
+                          ]}
+                        >
+                          <Text style={styles.selectedBadgeText}>
+                            ✓ Seleccionado
+                          </Text>
+                        </View>
+                      )}
                     </View>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
-
-            <View
-              style={[
-                styles.planInfo,
-                { borderLeftColor: currentPlan?.color || "#B78270" },
-              ]}
-            >
-              <View style={styles.planDetails}>
-                <Text style={styles.planLabel}>Plan seleccionado:</Text>
-                <Text
-                  style={[
-                    styles.planName,
-                    { color: currentPlan?.color || "#B78270" },
-                  ]}
-                >
-                  {currentPlan?.name || "Básico"}
-                </Text>
-                {selectedOption && selectedOption.price > 0 && (
-                  <Text style={styles.planPeriod}>
-                    por {selectedOption.period}
-                  </Text>
-                )}
-              </View>
-              <Text style={styles.priceText}>
-                {selectedOption?.price === 0
-                  ? "Gratis"
-                  : `${currencySymbol}${selectedOption?.price}`}
-              </Text>
+                    <Text
+                      style={[
+                        styles.optionPrice,
+                        selectedOption?.id === option.id && {
+                          color: currentPlan.color,
+                        },
+                      ]}
+                    >
+                      {option.currency === "eur" ? "€" : "$"}
+                      {option.price}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
             </View>
+          )}
 
-            <SubmitButton
-              onPress={onSubmit}
-              disabled={
-                result.isLoading ||
-                profileLoading ||
-                !dbInitialized ||
-                isProcessingPayment
-              }
-            >
-              {result.isLoading || profileLoading || isProcessingPayment ? (
-                <View style={styles.loadingContainer}>
-                  <ActivityIndicator size="small" color="#fff" />
-                  <Text style={styles.loadingText}>
-                    {isProcessingPayment ? "Procesando..." : "Registrando..."}
-                  </Text>
-                </View>
-              ) : (
-                <Text
-                  style={{
-                    color: "black",
-                    fontSize: 18,
-                    fontWeight: "600",
-                    textAlign: "center",
-                  }}
-                >
-                  {selectedOption?.price === 0
-                    ? "Registrarme"
-                    : "Pagar y Registrarme"}
+          <View
+            style={[
+              styles.planInfo,
+              { borderLeftColor: currentPlan?.color || "#B78270" },
+            ]}
+          >
+            <View style={styles.planDetails}>
+              <Text style={styles.planLabel}>Plan seleccionado:</Text>
+              <Text
+                style={[
+                  styles.planName,
+                  { color: currentPlan?.color || "#B78270" },
+                ]}
+              >
+                {currentPlan?.name || "Básico"}
+              </Text>
+              {selectedOption?.price > 0 && (
+                <Text style={styles.planPeriod}>
+                  por {selectedOption.period}
                 </Text>
               )}
-            </SubmitButton>
-            <Text style={styles.sub}>¿Ya tienes una cuenta?</Text>
-            <Pressable onPress={() => navigation.navigate("Login")}>
-              <Text style={styles.subLink}>Iniciar Sesión</Text>
-            </Pressable>
+            </View>
+            <Text style={styles.priceText}>
+              {selectedOption?.price === 0
+                ? "Gratis"
+                : `${currencySymbol}${selectedOption?.price}`}
+            </Text>
           </View>
-        </ScrollView>
+          {selectedOption?.price === 0 && (
+            <SubmitButton
+              onPress={onSubmit}
+              disabled={isLoading || !dbInitialized}
+            >
+              <Text
+                style={{
+                  color: "black",
+                  fontSize: 18,
+                  fontWeight: "600",
+                  textAlign: "center",
+                }}
+              >
+                Registrarme
+              </Text>
+            </SubmitButton>
+          )}
+
+          {selectedOption?.price > 0 && provider !== "mercadopago" && (
+            <Pressable
+              style={[styles.mpButton, isLoading && styles.mpButtonDisabled, { backgroundColor: "#B78270" }]}
+              onPress={onSubmit}
+              disabled={isLoading || !dbInitialized}
+            >
+              {isProcessingPayment ? (
+                <View style={styles.loadingContainer}>
+                  <ActivityIndicator size="small" color="#fff" /> 
+                </View>
+              ) : (
+                <Text style={styles.mpButtonText}>Pagar con Stripe</Text>
+              )}
+            </Pressable>
+
+          )}
+
+          {selectedOption?.price > 0 && provider === "mercadopago" && (
+            <Pressable
+              style={[styles.mpButton, isLoading && styles.mpButtonDisabled]}
+              onPress={handleMercadoPago}
+              disabled={isLoading || !dbInitialized}
+            >
+              {isProcessingPayment ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Text style={styles.mpButtonText}>Pagar con Mercado Pago</Text>
+              )}
+            </Pressable>
+          )}
+
+          <Text style={styles.sub}>¿Ya tienes una cuenta?</Text>
+          <Pressable onPress={() => navigation.navigate("Login")}>
+            <Text style={styles.subLink}>Iniciar Sesión</Text>
+          </Pressable>
+        </View>
+      </ScrollView>
+
+      <Modal visible={showWebView} animationType="slide">
+        <View style={{ flex: 1 }}>
+          <Pressable
+            onPress={() => setShowWebView(false)}
+            style={styles.webViewHeader}
+          >
+            <Text style={styles.webViewClose}>✕ Cancelar pago</Text>
+          </Pressable>
+          <WebView
+            source={{ uri: mpCheckoutUrl }}
+            onMessage={handleWebViewMessage}
+            javaScriptEnabled
+            domStorageEnabled
+            userAgent="Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
+          />
+        </View>
+      </Modal>
     </ImageBackground>
   );
 };
@@ -545,12 +613,8 @@ const Signup = ({ navigation }) => {
 export default Signup;
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-  },
-  scrollContainer: {
-    flexGrow: 1,
-  },
+  background: { flex: 1 },
+  scrollContainer: { flexGrow: 1 },
   header: {
     fontSize: 26,
     fontWeight: "700",
@@ -579,9 +643,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     textAlign: "center",
   },
-  optionsContainer: {
-    marginVertical: 16,
-  },
+  optionsContainer: { marginVertical: 16 },
   optionsLabel: {
     fontSize: 15,
     fontWeight: "600",
@@ -610,20 +672,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  optionLeft: {
-    flex: 1,
-  },
+  optionLeft: { flex: 1 },
   optionPeriod: {
     fontSize: 16,
     color: "#555",
     textTransform: "capitalize",
     marginBottom: 4,
   },
-  optionTextSelected: {
-    fontWeight: "700",
-    color: "#333",
-    fontSize: 17,
-  },
+  optionTextSelected: { fontWeight: "700", color: "#333", fontSize: 17 },
   selectedBadge: {
     paddingHorizontal: 8,
     paddingVertical: 3,
@@ -631,16 +687,8 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     marginTop: 4,
   },
-  selectedBadgeText: {
-    color: "#fff",
-    fontSize: 11,
-    fontWeight: "600",
-  },
-  optionPrice: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#333",
-  },
+  selectedBadgeText: { color: "#fff", fontSize: 11, fontWeight: "600" },
+  optionPrice: { fontSize: 22, fontWeight: "bold", color: "#333" },
   planInfo: {
     backgroundColor: "#f9f9f9",
     padding: 14,
@@ -651,50 +699,44 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderLeftWidth: 4,
   },
-  planDetails: {
-    flex: 1,
-  },
-  planLabel: {
-    fontSize: 13,
-    color: "#666",
-    marginBottom: 2,
-  },
-  planName: {
-    fontSize: 18,
-    fontWeight: "bold",
-    textTransform: "capitalize",
-  },
+  planDetails: { flex: 1 },
+  planLabel: { fontSize: 13, color: "#666", marginBottom: 2 },
+  planName: { fontSize: 18, fontWeight: "bold", textTransform: "capitalize" },
   planPeriod: {
     fontSize: 12,
     color: "#888",
     marginTop: 2,
     fontStyle: "italic",
   },
-  priceText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#333",
-  },
+  priceText: { fontSize: 20, fontWeight: "bold", color: "#333" },
   loadingContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 10,
   },
-  loadingText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  sub: {
-    color: "#555",
-    textAlign: "center",
+  loadingText: { color: "#fff", fontSize: 16, fontWeight: "600" },
+  mpButton: {
+    backgroundColor: "#009EE3",
+    borderRadius: 8,
+    padding: 14,
+    alignItems: "center",
     marginTop: 10,
   },
+  mpButtonDisabled: { opacity: 0.6 },
+  mpButtonText: { color: "#fff", fontSize: 18, fontWeight: "600" },
+  sub: { color: "#555", textAlign: "center", marginTop: 10 },
   subLink: {
     color: "#B78270",
     textAlign: "center",
     marginTop: 4,
     textDecorationLine: "underline",
   },
+  webViewHeader: {
+    padding: 16,
+    backgroundColor: "#f9f9f9",
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+  },
+  webViewClose: { color: "#B78270", fontWeight: "700" },
 });

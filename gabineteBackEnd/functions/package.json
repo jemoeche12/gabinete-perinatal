@@ -1,3 +1,4 @@
+
 {
   "name": "gabinete-functions",
   "version": "1.0.0",
@@ -32,6 +33,7 @@
     "express": "^5.1.0",
     "firebase-admin": "^13.4.0",
     "firebase-functions": "^6.4.0",
+    "geoip-lite": "^1.4.10",
     "mercadopago": "^2.12.0",
     "node-mailjet": "^6.0.8",
     "stripe": "^18.3.0"
@@ -44,3 +46,9 @@
   },
   "private": true
 }
+
+
+
+
+
+
