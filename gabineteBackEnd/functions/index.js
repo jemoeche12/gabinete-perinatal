@@ -215,12 +215,19 @@ app.post("/create-payment-intent", async (req, res) => {
 });
 
 app.post("/create-mp-order", async (req, res) => {
-  const { amount, customerEmail, customerName, cartItems } = req.body;
+  const { amount, customerEmail, customerName, cartItems, currency } = req.body;
 
   if (!amount || !customerEmail || !customerName) {
     return res.status(400).json({ error: "Faltan campos requeridos" });
   }
+  if(currency !== "ARS"){
+    return res.status(400).json({ error: "Mercado Pago solo acepta ARS como moneda" }); 
+  }
 
+  const countryCode = detectCountry(req);
+  if(!MP_COUNTRIES.has(countryCode)){
+    return res.status(400).json({ error: "Mercado Pago no está disponible en tu país" });
+  }
   try {
     const description = cartItems?.map((item) => item.titulo || item.name).join(", ");
 
@@ -228,6 +235,7 @@ app.post("/create-mp-order", async (req, res) => {
     await orderRef.set({
       estado: "pending",
       metodo: "mercado_pago",
+      provider: "mercadopago",
       amount,
       customerEmail,
       customerName,
@@ -258,7 +266,7 @@ app.post("/create-mercadopago-payment", async (req, res) => {
 
     const order = await mpPayment.create({
       body: {
-        transaction_amount: orderData.amount,
+        transaction_amount: Number(orderData.amount),
         token,
         description: orderData.description,
         installments: 1,

@@ -24,6 +24,7 @@ import { useUpdateUserProfileMutation } from "../services/userService";
 import fondoSignUp from "../../assets/fondos/CONTACTO.jpg";
 import Membresias from "./Membresias";
 import { usePaymentProvider } from "../hooks/usePaymentProvider";
+import { text } from "express";
 
 const API_BASE_URL = "https://api-yela3b24ha-uc.a.run.app";
 
@@ -32,28 +33,60 @@ const PLAN_CONFIG = {
     name: "Básico",
     color: "#E8D5C4",
     options: [
-      { id: "basico_free", price: 0, period: "gratis", currency: "eur" },
+      {
+        id: "basico_free",
+        period: "gratis",
+        price: {
+          EUR: 0,
+          ARS: 0,
+        },
+      },
     ],
   },
+
   intermedio: {
     name: "Intermedio",
     color: "#C9A690",
     options: [
-      { id: "intermedio_month", price: 18, period: "mes", currency: "eur" },
+      {
+        id: "intermedio_month",
+        period: "mes",
+        price: {
+          EUR: 18,
+          ARS: 18000,
+        },
+      },
       {
         id: "intermedio_6months",
-        price: 70,
         period: "6 meses",
-        currency: "eur",
+        price: {
+          EUR: 70,
+          ARS: 70000,
+        },
       },
-      { id: "intermedio_year", price: 100, period: "año", currency: "eur" },
+      {
+        id: "intermedio_year",
+        period: "año",
+        price: {
+          EUR: 100,
+          ARS: 100000,
+        },
+      },
     ],
   },
+
   premium: {
     name: "Premium",
     color: "#B78270",
     options: [
-      { id: "premium_year", price: 130, period: "año", currency: "eur" },
+      {
+        id: "premium_year",
+        period: "año",
+        price: {
+          EUR: 130,
+          ARS: 130000,
+        },
+      },
     ],
   },
 };
@@ -68,9 +101,9 @@ const Signup = ({ navigation }) => {
   const [selectedPlan, setSelectedPlan] = useState("basico");
   const [selectedOption, setSelectedOption] = useState({
     id: "basico_free",
-    price: 0,
+    price: { EUR: 0, ARS: 0 },
     period: "gratis",
-    currency: "eur",
+    currency: "EUR",
   });
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [showWebView, setShowWebView] = useState(false);
@@ -82,6 +115,9 @@ const Signup = ({ navigation }) => {
 
   const { provider } = usePaymentProvider();
 
+  const finalCurrency = provider === "mercadopago" ? "ARS" : "EUR";
+  const finalPrice = selectedOption?.price?.[finalCurrency] ?? 0;
+  const symbol = finalCurrency === "EUR" ? "€" : "$";
   const [triggerSignUp, result] = useSignUpMutation();
   const [triggerUpdateProfile, { isLoading: profileLoading }] =
     useUpdateUserProfileMutation();
@@ -149,7 +185,6 @@ const Signup = ({ navigation }) => {
       );
 
       const planName = PLAN_CONFIG[selectedPlan]?.name || selectedPlan;
-      const currencySymbol = selectedOption?.currency === "eur" ? "€" : "$";
 
       await sendEmailFromClient({
         to: [{ email: userEmail, name: name || "Nuevo Usuario" }],
@@ -160,8 +195,8 @@ const Signup = ({ navigation }) => {
             <p>Gracias por registrarte en la Red Perinatal Digital.</p>
             <p>Tu plan seleccionado es: <strong>${planName}</strong></p>
             ${
-              selectedOption?.price > 0
-                ? `<p>Tu pago de ${currencySymbol}${selectedOption.price} (${selectedOption.period}) ha sido procesado exitosamente.</p>`
+              finalPrice > 0
+                ? `<p>Tu pago de ${symbol}${finalPrice} (${selectedOption.period}) ha sido procesado exitosamente.</p>`
                 : ""
             }
             <p>¡Esperamos que disfrutes de todos nuestros recursos!</p>
@@ -244,8 +279,8 @@ const Signup = ({ navigation }) => {
               name: `Plan ${planName}`,
             },
           ],
-          amount: selectedOption.price,
-          currency: selectedOption.currency,
+          amount: finalPrice,
+          currency: finalCurrency,
         }),
       });
 
@@ -302,7 +337,7 @@ const Signup = ({ navigation }) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          amount: selectedOption.price,
+          amount: finalPrice,
           customerEmail: email,
           customerName: `${name} ${lastName}`,
           cartItems: [
@@ -315,7 +350,7 @@ const Signup = ({ navigation }) => {
 
       const data = await response.json();
 
-      const checkoutUrl = `${API_BASE_URL}/checkout.html?orderId=${data.orderId}&amount=${selectedOption.price}&publicKey=${data.publicKey}`;
+      const checkoutUrl = `${API_BASE_URL}/checkout.html?orderId=${data.orderId}&publicKey=${data.publicKey}`;
       setMpCheckoutUrl(checkoutUrl);
       setShowWebView(true);
       setIsProcessingPayment(false);
@@ -330,7 +365,13 @@ const Signup = ({ navigation }) => {
   };
 
   const handleWebViewMessage = async (event) => {
-    const data = JSON.parse(event.nativeEvent.data);
+    let data;
+    try{
+      data = JSON.parse(event.nativeEvent.data);
+    } catch (error) {
+      console.error("Error parsing WebView message:", error);
+      return;
+    }
 
     if (data.status === "approved") {
       setShowWebView(false);
@@ -356,7 +397,7 @@ const Signup = ({ navigation }) => {
   const onSubmit = async () => {
     if (!validateForm()) return;
 
-    const optionPrice = selectedOption?.price || 0;
+    const optionPrice = selectedOption?.price?.[finalCurrency] ?? 0;
 
     if (optionPrice === 0) {
       triggerSignUp({ email, password, returnSecureToken: true });
@@ -396,7 +437,6 @@ const Signup = ({ navigation }) => {
   };
 
   const currentPlan = PLAN_CONFIG[selectedPlan];
-  const currencySymbol = selectedOption?.currency === "eur" ? "€" : "$";
   const isLoading = result.isLoading || profileLoading || isProcessingPayment;
 
   return (
@@ -496,8 +536,11 @@ const Signup = ({ navigation }) => {
                         },
                       ]}
                     >
-                      {option.currency === "eur" ? "€" : "$"}
-                      {option.price}
+                      <Text>
+                        {option.price[finalCurrency] === 0
+                          ? "Gratis"
+                          : `${symbol}${option.price[finalCurrency]}`}
+                      </Text>{" "}
                     </Text>
                   </View>
                 </TouchableOpacity>
@@ -521,19 +564,17 @@ const Signup = ({ navigation }) => {
               >
                 {currentPlan?.name || "Básico"}
               </Text>
-              {selectedOption?.price > 0 && (
+              {finalPrice > 0 && (
                 <Text style={styles.planPeriod}>
                   por {selectedOption.period}
                 </Text>
               )}
             </View>
             <Text style={styles.priceText}>
-              {selectedOption?.price === 0
-                ? "Gratis"
-                : `${currencySymbol}${selectedOption?.price}`}
+              {finalPrice === 0 ? "Gratis" : `${symbol}${finalPrice}`}
             </Text>
           </View>
-          {selectedOption?.price === 0 && (
+          {finalPrice === 0 && (
             <SubmitButton
               onPress={onSubmit}
               disabled={isLoading || !dbInitialized}
@@ -551,24 +592,27 @@ const Signup = ({ navigation }) => {
             </SubmitButton>
           )}
 
-          {selectedOption?.price > 0 && provider !== "mercadopago" && (
+          {finalPrice > 0 && provider !== "mercadopago" && (
             <Pressable
-              style={[styles.mpButton, isLoading && styles.mpButtonDisabled, { backgroundColor: "#B78270" }]}
+              style={[
+                styles.mpButton,
+                isLoading && styles.mpButtonDisabled,
+                { backgroundColor: "#B78270" },
+              ]}
               onPress={onSubmit}
               disabled={isLoading || !dbInitialized}
             >
               {isProcessingPayment ? (
                 <View style={styles.loadingContainer}>
-                  <ActivityIndicator size="small" color="#fff" /> 
+                  <ActivityIndicator size="small" color="#fff" />
                 </View>
               ) : (
                 <Text style={styles.mpButtonText}>Pagar con Stripe</Text>
               )}
             </Pressable>
-
           )}
 
-          {selectedOption?.price > 0 && provider === "mercadopago" && (
+          {finalPrice > 0 && provider === "mercadopago" && (
             <Pressable
               style={[styles.mpButton, isLoading && styles.mpButtonDisabled]}
               onPress={handleMercadoPago}
@@ -592,7 +636,13 @@ const Signup = ({ navigation }) => {
       <Modal visible={showWebView} animationType="slide">
         <View style={{ flex: 1 }}>
           <Pressable
-            onPress={() => setShowWebView(false)}
+            onPress={() => {
+              Alert.alert(
+                "Cancelar Pago",
+                "¿Estas seguro que quieres cancelar el pago?",
+                [{ text: "No" }, { text: "Sí", onPress: () => setShowWebView(false) }],
+              );
+            }}
             style={styles.webViewHeader}
           >
             <Text style={styles.webViewClose}>✕ Cancelar pago</Text>
