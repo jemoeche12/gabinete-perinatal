@@ -113,9 +113,9 @@ app.post("/create-payment-intent", async (req, res) => {
     return res.status(500).json({ error: "Stripe no está configurado." });
   }
 
-  const stripe = new Stripe(stripeSecretKey, {
-    apiVersion: "2024-06-20",
-  });
+  const stripe = stripeSecretKey
+    ? new Stripe(stripeSecretKey, { apiVersion: "2024-06-20" })
+    : null;
 
   try {
     const {
@@ -271,7 +271,6 @@ app.post("/mercadopago-webhook", async (req, res) => {
   const xSignature = req.headers["x-signature"];
   const xRequestId = req.headers["x-request-id"];
   const dataId = req.query["data.id"];
-  
 
   if (xSignature && mpWebhookSecret) {
     const parts = {};
@@ -302,7 +301,7 @@ app.post("/mercadopago-webhook", async (req, res) => {
     if (!dataId) return res.sendStatus(200);
 
     const payment = await mpPayment.get({ id: dataId });
-    
+
     const orderId = payment.metadata?.order_id;
     if (!orderId) return res.sendStatus(200);
 
@@ -338,97 +337,113 @@ app.post("/mercadopago-webhook", async (req, res) => {
   }
 });
 
-const sendEmailFunction = onCall(async (request) => {
-  if (!mailjetApiKey || !mailjetApiSecret) {
-    console.error(
-      "Faltan las claves de Mailjet en la configuración de Firebase Functions.",
-    );
-    throw new HttpsError(
-      "failed-precondition",
-      "Mailjet no está configurado correctamente en Firebase Functions. Por favor, configura 'MAILJET_API_KEY' y 'MAILJET_API_SECRET'.",
-    );
-  }
+const sendEmailFunction = onCall(
+  {
+    secrets: ["MAILJET_API_KEY", "MAILJET_API_SECRET"],
+  },
+  async (request) => {
+    const mailjetApiKey = process.env.MAILJET_API_KEY;
+    const mailjetApiSecret = process.env.MAILJET_API_SECRET;
 
-  const mailer = new Mailjet({
-    apiKey: mailjetApiKey,
-    apiSecret: mailjetApiSecret,
-  });
-
-  const { to, subject, htmlContent } = request.data;
-
-  if (
-    !Array.isArray(to) ||
-    to.length === 0 ||
-    to.some((r) => !r?.email || !r.email.includes("@"))
-  ) {
-    throw new HttpsError(
-      "invalid-argument",
-      "Destinatarios de email inválidos. Se requiere un array de objetos con propiedad 'email'.",
-    );
-  }
-
-  try {
-    const messagePayload = {
-      Messages: [
-        {
-          From: {
-            email: "info@redperinataldigital.com",
-            name: "Red Perinatal Digital",
-          },
-          To: to.map((recipient) => ({
-            email: recipient.email,
-            name: recipient.name || "",
-          })),
-          Subject: subject,
-          HTMLPart: htmlContent,
-        },
-      ],
-    };
-
-    const response = await mailer
-      .post("send", { version: "v3.1" })
-      .request(messagePayload);
-
-    if (
-      response.body &&
-      response.body.Messages &&
-      response.body.Messages[0].Status === "success"
-    ) {
-      return {
-        status: "success",
-        message: "Email enviado exitosamente",
-        data: response.body,
-      };
-    } else {
-      const mailjetErrorMessage =
-        response.body?.Messages?.[0]?.Errors?.[0]?.ErrorMessage ||
-        "Error desconocido en Mailjet.";
+    if (!mailjetApiKey || !mailjetApiSecret) {
       console.error(
-        "Mailjet no reportó éxito en el envío:",
-        JSON.stringify(response.body, null, 2),
+        "Faltan las claves de Mailjet en la configuración de Firebase Functions.",
       );
       throw new HttpsError(
-        "internal",
-        `Mailjet no pudo enviar el email: ${mailjetErrorMessage}`,
+        "failed-precondition",
+        "Mailjet no está configurado correctamente en Firebase Functions. Por favor, configura 'MAILJET_API_KEY' y 'MAILJET_API_SECRET'.",
       );
     }
-  } catch (error) {
-    console.error("Error al enviar email (catch general):", error);
-    const errorMessage = error.statusCode
-      ? `Mailjet API Error (${error.statusCode}): ${
-          error.message || JSON.stringify(error)
-        }`
-      : error.message;
 
-    throw new HttpsError(
-      "internal",
-      errorMessage || "Error interno al enviar email.",
-    );
-  }
-});
+    const mailer = new Mailjet({
+      apiKey: mailjetApiKey,
+      apiSecret: mailjetApiSecret,
+    });
+
+    const { to, subject, htmlContent } = request.data;
+
+    if (
+      !Array.isArray(to) ||
+      to.length === 0 ||
+      to.some((r) => !r?.email || !r.email.includes("@"))
+    ) {
+      throw new HttpsError(
+        "invalid-argument",
+        "Destinatarios de email inválidos. Se requiere un array de objetos con propiedad 'email'.",
+      );
+    }
+
+    try {
+      const messagePayload = {
+        Messages: [
+          {
+            From: {
+              email: "info@redperinataldigital.com",
+              name: "Red Perinatal Digital",
+            },
+            To: to.map((recipient) => ({
+              email: recipient.email,
+              name: recipient.name || "",
+            })),
+            Subject: subject,
+            HTMLPart: htmlContent,
+          },
+        ],
+      };
+
+      const response = await mailer
+        .post("send", { version: "v3.1" })
+        .request(messagePayload);
+
+      if (
+        response.body &&
+        response.body.Messages &&
+        response.body.Messages[0].Status === "success"
+      ) {
+        return {
+          status: "success",
+          message: "Email enviado exitosamente",
+          data: response.body,
+        };
+      } else {
+        const mailjetErrorMessage =
+          response.body?.Messages?.[0]?.Errors?.[0]?.ErrorMessage ||
+          "Error desconocido en Mailjet.";
+        console.error(
+          "Mailjet no reportó éxito en el envío:",
+          JSON.stringify(response.body, null, 2),
+        );
+        throw new HttpsError(
+          "internal",
+          `Mailjet no pudo enviar el email: ${mailjetErrorMessage}`,
+        );
+      }
+    } catch (error) {
+      console.error("Error al enviar email (catch general):", error);
+      const errorMessage = error.statusCode
+        ? `Mailjet API Error (${error.statusCode}): ${
+            error.message || JSON.stringify(error)
+          }`
+        : error.message;
+
+      throw new HttpsError(
+        "internal",
+        errorMessage || "Error interno al enviar email.",
+      );
+    }
+  },
+);
 
 exports.api = onRequest(
-  { secrets: ["MP_ACCESS_TOKEN", "MP_PUBLIC_KEY", "MP_WEBHOOK_SECRET"] },
+  {
+    secrets: [
+      "MP_ACCESS_TOKEN",
+      "MP_PUBLIC_KEY",
+      "MP_WEBHOOK_SECRET",
+      "STRIPE_SECRET_KEY",
+      "STRIPE_WEBHOOK_SECRET",
+    ],
+  },
   app,
 );
 exports.sendEmailFunction = sendEmailFunction;
