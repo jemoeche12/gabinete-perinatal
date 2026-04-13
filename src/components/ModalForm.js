@@ -15,6 +15,8 @@ import { useGetProfileQuery } from "../services/userService";
 import { useCrearCitaMutation } from "../services/citasService";
 import { Picker } from "@react-native-picker/picker";
 import { sendEmailFromClient } from "../services/emailService";
+import { Platform } from "react-native";
+
 
 const diasDisponibles = ["LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES"];
 
@@ -140,10 +142,17 @@ const ModalForm = ({ modalVisible, setModalVisible }) => {
           <Picker
             selectedValue={diaSeleccionado}
             onValueChange={setDiaSeleccionado}
-            style={styles.picker}
+            style={[styles.picker, Platform.OS === "ios" && styles.pickerIOS]}
+            mode={Platform.OS === "ios" ? "dialog" : "dropdown"}
+            dropdownIconColor={Platform.OS === "ios" ? undefined : "#333"}
           >
+            <Picker.Item
+              label="Seleccioná un día..."
+              value=""
+              color="#000000"
+            />
             {diasDisponibles.map((dia) => (
-              <Picker.Item key={dia} label={dia} value={dia} style={{color: "black", backgroundColor: "white"}}/>
+              <Picker.Item key={dia} label={dia} value={dia} color="#000000" />
             ))}
           </Picker>
         </View>
@@ -237,6 +246,9 @@ const styles = StyleSheet.create({
     height: 50,
     fontFamily: "Roboto400",
     color: "#333",
+  },
+  pickerIOS: {
+    marginHorizontal: Platform.OS === "ios" ? -10 : 0,
   },
   button: {
     backgroundColor: "#B78270",

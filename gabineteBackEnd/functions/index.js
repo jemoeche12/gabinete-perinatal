@@ -168,7 +168,9 @@ app.post("/create-payment-intent", async (req, res) => {
     return res.status(500).json({ error: "Stripe no está configurado." });
   }
 
-  const stripe = new Stripe(stripeSecretKey, { apiVersion: "2024-06-20" });
+const stripe = stripeSecretKey
+  ? new Stripe(stripeSecretKey, { apiVersion: "2024-06-20" })
+  : null;
 
   try {
     const { amount, currency, cartItems, customerEmail, customerName, membresiaActual } = req.body;
@@ -344,7 +346,12 @@ app.use((error, req, res, next) => {
   res.status(500).json({ error: "Error interno del servidor" });
 });
 
-const sendEmailFunction = onCall(async (request) => {
+const sendEmailFunction = onCall({
+    secrets: ["MAILJET_API_KEY", "MAILJET_API_SECRET"],
+  },
+  async (request) => {
+    const mailjetApiKey = process.env.MAILJET_API_KEY;
+    const mailjetApiSecret = process.env.MAILJET_API_SECRET;
   if (!mailjetApiKey || !mailjetApiSecret) {
     throw new HttpsError("failed-precondition", "Mailjet no está configurado.");
   }
@@ -381,7 +388,8 @@ const sendEmailFunction = onCall(async (request) => {
 });
 
 exports.api = onRequest(
-  { secrets: ["MP_ACCESS_TOKEN", "MP_PUBLIC_KEY", "MP_WEBHOOK_SECRET"] },
+  { secrets: ["MP_ACCESS_TOKEN", "MP_PUBLIC_KEY", "MP_WEBHOOK_SECRET", "STRIPE_SECRET_KEY",
+      "STRIPE_WEBHOOK_SECRET",] },
   app,
 );
 exports.sendEmailFunction = sendEmailFunction;
