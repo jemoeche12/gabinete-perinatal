@@ -7,69 +7,51 @@ import {
   Image,
   StyleSheet,
   Dimensions,
-  View,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 const { width } = Dimensions.get("window");
+
 const MenuDesplegable = ({ visible, onClose }) => {
   const navigation = useNavigation();
   const menuWidth = width * 0.7;
-  const slideAnim = useRef(new Animated.Value(-menuWidth));
-  const opacityAnim = useRef(new Animated.Value(0));
+  
+  const slideAnim = useRef(new Animated.Value(-menuWidth)).current;
+  const opacityAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (visible) {
       Animated.parallel([
-        Animated.timing(slideAnim.current, {
+        Animated.timing(slideAnim, {
           toValue: 0,
           duration: 400,
           useNativeDriver: true,
           easing: Easing.ease,
         }),
-        Animated.timing(opacityAnim.current, {
+        Animated.timing(opacityAnim, {
           toValue: 1,
           duration: 400,
           useNativeDriver: true,
           easing: Easing.ease,
         }),
       ]).start();
-    } else {
-      Animated.parallel([
-        Animated.timing(slideAnim.current, {
-          toValue: -menuWidth,
-          duration: 400,
-          useNativeDriver: true,
-          easing: Easing.ease,
-        }),
-        Animated.timing(opacityAnim.current, {
-          toValue: 0,
-          duration: 400,
-          useNativeDriver: true,
-          easing: Easing.ease,
-        }),
-      ]).start(({ finished }) => {
-        if (finished) {
-          onClose?.();
-        }
-      });
     }
-  }, [visible]);
+  }, [visible, menuWidth]);
 
   return (
     <Animated.View
       style={[
         styles.menuContainer,
         {
-          transform: [{ translateX: slideAnim.current }],
-          opacity: opacityAnim.current,
+          transform: [{ translateX: slideAnim }],
+          opacity: opacityAnim,
         },
       ]}
     >
-        <Image
-          source={require("../../assets/Red.png")}
-          style={styles.imgIcon}
-        />
+      <Image
+        source={require("../../assets/Red.png")}
+        style={styles.imgIcon}
+      />
       <Pressable
         onPress={() => {
           navigation.navigate("Main", { screen: "Home" });

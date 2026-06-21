@@ -8,6 +8,7 @@ import PostReducer from "../features/post/PostSlice";
 import CommentReducer from "../features/comments/CommentSlice";
 import dueloReducer from "../features/duelo/DueloSlice";
 import GuidesReducer from "../features/guides/GuidesSlice";
+import AppReducer from "../features/app/AppSlice";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import { recursosApi } from "../services/recursosService";
 import { authApi } from "../services/authService";
@@ -33,6 +34,7 @@ const store = configureStore({
         comments: CommentReducer,
         duelo: dueloReducer,
         guides: GuidesReducer,
+        app: AppReducer,
         [recursosApi.reducerPath]: recursosApi.reducer,
         [authApi.reducerPath]: authApi.reducer,
         [talleresApi.reducerPath]: talleresApi.reducer,

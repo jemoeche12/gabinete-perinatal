@@ -15,6 +15,8 @@ import SubmitButton from "../components/SubmitButton";
 import { useDBContext } from "../context/DBContext";
 import { useLazyGetProfileQuery } from "../services/userService";
 import fondoLogin from "../../assets/fondos/CONTACTO.jpg";
+import { usePaymentProvider } from "../hooks/usePaymentProvider.js";
+import { setPaymentProvider } from "../features/app/AppSlice";
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -32,6 +34,8 @@ const Login = ({ navigation }) => {
     triggerGetProfile,
     { data: profileDate, isLoading: profileLoading, error: profileError },
   ] = useLazyGetProfileQuery();
+
+  const { provider: resolvedProvider, country: resolvedCountry } = usePaymentProvider(result.data?.idToken);
 
   useEffect(() => {
     if (result?.data && result.isSuccess) {
@@ -62,6 +66,11 @@ const Login = ({ navigation }) => {
   }, [result, insertSession, triggerGetProfile, dbInitialized]);
 
   useEffect(() => {
+    if(resolvedProvider && result.data?.idToken) {
+      dispatch(setPaymentProvider({ provider: resolvedProvider, country: resolvedCountry }));
+    }}, [resolvedProvider, resolvedCountry, result.data?.idToken, dispatch]);
+
+  useEffect(() => {
     if (profileError) {
       Alert.alert(
         "Disculpe, algo salió mal al cargar la información",
@@ -81,6 +90,13 @@ const Login = ({ navigation }) => {
       };
 
       dispatch(setUser(mergedUser));
+
+      setTimeout(() => {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Main", params: { screen: "Home" } }],
+        });
+      }, 500);
     }
   }, [
     profileDate,

@@ -6,14 +6,14 @@ import { getStorage } from "firebase/storage";
 
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAuPGwJQIpTwngSJu80vv0EpcAje1P9VmU",
-  authDomain: "gabinete-perinatal.firebaseapp.com",
-  databaseURL: "https://gabinete-perinatal-default-rtdb.firebaseio.com",
-  projectId: "gabinete-perinatal",
-  storageBucket: "gabinete-perinatal.firebasestorage.app",
-  messagingSenderId: "222466791048",
-  appId: "1:222466791048:web:3b157bb3770b1699ebb13d",
-  measurementId: "G-KH6T8W2GV3"
+  apiKey: "AIzaSyChw2u6fTSUkE9-8-S9me2OpZfYo_sPUrs",
+  authDomain: "redapoyoperinatal.firebaseapp.com",
+  databaseURL: "https://redapoyoperinatal-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "redapoyoperinatal",
+  storageBucket: "redapoyoperinatal.firebasestorage.app",
+  messagingSenderId: "5650404269",
+  appId: "1:5650404269:web:bfa95404789a870b3c0724",
+  measurementId: "G-3BJTQ0K6PQ"
 };
 
 const app = initializeApp(firebaseConfig);

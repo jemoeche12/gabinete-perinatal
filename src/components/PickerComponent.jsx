@@ -1,25 +1,34 @@
-import { View, StyleSheet } from "react-native";
+import React from "react";
+import { View, StyleSheet, Platform } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 
 const PickerComponent = ({ motivo, setMotivo }) => {
+  const motivoItems = [
+    { label: "Seleccioná un motivo...", value: "" },
+    { label: "Consulta general sobre la app", value: "consulta" },
+    { label: "Necesito orientación emocional", value: "orientacion" },
+    { label: "Problemas técnicos o errores", value: "tecnico" },
+    { label: "Sugerencia o mejora", value: "sugerencia" },
+    { label: "Otro", value: "otro" },
+  ];
+
   return (
     <View style={styles.pickerContainer}>
       <Picker
         selectedValue={motivo}
         onValueChange={(itemValue) => setMotivo(itemValue)}
-        style={styles.picker}
+        style={[styles.picker, Platform.OS === "ios" && styles.pickerIOS]}
+        mode={Platform.OS === "ios" ? "dialog" : "dropdown"}
+        dropdownIconColor={Platform.OS === "ios" ? undefined : "#333"}
       >
-        <Picker.Item label="Seleccioná un motivo..." value="" color="#000000" backgroundColor="white"/>
-        <Picker.Item label="Consulta general sobre la app" value="consulta" color="#000000" backgroundColor="white"/>
-        <Picker.Item
-          label="Necesito orientación emocional"
-          value="orientacion"
-          color="#000000"
-          backgroundColor="white" 
-        />
-        <Picker.Item label="Problemas técnicos o errores" value="tecnico" color="#000000" backgroundColor="white"/>
-        <Picker.Item label="Sugerencia o mejora" value="sugerencia" color="#000000" backgroundColor="white"/>
-        <Picker.Item label="Otro" value="otro" color="#000000" backgroundColor="white"/>
+        {motivoItems.map((item) => (
+          <Picker.Item
+            key={item.value}
+            label={item.label}
+            value={item.value}
+            color="#000000"
+          />
+        ))}
       </Picker>
     </View>
   );
@@ -27,7 +36,7 @@ const PickerComponent = ({ motivo, setMotivo }) => {
 
 export default PickerComponent;
 
-const styles =  StyleSheet.create({
+const styles = StyleSheet.create({
   pickerContainer: {
     borderWidth: 1,
     borderColor: "#ccc",
@@ -35,35 +44,15 @@ const styles =  StyleSheet.create({
     overflow: "hidden",
     backgroundColor: "#fff",
     marginBottom: 10,
+    height: 50,
+    justifyContent: "center",
   },
   picker: {
     height: 50,
     width: "100%",
-  },
-  radioContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginVertical: 10,
-  },
-  radioOption: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  radioCircle: {
-    height: 20,
-    width: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: "#B78270",
-    marginRight: 10,
-    backgroundColor: "#fff",
-  },
-  radioSelected: {
-    backgroundColor: "#B78270",
-  },
-  radioLabel: {
-    fontSize: 16,
-    fontFamily: "Roboto400",
     color: "#333",
+  },
+  pickerIOS: {
+    marginHorizontal: Platform.OS === "ios" ? -10 : 0,
   },
 });

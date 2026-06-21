@@ -15,7 +15,7 @@ import WebView from "react-native-webview";
 import { useStripe } from "@stripe/stripe-react-native";
 import InputForm from "../components/InputForm";
 import SubmitButton from "../components/SubmitButton";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useSignUpMutation } from "../services/authService";
 import { setUser } from "../features/user/UserSlice";
 import { useDBContext } from "../context/DBContext";
@@ -23,7 +23,6 @@ import { sendEmailFromClient } from "../services/emailService";
 import { useUpdateUserProfileMutation } from "../services/userService";
 import fondoSignUp from "../../assets/fondos/CONTACTO.jpg";
 import Membresias from "./Membresias";
-import { usePaymentProvider } from "../hooks/usePaymentProvider";
 
 const API_BASE_URL = "https://api-yela3b24ha-uc.a.run.app";
 
@@ -80,11 +79,12 @@ const Signup = ({ navigation }) => {
   const dispatch = useDispatch();
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
 
-  const { provider } = usePaymentProvider();
-
   const [triggerSignUp, result] = useSignUpMutation();
   const [triggerUpdateProfile, { isLoading: profileLoading }] =
     useUpdateUserProfileMutation();
+
+  const provider = useSelector((state) => state.app.paymentProvider);
+  const providerLoaded = useSelector((state) => state.app.providerLoaded);
 
   useEffect(() => {
     const currentPlan = PLAN_CONFIG[selectedPlan];
@@ -148,28 +148,32 @@ const Signup = ({ navigation }) => {
         }),
       );
 
-      const planName = PLAN_CONFIG[selectedPlan]?.name || selectedPlan;
-      const currencySymbol = selectedOption?.currency === "eur" ? "€" : "$";
+      try {
+        const planName = PLAN_CONFIG[selectedPlan]?.name || selectedPlan;
+        const currencySymbol = selectedOption?.currency === "eur" ? "€" : "$";
 
-      await sendEmailFromClient({
-        to: [{ email: userEmail, name: name || "Nuevo Usuario" }],
-        subject: "¡Bienvenido a la Red Perinatal Digital!",
-        htmlContent: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #B78270;">¡Hola ${name || ""}!</h2>
-            <p>Gracias por registrarte en la Red Perinatal Digital.</p>
-            <p>Tu plan seleccionado es: <strong>${planName}</strong></p>
-            ${
-              selectedOption?.price > 0
-                ? `<p>Tu pago de ${currencySymbol}${selectedOption.price} (${selectedOption.period}) ha sido procesado exitosamente.</p>`
-                : ""
-            }
-            <p>¡Esperamos que disfrutes de todos nuestros recursos!</p>
-            <br>
-            <p>Saludos,<br>El equipo de Red Perinatal Digital</p>
-          </div>
-        `,
-      });
+        await sendEmailFromClient({
+          to: [{ email: userEmail, name: name || "Nuevo Usuario" }],
+          subject: "¡Bienvenido a la Red Perinatal Digital!",
+          htmlContent: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2 style="color: #B78270;">¡Hola ${name || ""}!</h2>
+              <p>Gracias por registrarte en la Red Perinatal Digital.</p>
+              <p>Tu plan seleccionado es: <strong>${planName}</strong></p>
+              ${
+                selectedOption?.price > 0
+                  ? `<p>Tu pago de ${currencySymbol}${selectedOption.price} (${selectedOption.period}) ha sido procesado exitosamente.</p>`
+                  : ""
+              }
+              <p>¡Esperamos que disfrutes de todos nuestros recursos!</p>
+              <br>
+              <p>Saludos,<br>El equipo de Red Perinatal Digital</p>
+            </div>
+          `,
+        });
+      } catch (emailErr) {
+        console.warn("No se pudo enviar el email de bienvenida:", emailErr);
+      }
 
       setIsProcessingPayment(false);
 
@@ -536,7 +540,9 @@ const Signup = ({ navigation }) => {
           {selectedOption?.price === 0 && (
             <SubmitButton
               onPress={onSubmit}
-              disabled={isLoading || !dbInitialized}
+              disabled={
+                isLoading || !dbInitialized || !providerLoaded === "mercadopago"
+              }
             >
               <Text
                 style={{
@@ -553,26 +559,29 @@ const Signup = ({ navigation }) => {
 
           {selectedOption?.price > 0 && provider !== "mercadopago" && (
             <Pressable
-              style={[styles.mpButton, isLoading && styles.mpButtonDisabled, { backgroundColor: "#B78270" }]}
+              style={[
+                styles.mpButton,
+                isLoading && styles.mpButtonDisabled,
+                { backgroundColor: "#B78270" },
+              ]}
               onPress={onSubmit}
-              disabled={isLoading || !dbInitialized}
+              disabled={isLoading || !dbInitialized || !providerLoaded}
             >
               {isProcessingPayment ? (
                 <View style={styles.loadingContainer}>
-                  <ActivityIndicator size="small" color="#fff" /> 
+                  <ActivityIndicator size="small" color="#fff" />
                 </View>
               ) : (
                 <Text style={styles.mpButtonText}>Pagar con Stripe</Text>
               )}
             </Pressable>
-
           )}
 
           {selectedOption?.price > 0 && provider === "mercadopago" && (
             <Pressable
               style={[styles.mpButton, isLoading && styles.mpButtonDisabled]}
               onPress={handleMercadoPago}
-              disabled={isLoading || !dbInitialized}
+              disabled={isLoading || !dbInitialized || !providerLoaded}
             >
               {isProcessingPayment ? (
                 <ActivityIndicator size="small" color="#fff" />

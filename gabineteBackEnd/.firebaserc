@@ -3,7 +3,8 @@
     "default": "gabinete-perinatal",
     "redPerinatal": "gabinete-perinatal",
     "redPerintal": "gabinete-perinatal",
-    "gabinete-perinatal": "gabinete-perinatal"
+    "gabinete-perinatal": "gabinete-perinatal",
+    "RedApoyoApp": "redapoyoperinatal"
   },
   "targets": {},
   "etags": {}

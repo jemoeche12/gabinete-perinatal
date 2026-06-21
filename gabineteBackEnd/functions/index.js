@@ -49,7 +49,6 @@ function getClientIp(req) {
   return req.ip;
 }
 
-
 app.get("/get-payment-provider", async (req, res) => {
   const CACHE_TTL_MS = 30 * 24 * 60 * 60 * 1000; 
   try {
@@ -114,16 +113,22 @@ function detectCountry(req) {
   return geo?.country ?? "US";
 }
 
+
 app.post("/webhook", async (request, response) => {
   const signature = request.headers["stripe-signature"];
   let event;
 
-  const stripe = new Stripe(stripeSecretKey, { apiVersion: "2024-06-20" });
+  if (!stripeSecretKey) {
+    console.error("❌ Webhook Error: STRIPE_SECRET_KEY no está configurada.");
+    return response.status(500).send("Stripe no está configurado.");
+  }
+
+  const stripeInstance = new Stripe(stripeSecretKey, { apiVersion: "2024-06-20" });
 
   try {
-    event = stripe.webhooks.constructEvent(request.rawBody, signature, stripeWebhookSecret);
+    event = stripeInstance.webhooks.constructEvent(request.rawBody, signature, stripeWebhookSecret);
   } catch (err) {
-    console.error("⚠️  Error verificando firma del webhook:", err.message);
+    console.error("⚠️ Error verificando firma del webhook:", err.message);
     return response.status(400).send(`Webhook Error: ${err.message}`);
   }
 
@@ -163,16 +168,15 @@ app.post("/webhook", async (request, response) => {
   response.json({ received: true });
 });
 
+
 app.post("/create-payment-intent", async (req, res) => {
   if (!stripeSecretKey) {
+    console.error("❌ Error: STRIPE_SECRET_KEY no está definida.");
     return res.status(500).json({ error: "Stripe no está configurado." });
   }
 
-const stripe = stripeSecretKey
-  ? new Stripe(stripeSecretKey, { apiVersion: "2024-06-20" })
-  : null;
-
   try {
+    const stripeInstance = new Stripe(stripeSecretKey, { apiVersion: "2024-06-20" });
     const { amount, currency, cartItems, customerEmail, customerName, membresiaActual } = req.body;
 
     let amountFinal = amount;
@@ -189,30 +193,31 @@ const stripe = stripeSecretKey
     }
 
     if (!currency) return res.status(400).json({ error: "Currency es requerida" });
+    if (!cartItems || !Array.isArray(cartItems)) return res.status(400).json({ error: "cartItems es requerido" });
 
     const amountInCents = Math.round(amountFinal * 100);
     const orderId = `order_${Date.now()}`;
-    const productNames = cartItems.map((item) => item.titulo || item.name).join(", ");
+    const productNames = cartItems.map((item) => item.titulo || item.name || "Producto").join(", ");
 
-    const paymentIntent = await stripe.paymentIntents.create({
+    const paymentIntent = await stripeInstance.paymentIntents.create({
       amount: amountInCents,
-      currency,
+      currency: currency.toLowerCase(), 
       automatic_payment_methods: { enabled: true },
       metadata: {
         order_id: orderId,
         customer_email: customerEmail || "",
         customer_name: customerName || "",
-        product_names: productNames,
+        product_names: productNames.substring(0, 500),
         total_amount: amount.toString(),
         integration_check: "accept_a_payment",
         type: "membresia",
       },
     });
 
-    res.json({ clientSecret: paymentIntent.client_secret, orderId });
+    return res.json({ clientSecret: paymentIntent.client_secret, orderId });
   } catch (error) {
-    console.error("Error en /create-payment-intent:", error);
-    res.status(500).json({ error: error.message || "Error interno del servidor" });
+    console.error("❌ Error en /create-payment-intent:", error);
+    return res.status(500).json({ error: error.message || "Error interno del servidor" });
   }
 });
 
@@ -346,50 +351,61 @@ app.use((error, req, res, next) => {
   res.status(500).json({ error: "Error interno del servidor" });
 });
 
-const sendEmailFunction = onCall({
-    secrets: ["MAILJET_API_KEY", "MAILJET_API_SECRET"],
+
+exports.api = onRequest(
+  { 
+    memory: "512MiB",
+    secrets: [
+      "MP_ACCESS_TOKEN", 
+      "MP_PUBLIC_KEY", 
+      "MP_WEBHOOK_SECRET", 
+      "STRIPE_SECRET_KEY",
+      "STRIPE_WEBHOOK_SECRET"
+    ] 
+  },
+  app
+);
+
+exports.sendEmailFunction = onCall(
+  {
+    memory: "512MiB",
+    secrets: ["MAILJET_API_KEY", "MAILJET_API_SECRET"]
   },
   async (request) => {
     const mailjetApiKey = process.env.MAILJET_API_KEY;
     const mailjetApiSecret = process.env.MAILJET_API_SECRET;
-  if (!mailjetApiKey || !mailjetApiSecret) {
-    throw new HttpsError("failed-precondition", "Mailjet no está configurado.");
-  }
-
-  const mailer = new Mailjet({ apiKey: mailjetApiKey, apiSecret: mailjetApiSecret });
-  const { to, subject, htmlContent } = request.data;
-
-  if (!Array.isArray(to) || to.length === 0 || to.some((r) => !r?.email || !r.email.includes("@"))) {
-    throw new HttpsError("invalid-argument", "Destinatarios de email inválidos.");
-  }
-
-  try {
-    const response = await mailer.post("send", { version: "v3.1" }).request({
-      Messages: [{
-        From: { email: "info@redperinataldigital.com", name: "Red Perinatal Digital" },
-        To: to.map((r) => ({ email: r.email, name: r.name || "" })),
-        Subject: subject,
-        HTMLPart: htmlContent,
-      }],
-    });
-
-    if (response.body?.Messages?.[0].Status === "success") {
-      return { status: "success", message: "Email enviado exitosamente", data: response.body };
+    if (!mailjetApiKey || !mailjetApiSecret) {
+      throw new HttpsError("failed-precondition", "Mailjet no está configurado.");
     }
 
-    const mailjetError = response.body?.Messages?.[0]?.Errors?.[0]?.ErrorMessage || "Error desconocido.";
-    throw new HttpsError("internal", `Mailjet no pudo enviar el email: ${mailjetError}`);
-  } catch (error) {
-    const errorMessage = error.statusCode
-      ? `Mailjet API Error (${error.statusCode}): ${error.message}`
-      : error.message;
-    throw new HttpsError("internal", errorMessage || "Error interno al enviar email.");
-  }
-});
+    const mailer = new Mailjet({ apiKey: mailjetApiKey, apiSecret: mailjetApiSecret });
+    const { to, subject, htmlContent } = request.data;
 
-exports.api = onRequest(
-  { secrets: ["MP_ACCESS_TOKEN", "MP_PUBLIC_KEY", "MP_WEBHOOK_SECRET", "STRIPE_SECRET_KEY",
-      "STRIPE_WEBHOOK_SECRET",] },
-  app,
+    if (!Array.isArray(to) || to.length === 0 || to.some((r) => !r?.email || !r.email.includes("@"))) {
+      throw new HttpsError("invalid-argument", "Destinatarios de email inválidos.");
+    }
+
+    try {
+      const response = await mailer.post("send", { version: "v3.1" }).request({
+        Messages: [{
+          From: { email: "info@redperinataldigital.com", name: "Red Perinatal Digital" },
+          To: to.map((r) => ({ email: r.email, name: r.name || "" })),
+          Subject: subject,
+          HTMLPart: htmlContent,
+        }],
+      });
+
+      if (response.body?.Messages?.[0].Status === "success") {
+        return { status: "success", message: "Email enviado exitosamente", data: response.body };
+      }
+
+      const mailjetError = response.body?.Messages?.[0]?.Errors?.[0]?.ErrorMessage || "Error desconocido.";
+      throw new HttpsError("internal", `Mailjet no pudo enviar el email: ${mailjetError}`);
+    } catch (error) {
+      const errorMessage = error.statusCode
+        ? `Mailjet API Error (${error.statusCode}): ${error.message}`
+        : error.message;
+      throw new HttpsError("internal", errorMessage || "Error interno al enviar email.");
+    }
+  }
 );
-exports.sendEmailFunction = sendEmailFunction;
