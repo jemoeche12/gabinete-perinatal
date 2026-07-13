@@ -122,6 +122,7 @@ const Signup = ({ navigation }) => {
 
       await triggerUpdateProfile({
         localId,
+        idToken,
         name,
         lastName,
         email: userEmail,

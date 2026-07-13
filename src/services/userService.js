@@ -15,12 +15,12 @@ export const userApi = createApi({
 
         }),
         updateUserProfile: builder.mutation({
-            query: ({localId, ...profileDate}) => ({
-                url: `user/${localId}.json`,
-                method: "PATCH",
-                body: profileDate,
-            })
-        })
+    query: ({ localId, idToken, ...profileData }) => ({
+        url: `users/${localId}.json?auth=${idToken}`,  
+        method: "PATCH",
+        body: profileData,
+    })
+})
     })
 
 })
