@@ -5,22 +5,18 @@ import { useGetProfileImageQuery } from "../services/recursosService";
 import { useDBContext } from "../context/DBContext";
 import { clearUser } from "../features/user/UserSlice";
 import Card from "../components/Card";
-import { useGetProfileQuery } from "../services/userService";
 import addImg from "../../assets/icon/addImg.png";
 import closeSession from "../../assets/icon/closeSession.png";
 import { colors } from "../utils/customerStyle";
 
 const MyProfil = ({ navigation }) => {
-  const { imageCamera, localId, email } = useSelector(
+  const { imageCamera, localId, email, name, lastName } = useSelector(
     (state) => state.auth.value,
   );
 
   const { data: imageFromBase } = useGetProfileImageQuery(localId);
   const { truncateSessionTable, dbInitialized } = useDBContext();
-  const { data: profileDate, isLoading, isError } = useGetProfileQuery(localId);
   const dispatch = useDispatch();
-  const name = profileDate?.name || "";
-  const lastName = profileDate?.lastName || "";
 
   const tomarImagen = () => {
     navigation.navigate("ImagenSeleccionada");
@@ -29,39 +25,19 @@ const MyProfil = ({ navigation }) => {
   const cerrarSesion = async () => {
     try {
       if (!dbInitialized) {
-        Alert.alert(
-          "Error de DB",
-          "La base de datos no está lista. Intente de nuevo.",
-        );
+        Alert.alert("Error de DB", "La base de datos no está lista. Intente de nuevo.");
         return;
       }
-
       await truncateSessionTable();
       dispatch(clearUser());
       Alert.alert("Sesión cerrada", "Has cerrado sesión correctamente.");
     } catch (error) {
-      Alert.alert(
-        "Error al cerrar sesión",
-        error.message || "Error desconocido al cerrar sesión.",
-      );
+      Alert.alert("Error al cerrar sesión", error.message || "Error desconocido.");
     }
   };
 
   const imageProfileDefault = "../../assets/img/imageProfile2.png";
-  if (isLoading) {
-    return (
-      <View>
-        <Text>Por favor espere</Text>
-      </View>
-    );
-  }
-  if (isError) {
-    return (
-      <View>
-        <Text>Disculpe en este momento tenemos un error</Text>
-      </View>
-    );
-  }
+
   return (
     <View style={styles.container}>
       <View style={styles.card}>
